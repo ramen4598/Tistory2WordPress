@@ -44,12 +44,12 @@ sequenceDiagram
             Tistory-->>Crawler: Return HTML
             Crawler->>Parser: Parse HTML content
             Parser->>Parser: Extract post metadata
-            Parser->>Parser: Extract image URLs
             Parser->>Parser: Extract attachment URLs
             Parser-->>Crawler: Return TistoryPost object
             Crawler-->>CLI: Return TistoryPost
 
             CLI->>Cleaner: Clean HTML content
+            Cleaner->>Cleaner: Remove unnecessary tags
             Cleaner->>Cleaner: Remove Tistory-specific classes
             Cleaner->>Cleaner: Remove inline styles
             Cleaner->>Cleaner: Preserve semantic structure
@@ -72,7 +72,7 @@ sequenceDiagram
             CLI->>WXRGen: Add post to WXR
             WXRGen->>WXRGen: Create <item> element
             WXRGen->>WXRGen: Add post metadata
-            WXRGen->>WXRGen: Add cleaned content with image URLs
+            WXRGen->>WXRGen: Add cleaned content
             WXRGen->>WXRGen: Add categories and tags
             WXRGen-->>CLI: Confirm post added
 
