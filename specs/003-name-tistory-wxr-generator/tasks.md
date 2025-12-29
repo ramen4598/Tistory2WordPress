@@ -21,10 +21,10 @@ Project initialization and dependencies.
 - [X] T002 Initialize TypeScript project with package.json and tsconfig.json
 - [X] T003 [P] Install core dependencies (cheerio, turndown, marked, @xmlbuilder2/builder, p-queue, dotenv)
 - [X] T004 [P] Install dev dependencies (Jest, TypeScript types, ts-node, eslint, prettier)
-- [ ] T005 [P] Configure Jest for TypeScript in jest.config.js
-- [ ] T006 [P] Configure ESLint and Prettier in .eslintrc.js and .prettierrc
-- [ ] T007 [P] Create .env.example with required environment variables
-- [ ] T008 [P] Add npm scripts (start, build, test, lint, format) to package.json
+- [X] T005 [P] Configure Jest for TypeScript in jest.config.js
+- [X] T006 [P] Configure ESLint and Prettier in .eslintrc.js and .prettierrc
+- [X] T007 [P] Create .env.example with required environment variables
+- [X] T008 [P] Add npm scripts (start, build, test, lint, format) to package.json
 
 ---
 

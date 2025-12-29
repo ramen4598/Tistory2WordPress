@@ -4,4 +4,32 @@
 AGENTS.md
 # 바로 옆 requirements.md 파일만 추적
 /requirements.md
+
+# Dependencies
 node_modules
+
+# Environment variables
+.env
+.env.local
+
+# Build output
+dist
+build
+
+# Test coverage
+coverage
+
+# Output files
+output/
+!output/.gitkeep
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+
