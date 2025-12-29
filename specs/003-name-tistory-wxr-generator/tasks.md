@@ -34,8 +34,8 @@ Project initialization and dependencies.
 
 Core infrastructure and shared utilities that all features depend on.
 
-- [ ] T009 Create Config interface in src/models/Config.ts
-- [ ] T010 Implement config loader in src/utils/config.ts (load from .env)
+- [X] T009 Create Config interface in src/models/Config.ts
+- [X] T010 Implement config loader in src/utils/config.ts (load from .env)
 - [ ] T011 [P] Create logger utility in src/utils/logger.ts (console + file logging)
 - [ ] T012 [P] Create Post model in src/models/Post.ts
 - [ ] T013 [P] Create Category model in src/models/Category.ts
