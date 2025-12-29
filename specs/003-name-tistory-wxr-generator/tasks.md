@@ -37,11 +37,11 @@ Core infrastructure and shared utilities that all features depend on.
 - [X] T009 Create Config interface in src/models/Config.ts
 - [X] T010 Implement config loader in src/utils/config.ts (load from .env)
 - [X] T011 [P] Create logger utility in src/utils/logger.ts (console + file logging)
-- [ ] T012 [P] Create Post model in src/models/Post.ts
-- [ ] T013 [P] Create Category model in src/models/Category.ts
-- [ ] T014 [P] Create Tag model in src/models/Tag.ts
-- [ ] T015 [P] Create Image model in src/models/Image.ts
-- [ ] T016 [P] Create Attachment model in src/models/Attachment.ts
+- [X] T012 [P] Create Post model in src/models/Post.ts
+- [X] T013 [P] Create Category model in src/models/Category.ts
+- [X] T014 [P] Create Tag model in src/models/Tag.ts
+- [X] T015 [P] Create Image model in src/models/Image.ts
+- [X] T016 [P] Create Attachment model in src/models/Attachment.ts
 - [ ] T017 [P] Create InternalLink model in src/models/InternalLink.ts
 - [ ] T018 [P] Create MigrationState model in src/models/MigrationState.ts
 - [ ] T019 [P] Create WXRData model in src/models/WXRData.ts
