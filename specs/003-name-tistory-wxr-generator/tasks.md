@@ -42,9 +42,9 @@ Core infrastructure and shared utilities that all features depend on.
 - [X] T014 [P] Create Tag model in src/models/Tag.ts
 - [X] T015 [P] Create Image model in src/models/Image.ts
 - [X] T016 [P] Create Attachment model in src/models/Attachment.ts
-- [ ] T017 [P] Create InternalLink model in src/models/InternalLink.ts
-- [ ] T018 [P] Create MigrationState model in src/models/MigrationState.ts
-- [ ] T019 [P] Create WXRData model in src/models/WXRData.ts
+- [X] T017 [P] Create InternalLink model in src/models/InternalLink.ts
+- [X] T018 [P] Create MigrationState model in src/models/MigrationState.ts
+- [X] T019 [P] Create WXRData model in src/models/WXRData.ts
 
 ---
 
