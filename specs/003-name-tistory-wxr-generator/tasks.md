@@ -17,10 +17,10 @@ This task list breaks down the Tistory to WordPress migration tool into implemen
 
 Project initialization and dependencies.
 
-- [ ] T001 Create project structure per plan.md (src/, tests/, output/)
-- [ ] T002 Initialize TypeScript project with package.json and tsconfig.json
-- [ ] T003 [P] Install core dependencies (cheerio, turndown, marked, @xmlbuilder2/builder, p-queue, dotenv)
-- [ ] T004 [P] Install dev dependencies (Jest, TypeScript types, ts-node, eslint, prettier)
+- [X] T001 Create project structure per plan.md (src/, tests/, output/)
+- [X] T002 Initialize TypeScript project with package.json and tsconfig.json
+- [X] T003 [P] Install core dependencies (cheerio, turndown, marked, @xmlbuilder2/builder, p-queue, dotenv)
+- [X] T004 [P] Install dev dependencies (Jest, TypeScript types, ts-node, eslint, prettier)
 - [ ] T005 [P] Configure Jest for TypeScript in jest.config.js
 - [ ] T006 [P] Configure ESLint and Prettier in .eslintrc.js and .prettierrc
 - [ ] T007 [P] Create .env.example with required environment variables
