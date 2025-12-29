@@ -118,28 +118,13 @@ As a user with a large blog (500+ posts), I want the migration to complete faste
 - **FR-018**: System MUST log all errors with sufficient detail for debugging
 - **FR-019**: System MUST support resuming migration from the last successful post by tracking progress in a JSON state file (processed post URLs, last checkpoint timestamp)
 - **FR-020**: System MUST be implemented in TypeScript
-- **FR-003**: System MUST handle pagination to collect all posts across all pages
-- **FR-004**: System MUST parse each post's details including title, content, publish date, modified date, URL, categories (with hierarchy), tags, images (URL, alt text), and attachments (URL, filename)
-- **FR-005**: System MUST implement a per-post processing pipeline (crawl → clean → transform) instead of batch processing
-- **FR-006**: System MUST support parallel processing of multiple posts using a worker pool with configurable concurrent workers via environment variable (default: 4 workers)
-- **FR-007**: System MUST convert HTML content to Markdown and back to HTML to remove unnecessary HTML/CSS structure
-- **FR-008**: System MUST remove Tistory-specific HTML/CSS structures while preserving content
-- **FR-009**: System MUST identify internal links (links referencing the same Tistory blog URL)
-- **FR-010**: System MUST generate link_mapping.json file listing all internal links with source and target URLs
-- **FR-011**: System MUST download attachments locally to the downloads directory
-- **FR-012**: System MUST preserve image URLs in the WXR (WordPress Importer will fetch images automatically)
-- **FR-013**: System MUST generate WordPress Importer plugin compatible WXR XML file
-- **FR-014**: System MUST include posts, categories, and tags in the WXR file
-- **FR-015**: System MUST implement rate limiting for crawling operations at 1 request per second per worker, configurable via environment variable
-- **FR-016**: System MUST log all errors with sufficient detail for debugging
-- **FR-017**: System MUST support resuming migration from the last successful post
-- **FR-018**: System MUST be implemented in TypeScript
 
 ### Key Entities
 
 - **Post**: Represents a single blog post with attributes: title, content, publish_date, modified_date, url, categories, tags, images, attachments
 - **Category**: Represents a blog category with attributes: name, parent (for hierarchy), posts
 - **Tag**: Represents a blog tag with attributes: name, posts
+- **Image**: Represents an image with attributes: url, alt_text
 - **Attachment**: Represents a file attachment with attributes: url, filename, local_path
 - **InternalLink**: Represents a link to another post within the same blog with attributes: source_url, target_url
 
