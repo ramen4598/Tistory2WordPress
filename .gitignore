@@ -33,3 +33,5 @@ output/
 # OS
 Thumbs.db
 
+# tmp files
+tmp/

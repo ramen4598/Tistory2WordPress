@@ -10,6 +10,7 @@
   "scripts": {
     "start": "ts-node src/cli.ts",
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
