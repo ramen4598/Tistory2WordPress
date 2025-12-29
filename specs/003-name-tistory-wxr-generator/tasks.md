@@ -56,7 +56,7 @@ Core infrastructure and shared utilities that all features depend on.
 
 ### Implementation for User Story 1
 
-- [ ] T020 [P] [US1] Implement Crawler service in src/services/crawler.ts (discover post URLs with pagination)
+- [X] T020 [P] [US1] Implement Crawler service in src/services/crawler.ts (discover post URLs with pagination)
 - [ ] T021 [US1] Implement HTML post fetching in Crawler (fetch individual post HTML from Tistory)
 - [ ] T022 [US1] Implement post metadata parsing in Crawler (extract title, dates, categories, tags from HTML)
 - [ ] T023 [P] [US1] Implement Cleaner service in src/services/cleaner.ts (HTML→Markdown→HTML conversion)
