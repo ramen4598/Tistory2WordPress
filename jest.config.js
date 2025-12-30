@@ -10,31 +10,30 @@ module.exports = {
   roots: ['<rootDir>/src', '<rootDir>/tests'],
 
   // Test match patterns
-  testMatch: [
-    '**/__tests__/**/*.ts',
-    '**/?(*.)+(spec|test).ts'
-  ],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
 
-  // Transform TypeScript files
+  // Transform TypeScript and selected JavaScript files (e.g. ESM libs like marked)
   transform: {
-    '^.+\\.ts$': ['ts-jest', {
-      tsconfig: {
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true
-      }
-    }]
+    '^.+\\.[tj]s$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+          allowJs: true,
+        },
+      },
+    ],
   },
+
+  // Ensure ESM-only dependencies like marked are transformed
+  transformIgnorePatterns: ['/node_modules/(?!(marked)/)'],
 
   // Module file extensions
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
 
   // Coverage configuration
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts'
-  ],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/**/*.test.ts', '!src/**/*.spec.ts'],
 
   // Coverage thresholds (optional)
   coverageThreshold: {
@@ -42,8 +41,8 @@ module.exports = {
       branches: 70,
       functions: 70,
       lines: 70,
-      statements: 70
-    }
+      statements: 70,
+    },
   },
 
   // Coverage directory
@@ -59,5 +58,5 @@ module.exports = {
   verbose: true,
 
   // Test timeout (10 seconds)
-  testTimeout: 10000
+  testTimeout: 10000,
 };
