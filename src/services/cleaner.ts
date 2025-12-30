@@ -40,8 +40,12 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
 
     const $ = cheerio.load(html);
     const root = $(postContentSelector).first();
-    const rawContentHtml = root.html();
+    logger.debug('Cleaner.cleanHtml: selected content root', {
+      selector: postContentSelector,
+      html: root.html(),
+    });
 
+    const rawContentHtml = root.html();
     if (!rawContentHtml) {
       logger.warn('Cleaner.cleanHtml: no content found for selector', {
         selector: postContentSelector,
