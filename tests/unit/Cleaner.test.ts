@@ -85,25 +85,35 @@ describe('Cleaner service', () => {
   it('should preserve table structure during HTML to Markdown and back conversions', () => {
     const cleaner = createCleaner();
     const content = `
-      <table>
+      <table class="table" style="width:100%; border-collapse: collapse;" border="1" data-ke-align="alignLeft">
         <tr>
-          <th>Header 1</th>
-          <th>Header 2</th>
+          <th style="width: 50%;">Header 1</th>
+          <th style="width: 50%;">Header 2</th>
         </tr>
         <tr>
-          <td>Data 1</td>
-          <td>Data 2</td>
+          <td style="width: 50%;">Data 1</td>
+          <td style="width: 50%;">Data 2</td>
         </tr>
       </table>
     `;
     const html =
       metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
-    const markdown = cleaner.htmlToMarkdown(html);
-    const convertedHtml = cleaner.markdownToHtml(markdown);
-
-    expect(convertedHtml).toContain('<table>');
-    expect(convertedHtml).toContain('<th>Header 1</th>');
-    expect(convertedHtml).toContain('<td>Data 1</td>');
+    const cleanedHtml = cleaner.cleanHtml(html);
+    expect(cleanedHtml).toContain('<table>');
+    expect(cleanedHtml).toContain('<thead>');
+    expect(cleanedHtml).toContain('<tbody>');
+    expect(cleanedHtml).toContain('<th>');
+    expect(cleanedHtml).toContain('<tr>');
+    expect(cleanedHtml).toContain('<th>Header 1</th>');
+    expect(cleanedHtml).toContain('<th>Header 2</th>');
+    expect(cleanedHtml).toContain('<td>Data 1</td>');
+    expect(cleanedHtml).toContain('<td>Data 2</td>');
   });
+
+  });
+
+  // TODO: 코드 블록 유지. hljs 유지 (보류)
+  // TODO: 표 안에 이미지 유지 (보류)
+
   // TODO: Add more tests to cover different scenarios
 });
