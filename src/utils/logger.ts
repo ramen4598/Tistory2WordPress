@@ -156,9 +156,25 @@ export class Logger {
 let globalLogger: Logger | null = null;
 
 /**
- * Initialize global logger with configuration
+ * Get global logger instance.
+ * If not initialized yet, create a default one.
+ *
+ * Default configuration:
+ * - level: 'info'
+ * - no log file (console only)
  */
-export function initLogger(config: LoggerConfig): Logger {
+export function getLogger(): Logger {
+  if (!globalLogger) {
+    globalLogger = new Logger({ level: 'info' });
+  }
+  return globalLogger;
+}
+
+/**
+ * Initialize or reconfigure the global logger with a specific configuration.
+ * This is now internal to this module; external callers should use getLogger().
+ */
+function initLogger(config: LoggerConfig): Logger {
   if (globalLogger) {
     globalLogger.close();
   }
@@ -167,14 +183,10 @@ export function initLogger(config: LoggerConfig): Logger {
 }
 
 /**
- * Get global logger instance
- * @throws Error if logger is not initialized
+ * Allow explicit reinitialization of the global logger with custom configuration.
  */
-export function getLogger(): Logger {
-  if (!globalLogger) {
-    throw new Error('Logger not initialized. Call initLogger() first.');
-  }
-  return globalLogger;
+export function configureLogger(config: LoggerConfig): Logger {
+  return initLogger(config);
 }
 
 /**

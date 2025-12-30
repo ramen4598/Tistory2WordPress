@@ -1,6 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Logger, initLogger, getLogger, closeLogger, LoggerConfig } from '../../src/utils/logger';
+import {
+  Logger,
+  getLogger,
+  closeLogger,
+  configureLogger,
+  LoggerConfig,
+} from '../../src/utils/logger';
 
 describe('Logger', () => {
   const testLogDir = path.join(__dirname, '../../tmp/logs');
@@ -127,46 +133,45 @@ describe('Logger', () => {
     });
   });
 
-  describe('Global logger functions', () => {
-    it('should initialize global logger', () => {
-      const config: LoggerConfig = { level: 'info' };
-      const logger = initLogger(config);
-
-      expect(logger).toBeInstanceOf(Logger);
-    });
-
-    it('should get global logger instance', () => {
-      const config: LoggerConfig = { level: 'info' };
-      initLogger(config);
-
+  describe('Global logger functions (singleton)', () => {
+    it('should lazily create a default global logger via getLogger', () => {
       const logger = getLogger();
       expect(logger).toBeInstanceOf(Logger);
     });
 
-    it('should throw error when getting uninitialized logger', () => {
-      expect(() => getLogger()).toThrow('Logger not initialized');
+    it('should configure global logger with custom settings using configureLogger', () => {
+      const config: LoggerConfig = { level: 'debug', logFile: testLogFile };
+      const logger = configureLogger(config);
+
+      expect(logger).toBeInstanceOf(Logger);
+      logger.debug('Configured message');
+      logger.close();
     });
 
-    it('should close previous logger when reinitializing', () => {
+    it('should reconfigure global logger and close previous instance', () => {
       const config1: LoggerConfig = { level: 'info', logFile: testLogFile };
-      const logger1 = initLogger(config1);
+      const logger1 = configureLogger(config1);
       const closeSpy = jest.spyOn(logger1, 'close');
 
       const config2: LoggerConfig = { level: 'debug' };
-      initLogger(config2);
+      const logger2 = configureLogger(config2);
 
       expect(closeSpy).toHaveBeenCalled();
+      expect(logger2).toBeInstanceOf(Logger);
+      expect(logger2).not.toBe(logger1);
     });
 
-    it('should close global logger', () => {
-      const config: LoggerConfig = { level: 'info' };
-      const logger = initLogger(config);
+    it('should close global logger and allow lazy re-creation', () => {
+      const logger = getLogger();
       const closeSpy = jest.spyOn(logger, 'close');
 
       closeLogger();
 
       expect(closeSpy).toHaveBeenCalled();
-      expect(() => getLogger()).toThrow('Logger not initialized');
+
+      const newLogger = getLogger();
+      expect(newLogger).toBeInstanceOf(Logger);
+      expect(newLogger).not.toBe(logger);
     });
   });
 
