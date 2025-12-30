@@ -29,6 +29,9 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
     // the HTML -> Markdown -> HTML round trip.
     turndownService.keep(['sup', 'sub']);
 
+    // Register rule to clean up iframe HTML.
+    registerCleanIframeRule(turndownService);
+
     return turndownService.turndown(html);
   };
 
@@ -84,4 +87,48 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
     markdownToHtml,
     cleanHtml,
   };
+};
+
+const registerCleanIframeRule = (turndownService: TurndownService): void => {
+  // Convert iframes (e.g. YouTube embeds) into
+  // raw HTML iframe tags with only the src, width,
+  // height, and allowfullscreen attributes, so that the
+  // HTML -> Markdown -> HTML round trip yields a clean
+  // <iframe ...></iframe>.
+  turndownService.addRule('cleanIframe', {
+    filter: ['iframe'],
+    replacement: (_content, node) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const element = node as any;
+
+      // Turndown이 다양한 HTML 파서와 함께 사용될 때 호환성 보장
+      const getAttr = (name: string): string | null => {
+        // DOM API 방식 (예: jsdom 또는 브라우저 환경)
+        if (typeof element.getAttribute === 'function') {
+          const value = element.getAttribute(name);
+          return value == null ? null : String(value);
+        }
+        // 객체 프로퍼티 방식 (예: cheerio 또는 단순 객체)
+        const value = (element as Record<string, unknown>)[name];
+        return value == null ? null : String(value);
+      };
+
+      const src = getAttr('src');
+      if (!src) return '';
+
+      // 일부 속성만 보존
+      const width = getAttr('width');
+      const height = getAttr('height');
+      const allowfullscreen = getAttr('allowfullscreen');
+
+      const attrs: string[] = [`src="${src}"`];
+      if (width) attrs.push(`width="${width}"`);
+      if (height) attrs.push(`height="${height}"`);
+      if (allowfullscreen) attrs.push(`allowfullscreen="${allowfullscreen}"`);
+
+      const attrString = attrs.join(' ');
+
+      return `\n\n<iframe ${attrString}></iframe>\n\n`;
+    },
+  });
 };

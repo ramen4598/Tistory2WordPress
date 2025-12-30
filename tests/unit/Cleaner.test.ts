@@ -18,6 +18,11 @@ const dummyPost634Html = fs.readFileSync(
   'utf8'
 );
 
+const dummyPost384Html = fs.readFileSync(
+  path.join(__dirname, '..', 'dummy', 'post384.html'),
+  'utf8'
+);
+
 describe('Cleaner service', () => {
   const blogUrl = 'https://ramen4598.tistory.com';
   const metaTags = `
@@ -71,6 +76,7 @@ describe('Cleaner service', () => {
     );
     console.log('Cleaned HTML of post 637 written to post637.cleaned.html');
   });
+
   it('Just print out the cleaned HTML of post 634 for manual verification', async () => {
     const cleaner = createCleaner();
     const cleanedHtml = await cleaner.cleanHtml(dummyPost634Html);
@@ -81,8 +87,19 @@ describe('Cleaner service', () => {
     );
     console.log('Cleaned HTML of post 634 written to post634.cleaned.html');
   });
-  // TODO: Preserve table structure in HTML to Markdown and back conversions
-  it('should preserve table structure during HTML to Markdown and back conversions', () => {
+
+  it('Just print out the cleaned HTML of post 384 for manual verification', async () => {
+    const cleaner = createCleaner();
+    const cleanedHtml = await cleaner.cleanHtml(dummyPost384Html);
+    fs.writeFileSync(
+      path.join(__dirname, '..', '..', 'tmp', 'post384.cleaned.html'),
+      cleanedHtml,
+      'utf8'
+    );
+    console.log('Cleaned HTML of post 384 written to post384.cleaned.html');
+  });
+
+  it('should preserve table structure during cleaning', () => {
     const cleaner = createCleaner();
     const content = `
       <table class="table" style="width:100%; border-collapse: collapse;" border="1" data-ke-align="alignLeft">
@@ -151,6 +168,44 @@ describe('Cleaner service', () => {
     expect(cleanedHtml).toContain('<blockquote>');
     expect(cleanedHtml).toContain('<p>This is a blockquote.</p>');
   });
+
+  it('should preserve YouTube iframes during cleaning', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <figure
+        data-ke-type="video"
+        data-ke-style="alignLeft"
+        data-video-host="youtube"
+        data-video-url="https://www.youtube.com/watch?v=ddZ-f_nuQ8k"
+        data-video-thumbnail="https://blog.kakaocdn.net/dna/wiT5Z/hyZL1Q7FcY/AAAAAAAAAAAAAAAAAAAAAA5A2vLBp5FpTEf0-hZ38PH36lFG4vcDc3M-nIwL838y/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=ByC2CXcjaUhJxrtnRl4W05BhBos%3D"
+        data-video-width="400"
+        data-video-height="225"
+        data-video-origin-width="860"
+        data-video-origin-height="484"
+        data-ke-mobilestyle="widthContent"
+        data-video-title="Getting the most out of Proxmox Backup Server: Backing up other data, Offsite syncs, and more"
+        data-original-url=""
+        style="width: 400px;"
+      >
+        <div class="video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/example"
+            width="400"
+            height="225"
+            frameborder=""
+            allowfullscreen="true"
+          ></iframe>
+        </div>
+        <figcaption style="display: none;"></figcaption>
+      </figure>
+    `;
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    expect(cleanedHtml).toContain(
+      '<iframe src="https://www.youtube.com/embed/example" width="400" height="225" allowfullscreen="true"></iframe>'
+    );
   });
 
   // TODO: 코드 블록 유지. hljs 유지 (보류)
