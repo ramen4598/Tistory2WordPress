@@ -110,6 +110,47 @@ describe('Cleaner service', () => {
     expect(cleanedHtml).toContain('<td>Data 2</td>');
   });
 
+  it('should preserve bold, strong, and italic formatting during cleaning', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <p>This is <strong>strong text</strong>, this is <b>bold text</b>, and this is <em>italic text</em>.</p>
+    `;
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    expect(cleanedHtml).toContain('<strong>strong text</strong>');
+    expect(cleanedHtml).toContain('<strong>bold text</strong>');
+    expect(cleanedHtml).toContain('<em>italic text</em>');
+  });
+
+  it('should preserve superscript and subscript formatting during cleaning', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <p>This is <sup>superscript</sup> and this is <sub>subscript</sub>.</p>
+    `;
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    expect(cleanedHtml).toContain('<sup>superscript</sup>');
+    expect(cleanedHtml).toContain('<sub>subscript</sub>');
+  });
+
+  it('should preserve blockquotes during cleaning', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <blockquote>
+        <p>This is a blockquote.</p>
+      </blockquote>
+    `;
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    expect(cleanedHtml).toContain('<blockquote>');
+    expect(cleanedHtml).toContain('<p>This is a blockquote.</p>');
+  });
   });
 
   // TODO: 코드 블록 유지. hljs 유지 (보류)
