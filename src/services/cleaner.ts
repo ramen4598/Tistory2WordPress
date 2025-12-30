@@ -21,6 +21,11 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
 
   const defaultHtmlToMarkdown = (html: string): string => {
     const turndownService = new TurndownService();
+
+    // Preserve table-related HTML so table structure survives
+    // the HTML -> Markdown -> HTML round trip.
+    turndownService.keep(['table', 'thead', 'tbody', 'tr', 'th', 'td']);
+
     return turndownService.turndown(html);
   };
 
