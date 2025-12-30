@@ -18,6 +18,11 @@ export interface Crawler {
    * Discover all post URLs by crawling list pages with pagination.
    */
   discoverPostUrls: () => Promise<string[]>;
+
+  /**
+   * Fetch raw HTML for an individual post URL.
+   */
+  fetchPostHtml: (postPathOrUrl: string) => Promise<string>;
 }
 
 /**
@@ -30,9 +35,6 @@ export interface Crawler {
  *   - page 2: `BLOG_URL?page=2`
  *   - page 3: `BLOG_URL?page=3`, etc.
  * - If the next page does not exist (fetch fails), crawling stops.
- *
- * This focuses on URL discovery and pagination only. Individual post fetching
- * and metadata parsing are handled by separate tasks (T021, T022).
  */
 export const createCrawler = (options: CrawlerOptions): Crawler => {
   const config = loadConfig();
@@ -79,16 +81,11 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
     const discoveredUrls = new Set<string>();
     let page = 1;
 
-    // Keep requesting sequential pages until a page is missing or empty.
-    // - Missing page: fetch throws (network/404) -> stop.
-    // - Empty page: no post links found -> stop.
-    // This prevents infinite crawling and matches the requested behavior.
-    //
     // 페이지 전략:
     // - 1페이지: BLOG_URL (page=1 취급)
     // - 다음 페이지: 현재 page + 1, 즉 ?page=2, ?page=3 ...
     // - 다음 페이지가 없거나(post가 없거나 fetch 실패) 하면 탐색 종료
-    //
+
     while (true) {
       const pageUrl = buildPageUrl(page);
 
@@ -120,7 +117,15 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
     return Array.from(discoveredUrls);
   };
 
+  const fetchPostHtml = async (postPathOrUrl: string): Promise<string> => {
+    const targetUrl = resolveUrl(postPathOrUrl);
+    const response = await fetchFn(targetUrl);
+    const html = await response.text();
+    return html.trim();
+  };
+
   return {
     discoverPostUrls,
+    fetchPostHtml,
   };
 };

@@ -138,4 +138,50 @@ describe('Crawler service', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(urls).toEqual([]);
   });
+
+  it('should fetch individual post HTML from Tistory with path', async () => {
+    const postHtml = `
+      <html>
+        <body>
+          <h1>Post 1</h1>
+        </body>
+      </html>
+    `;
+
+    const fetchMock = jest.fn().mockResolvedValueOnce({ text: async () => postHtml });
+
+    const crawler = createCrawler({
+      fetchFn: fetchMock as any,
+      postLinkSelector: 'a.link_category',
+    });
+
+    const html = await crawler.fetchPostHtml('/1');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(`${blogUrl}/1`);
+    expect(html).toBe(postHtml.trim());
+  });
+
+  it('should fetch individual post HTML from Tistory with full URL', async () => {
+    const postHtml = `
+      <html>
+        <body>
+          <h1>Post 1</h1>
+        </body>
+      </html>
+    `;
+
+    const fetchMock = jest.fn().mockResolvedValueOnce({ text: async () => postHtml });
+
+    const crawler = createCrawler({
+      fetchFn: fetchMock as any,
+      postLinkSelector: 'a.link_category',
+    });
+
+    const html = await crawler.fetchPostHtml(`${blogUrl}/1`);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(`${blogUrl}/1`);
+    expect(html).toBe(postHtml.trim());
+  });
 });
