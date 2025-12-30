@@ -20,6 +20,24 @@ const dummyPost634Html = fs.readFileSync(
 
 describe('Cleaner service', () => {
   const blogUrl = 'https://ramen4598.tistory.com';
+  const metaTags = `
+    <meta name="title" content="Test Post Title">
+    <meta property="article:published_time" content="2024-01-15T10:00:00+09:00">
+    <meta property="article:modified_time" content="2024-01-16T15:30:00+09:00">
+  `;
+  const categoryTags = `
+    <div class="another_category">
+      <h4><a href="/category/tech">Tech</a></h4>
+    </div>
+  `;
+  const tagTags = `
+    <div class="area_tag">
+      <a href="/tag/javascript" rel="tag">JavaScript</a>
+      <a href="/tag/typescript" rel="tag">TypeScript</a>
+    </div>
+  `;
+  const contentWrapperStart = '<div class="tt_article_useless_p_margin contents_style">';
+  const contentWrapperEnd = '</div>';
 
   beforeEach(() => {
     mockedLoadConfig.mockReturnValue({
@@ -35,6 +53,7 @@ describe('Cleaner service', () => {
       postCategorySelector: 'div.another_category h4 a',
       postTagSelector: 'div.area_tag a[rel="tag"]',
       postListLinkSelector: 'a.link_category',
+      postContentSelector: 'div.tt_article_useless_p_margin.contents_style',
     } as any);
   });
 
@@ -61,6 +80,30 @@ describe('Cleaner service', () => {
       'utf8'
     );
     console.log('Cleaned HTML of post 634 written to post634.cleaned.html');
+  });
+  // TODO: Preserve table structure in HTML to Markdown and back conversions
+  it('should preserve table structure during HTML to Markdown and back conversions', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <table>
+        <tr>
+          <th>Header 1</th>
+          <th>Header 2</th>
+        </tr>
+        <tr>
+          <td>Data 1</td>
+          <td>Data 2</td>
+        </tr>
+      </table>
+    `;
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+    const markdown = cleaner.htmlToMarkdown(html);
+    const convertedHtml = cleaner.markdownToHtml(markdown);
+
+    expect(convertedHtml).toContain('<table>');
+    expect(convertedHtml).toContain('<th>Header 1</th>');
+    expect(convertedHtml).toContain('<td>Data 1</td>');
   });
   // TODO: Add more tests to cover different scenarios
 });
