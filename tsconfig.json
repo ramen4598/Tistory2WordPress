@@ -30,6 +30,7 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "skipLibCheck": true,
+    "typeRoots": ["./node_modules/@types", "./types"],
 
     /* Completeness */
     "resolveJsonModule": true

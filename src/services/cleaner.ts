@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio';
 import TurndownService from 'turndown';
+import { gfm } from 'turndown-plugin-gfm';
 import { marked } from 'marked';
 import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
@@ -22,9 +23,11 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
   const defaultHtmlToMarkdown = (html: string): string => {
     const turndownService = new TurndownService();
 
-    // Preserve table-related HTML so table structure survives
+    turndownService.use(gfm);
+
+    // Preserve inline formatting tags that should survive
     // the HTML -> Markdown -> HTML round trip.
-    turndownService.keep(['table', 'thead', 'tbody', 'tr', 'th', 'td']);
+    turndownService.keep(['sup', 'sub']);
 
     return turndownService.turndown(html);
   };
