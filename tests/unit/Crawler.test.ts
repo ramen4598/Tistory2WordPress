@@ -9,14 +9,6 @@ const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 describe('Crawler service', () => {
   const blogUrl = 'https://myblog.tistory.com';
 
-  const metadataSelectors = {
-    title: 'meta[name="title"]',
-    publishDate: 'meta[property="article:published_time"]',
-    modifiedDate: 'meta[property="article:modified_time"]',
-    category: 'div.another_category h4 a',
-    tag: 'div.area_tag a[rel="tag"]',
-  };
-
   beforeEach(() => {
     mockedLoadConfig.mockReturnValue({
       blogUrl,
@@ -25,6 +17,12 @@ describe('Crawler service', () => {
       outputDir: './output',
       downloadsDir: './output/downloads',
       logLevel: 'info',
+      postTitleSelector: 'meta[name="title"]',
+      postPublishDateSelector: 'meta[property="article:published_time"]',
+      postModifiedDateSelector: 'meta[property="article:modified_time"]',
+      postCategorySelector: 'div.another_category h4 a',
+      postTagSelector: 'div.area_tag a[rel="tag"]',
+      postListLinkSelector: 'a.link_category',
     } as any);
   });
 
@@ -58,8 +56,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: fetchMock as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const urls = await crawler.discoverPostUrls();
@@ -87,8 +83,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: fetchMock as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const urls = await crawler.discoverPostUrls();
@@ -116,8 +110,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: fetchMock as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const urls = await crawler.discoverPostUrls();
@@ -141,8 +133,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: fetchMock as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const urls = await crawler.discoverPostUrls();
@@ -164,8 +154,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: fetchMock as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const html = await crawler.fetchPostHtml('/1');
@@ -188,8 +176,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: fetchMock as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const html = await crawler.fetchPostHtml(`${blogUrl}/1`);
@@ -223,8 +209,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: jest.fn() as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const url = `${blogUrl}/1`;
@@ -269,8 +253,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: jest.fn() as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const url = `${blogUrl}/1`;
@@ -301,8 +283,6 @@ describe('Crawler service', () => {
 
     const crawler = createCrawler({
       fetchFn: jest.fn() as any,
-      postLinkSelector: 'a.link_category',
-      metadataSelectors,
     });
 
     const url = `${blogUrl}/korean`;

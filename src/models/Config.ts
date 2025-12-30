@@ -46,6 +46,42 @@ export interface Config {
    * If not set, logs only to console
    */
   logFile?: string;
+
+  /**
+   * CSS selector for post title element
+   * e.g. meta[name="title"]
+   */
+  postTitleSelector: string;
+
+  /**
+   * CSS selector for post publish date element
+   * e.g. meta[property="article:published_time"]
+   */
+  postPublishDateSelector: string;
+
+  /**
+   * CSS selector for post modified date element
+   * e.g. meta[property="article:modified_time"]
+   */
+  postModifiedDateSelector: string;
+
+  /**
+   * CSS selector for post category elements
+   * e.g. div.another_category h4 a
+   */
+  postCategorySelector: string;
+
+  /**
+   * CSS selector for post tag elements
+   * e.g. div.area_tag a[rel="tag"]
+   */
+  postTagSelector: string;
+
+  /**
+   * CSS selector for post links on list/archive pages
+   * e.g. a.link_category
+   */
+  postListLinkSelector: string;
 }
 
 /**

@@ -8,23 +8,6 @@ export interface CrawlerOptions {
    * Fetch implementation (e.g., global fetch or mocked fetch in tests)
    */
   fetchFn: (url: string) => Promise<{ text: () => Promise<string> }>;
-
-  /**
-   * CSS selector used to locate post links on list pages
-   */
-  postLinkSelector: string;
-
-  /**
-   * CSS selectors used to locate metadata elements in a post HTML document.
-   * If not provided, sensible defaults for typical Tistory themes are used.
-   */
-  metadataSelectors?: {
-    title: string;
-    publishDate: string;
-    modifiedDate: string;
-    category: string;
-    tag: string;
-  };
 }
 
 export interface ParsedPostMetadata {
@@ -66,14 +49,16 @@ export interface Crawler {
  */
 export const createCrawler = (options: CrawlerOptions): Crawler => {
   const config = loadConfig();
-  const { fetchFn, postLinkSelector } = options;
+  const { fetchFn } = options;
 
-  const metadataSelectors = options.metadataSelectors ?? {
-    title: 'meta[name="title"]',
-    publishDate: 'meta[property="article:published_time"]',
-    modifiedDate: 'meta[property="article:modified_time"]',
-    category: 'div.another_category h4 a',
-    tag: 'div.area_tag a[rel="tag"]',
+  const postLinkSelector = config.postListLinkSelector;
+
+  const metadataSelectors = {
+    title: config.postTitleSelector,
+    publishDate: config.postPublishDateSelector,
+    modifiedDate: config.postModifiedDateSelector,
+    category: config.postCategorySelector,
+    tag: config.postTagSelector,
   };
 
   const resolveUrl = (path: string): string => {

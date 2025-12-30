@@ -55,7 +55,52 @@ export function loadConfig(): Config {
 
   const logFile = process.env['LOG_FILE'];
 
+  // Load required CSS selectors for post metadata
+  const postTitleSelector = process.env['TISTORY_SELECTOR_TITLE'];
+  const postPublishDateSelector = process.env['TISTORY_SELECTOR_PUBLISH_DATE'];
+  const postModifiedDateSelector = process.env['TISTORY_SELECTOR_MODIFIED_DATE'];
+  const postCategorySelector = process.env['TISTORY_SELECTOR_CATEGORY'];
+  const postTagSelector = process.env['TISTORY_SELECTOR_TAG'];
+  const postListLinkSelector = process.env['TISTORY_SELECTOR_POST_LINK'];
+
+  if (!postTitleSelector) {
+    throw new ConfigurationError(
+      'TISTORY_SELECTOR_TITLE is required. Please set it in .env or environment variables.'
+    );
+  }
+
+  if (!postPublishDateSelector) {
+    throw new ConfigurationError(
+      'TISTORY_SELECTOR_PUBLISH_DATE is required. Please set it in .env or environment variables.'
+    );
+  }
+
+  if (!postModifiedDateSelector) {
+    throw new ConfigurationError(
+      'TISTORY_SELECTOR_MODIFIED_DATE is required. Please set it in .env or environment variables.'
+    );
+  }
+
+  if (!postCategorySelector) {
+    throw new ConfigurationError(
+      'TISTORY_SELECTOR_CATEGORY is required. Please set it in .env or environment variables.'
+    );
+  }
+
+  if (!postTagSelector) {
+    throw new ConfigurationError(
+      'TISTORY_SELECTOR_TAG is required. Please set it in .env or environment variables.'
+    );
+  }
+
+  if (!postListLinkSelector) {
+    throw new ConfigurationError(
+      'TISTORY_SELECTOR_POST_LINK is required. Please set it in .env or environment variables.'
+    );
+  }
+
   // Validate numeric fields
+
   if (isNaN(workerCount) || workerCount < 1 || workerCount > 16) {
     throw new ConfigurationError(
       `WORKER_COUNT must be a number between 1 and 16. Got: ${process.env['WORKER_COUNT']}`
@@ -84,5 +129,11 @@ export function loadConfig(): Config {
     downloadsDir,
     logLevel,
     logFile,
+    postTitleSelector,
+    postPublishDateSelector,
+    postModifiedDateSelector,
+    postCategorySelector,
+    postTagSelector,
+    postListLinkSelector,
   };
 }
