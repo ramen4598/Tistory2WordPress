@@ -1,5 +1,7 @@
 import * as cheerio from 'cheerio';
 import { loadConfig } from '../utils/config';
+import { Category } from '../models/Category';
+import { Tag } from '../models/Tag';
 
 export interface CrawlerOptions {
   /**
@@ -11,6 +13,27 @@ export interface CrawlerOptions {
    * CSS selector used to locate post links on list pages
    */
   postLinkSelector: string;
+
+  /**
+   * CSS selectors used to locate metadata elements in a post HTML document.
+   * If not provided, sensible defaults for typical Tistory themes are used.
+   */
+  metadataSelectors?: {
+    title: string;
+    publishDate: string;
+    modifiedDate: string;
+    category: string;
+    tag: string;
+  };
+}
+
+export interface ParsedPostMetadata {
+  url: string;
+  title: string;
+  publish_date: Date;
+  modified_date: Date | null;
+  categories: Category[];
+  tags: Tag[];
 }
 
 export interface Crawler {
@@ -23,6 +46,11 @@ export interface Crawler {
    * Fetch raw HTML for an individual post URL.
    */
   fetchPostHtml: (postPathOrUrl: string) => Promise<string>;
+
+  /**
+   * Parse post metadata (title, dates, categories, tags) from HTML.
+   */
+  parsePostMetadata: (html: string, url: string) => ParsedPostMetadata;
 }
 
 /**
@@ -39,6 +67,14 @@ export interface Crawler {
 export const createCrawler = (options: CrawlerOptions): Crawler => {
   const config = loadConfig();
   const { fetchFn, postLinkSelector } = options;
+
+  const metadataSelectors = options.metadataSelectors ?? {
+    title: 'meta[name="title"]',
+    publishDate: 'meta[property="article:published_time"]',
+    modifiedDate: 'meta[property="article:modified_time"]',
+    category: 'div.another_category h4 a',
+    tag: 'div.area_tag a[rel="tag"]',
+  };
 
   const resolveUrl = (path: string): string => {
     if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -124,8 +160,83 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
     return html.trim();
   };
 
+  const slugify = (name: string): string => {
+    return name
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\p{L}\p{N}-]/gu, '');
+  };
+
+  const parsePostMetadata = (html: string, url: string): ParsedPostMetadata => {
+    const $ = cheerio.load(html);
+
+    const titleElement = $(metadataSelectors.title).first();
+    const titleFromContent = titleElement.attr('content');
+    const titleFallbackText = titleElement.text();
+    const titleText = (titleFromContent || titleFallbackText || '').trim() || 'Untitled';
+
+    const publishElement = $(metadataSelectors.publishDate).first();
+    const publishFromContent = publishElement.attr('content');
+    const publishFromDatetime = publishElement.attr('datetime');
+    const publishDateText = (
+      publishFromContent ||
+      publishFromDatetime ||
+      publishElement.text() ||
+      ''
+    ).trim();
+    const publishDate = new Date(publishDateText);
+
+    const modifiedElement = $(metadataSelectors.modifiedDate).first();
+    const modifiedFromContent = modifiedElement.attr('content');
+    const modifiedFromDatetime = modifiedElement.attr('datetime');
+    const modifiedDateText = (
+      modifiedFromContent ||
+      modifiedFromDatetime ||
+      modifiedElement.text() ||
+      ''
+    ).trim();
+    const modifiedDate = modifiedDateText ? new Date(modifiedDateText) : null;
+
+    const categories: Category[] = [];
+    $(metadataSelectors.category).each((_, element) => {
+      const name = $(element).text().trim();
+      if (!name) {
+        return;
+      }
+      categories.push({
+        name,
+        slug: slugify(name),
+        parent: null, // TODO: 계층화된 카테고리 지원 방법 고려
+        description: null,
+      });
+    });
+
+    const tags: Tag[] = [];
+    $(metadataSelectors.tag).each((_, element) => {
+      const name = $(element).text().trim();
+      if (!name) {
+        return;
+      }
+      tags.push({
+        name,
+        slug: slugify(name),
+      });
+    });
+
+    return {
+      url,
+      title: titleText,
+      publish_date: publishDate,
+      modified_date: modifiedDate,
+      categories,
+      tags,
+    };
+  };
+
   return {
     discoverPostUrls,
     fetchPostHtml,
+    parsePostMetadata,
   };
 };

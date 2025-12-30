@@ -58,7 +58,7 @@ Core infrastructure and shared utilities that all features depend on.
 
 - [x] T020 [P] [US1] Implement Crawler service in src/services/crawler.ts (discover post URLs with pagination)
 - [x] T021 [US1] Implement HTML post fetching in Crawler (fetch individual post HTML from Tistory)
-- [ ] T022 [US1] Implement post metadata parsing in Crawler (extract title, dates, categories, tags from HTML)
+- [x] T022 [US1] Implement post metadata parsing in Crawler (extract title, dates, categories, tags from HTML)
 - [ ] T023 [P] [US1] Implement Cleaner service in src/services/cleaner.ts (HTML→Markdown→HTML conversion)
 - [ ] T024 [US1] Integrate turndown library in Cleaner (HTML to Markdown)
 - [ ] T025 [US1] Integrate marked library in Cleaner (Markdown to HTML)
