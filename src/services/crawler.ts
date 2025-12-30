@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 import { loadConfig } from '../utils/config';
 import { Category } from '../models/Category';
 import { Tag } from '../models/Tag';
+import { getLogger } from '../utils/logger';
 
 export interface CrawlerOptions {
   /**
@@ -50,6 +51,9 @@ export interface Crawler {
 export const createCrawler = (options: CrawlerOptions): Crawler => {
   const config = loadConfig();
   const { fetchFn } = options;
+  const logger = getLogger();
+
+  logger.info('Crawler: initialized', { blogUrl: config.blogUrl });
 
   const postLinkSelector = config.postListLinkSelector;
 
@@ -79,8 +83,13 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
   };
 
   const fetchPage = async (url: string): Promise<{ html: string }> => {
+    logger.debug('Crawler.fetchPage: fetching list page', { url });
+
     const response = await fetchFn(url);
     const html = await response.text();
+
+    logger.debug('Crawler.fetchPage: fetched list page HTML', { url, length: html.length });
+
     return { html };
   };
 
@@ -95,12 +104,18 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       }
     });
 
+    logger.debug('Crawler.extractPostUrls: extracted post URLs from page', {
+      count: urls.length,
+    });
+
     return urls;
   };
 
   const discoverPostUrls = async (): Promise<string[]> => {
     const discoveredUrls = new Set<string>();
     let page = 1;
+
+    logger.info('Crawler.discoverPostUrls: start discovery');
 
     // 페이지 전략:
     // - 1페이지: BLOG_URL (page=1 취급)
@@ -110,11 +125,17 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
     while (true) {
       const pageUrl = buildPageUrl(page);
 
+      logger.debug('Crawler.discoverPostUrls: fetching page', { page, pageUrl });
+
       let html: string;
       try {
         const result = await fetchPage(pageUrl);
         html = result.html;
       } catch {
+        logger.info('Crawler.discoverPostUrls: stopping discovery, failed to fetch page', {
+          page,
+          pageUrl,
+        });
         // 다음 페이지가 존재하지 않는 경우
         break;
       }
@@ -122,6 +143,10 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       const pagePostUrls = extractPostUrls(html);
 
       if (pagePostUrls.length === 0) {
+        logger.info('Crawler.discoverPostUrls: stopping discovery, no post URLs on page', {
+          page,
+          pageUrl,
+        });
         // 더 이상 post URL이 없는 경우
         break;
       }
@@ -132,17 +157,36 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
         }
       }
 
+      logger.debug('Crawler.discoverPostUrls: accumulated URLs after page', {
+        page,
+        totalCount: discoveredUrls.size,
+      });
+
       page += 1;
     }
+
+    logger.info('Crawler.discoverPostUrls: finished discovery', {
+      totalCount: discoveredUrls.size,
+    });
 
     return Array.from(discoveredUrls);
   };
 
   const fetchPostHtml = async (postPathOrUrl: string): Promise<string> => {
     const targetUrl = resolveUrl(postPathOrUrl);
+
+    logger.debug('Crawler.fetchPostHtml: fetching post HTML', { input: postPathOrUrl, targetUrl });
+
     const response = await fetchFn(targetUrl);
     const html = await response.text();
-    return html.trim();
+    const trimmed = html.trim();
+
+    logger.debug('Crawler.fetchPostHtml: fetched post HTML', {
+      targetUrl,
+      length: trimmed.length,
+    });
+
+    return trimmed;
   };
 
   const slugify = (name: string): string => {
@@ -154,6 +198,8 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
   };
 
   const parsePostMetadata = (html: string, url: string): ParsedPostMetadata => {
+    logger.debug('Crawler.parsePostMetadata: parsing metadata', { url });
+
     const $ = cheerio.load(html);
 
     const titleElement = $(metadataSelectors.title).first();
@@ -209,7 +255,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       });
     });
 
-    return {
+    const result: ParsedPostMetadata = {
       url,
       title: titleText,
       publish_date: publishDate,
@@ -217,6 +263,15 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       categories,
       tags,
     };
+
+    logger.debug('Crawler.parsePostMetadata: parsed metadata summary', {
+      url,
+      title: result.title,
+      categoryCount: result.categories.length,
+      tagCount: result.tags.length,
+    });
+
+    return result;
   };
 
   return {
