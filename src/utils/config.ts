@@ -62,6 +62,7 @@ export function loadConfig(): Config {
   const postCategorySelector = process.env['TISTORY_SELECTOR_CATEGORY'];
   const postTagSelector = process.env['TISTORY_SELECTOR_TAG'];
   const postListLinkSelector = process.env['TISTORY_SELECTOR_POST_LINK'];
+  const postContentSelector = process.env['TISTORY_SELECTOR_CONTENT'];
 
   if (!postTitleSelector) {
     throw new ConfigurationError(
@@ -96,6 +97,12 @@ export function loadConfig(): Config {
   if (!postListLinkSelector) {
     throw new ConfigurationError(
       'TISTORY_SELECTOR_POST_LINK is required. Please set it in .env or environment variables.'
+    );
+  }
+
+  if (!postContentSelector) {
+    throw new ConfigurationError(
+      'TISTORY_SELECTOR_CONTENT is required. Please set it in .env or environment variables.'
     );
   }
 
@@ -135,5 +142,6 @@ export function loadConfig(): Config {
     postCategorySelector,
     postTagSelector,
     postListLinkSelector,
+    postContentSelector,
   };
 }

@@ -78,6 +78,13 @@ export interface Config {
   postTagSelector: string;
 
   /**
+   * CSS selector for the root element containing post content HTML.
+   * Only HTML under this element will be cleaned and exported to WXR.
+   * e.g. div.tt_article_useless_p_margin.contents_style
+   */
+  postContentSelector: string;
+
+  /**
    * CSS selector for post links on list/archive pages
    * e.g. a.link_category
    */
