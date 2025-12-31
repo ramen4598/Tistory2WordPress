@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as cheerio from 'cheerio';
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
@@ -51,13 +52,16 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
     // the HTML -> Markdown -> HTML round trip.
     turndownService.keep(['sup', 'sub']);
 
+    // Rule 적용 순서가 중요. 나중에 추가한 규칙이 최종적으로 우선 적용됨
+    // 따라서 아래로 갈수록 더 세부 규칙을 처리하도록 배치해야 함
     // Plugin for GitHub Flavored Markdown (GFM) support.
     turndownService.use(gfm);
-
-    // Register rule to clean up iframe HTML.
-    registerCleanIframeRule(turndownService);
+    // Register rule to clean up generic tables without relying on GFM table heading detection.
+    registerGenericTableRule(turndownService);
     // Register rule to clean up Tistory image table HTML.
     registerImageTableRule(turndownService);
+    // Register rule to clean up iframe HTML.
+    registerCleanIframeRule(turndownService);
 
     return turndownService.turndown(html);
   };
@@ -127,7 +131,6 @@ const registerCleanIframeRule = (turndownService: TurndownService): void => {
   turndownService.addRule('cleanIframe', {
     filter: ['iframe'],
     replacement: (_content, node) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const element = node as any;
 
       const src = getAttr(element, 'src');
@@ -162,7 +165,6 @@ const registerImageTableRule = (turndownService: TurndownService): void => {
   turndownService.addRule('tistoryImageTable', {
     filter: (node) => {
       // 노드가 <table>인지 확인
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const element = node as any;
       if (!element || typeof element.nodeName !== 'string') return false;
       if (element.nodeName.toLowerCase() !== 'table') return false;
@@ -177,11 +179,10 @@ const registerImageTableRule = (turndownService: TurndownService): void => {
       if (!hasImageFigure) return false;
 
       // 모든 <td> 요소를 가져온다
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const tds = Array.from(querySelectorAll('td')) as any[];
       if (tds.length === 0) return false;
 
-      // TODO: 하나의 셀에만 img가 있을 때도 처리할지 여부 고민 필요
+      // TODO: 일부 셀에만 img가 있을 때도 처리하도록 수정해야 함.
       // 모든 셀에 img가 있을 때만 이 규칙을 적용한다.
       const everyCellHasImage = tds.every(
         (td) => typeof td.querySelector === 'function' && td.querySelector('img')
@@ -190,11 +191,9 @@ const registerImageTableRule = (turndownService: TurndownService): void => {
       return everyCellHasImage;
     },
     replacement: (_content, node) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const table = node as any;
       if (!table || typeof table.querySelectorAll !== 'function') return '';
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rows = Array.from(table.querySelectorAll('tr')) as any[];
       if (rows.length === 0) return '';
 
@@ -203,7 +202,6 @@ const registerImageTableRule = (turndownService: TurndownService): void => {
       const rowHtml = rows
         .map((tr) => {
           if (typeof tr.querySelectorAll !== 'function') return '';
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const cells = Array.from(tr.querySelectorAll('td')) as any[];
           if (cells.length === 0) return '';
 
@@ -242,13 +240,84 @@ const registerImageTableRule = (turndownService: TurndownService): void => {
 };
 
 /**
+ * Turndown 규칙을 추가하여 일반 텍스트 기반 표(table)를 정리합니다.
+ * GFM 테이블 플러그인이 헤더 행(<th>) 유무에 따라 일부 테이블을 그대로 keep
+ * 하는 문제를 우회하기 위한 보조 규칙입니다.
+ *
+ * - table, thead/tbody/tfoot, tr, th/td만 남깁니다.
+ * - 모든 data-* 속성, style, border 등 표현용 속성은 제거됩니다.
+ * - 셀 안의 인라인 콘텐츠는 Turndown 기본 규칙(굵게, 링크 등)에 맡깁니다.
+ */
+const registerGenericTableRule = (turndownService: TurndownService): void => {
+  turndownService.addRule('genericTable', {
+    filter: (node) => {
+      const element = node as any;
+      if (!element || typeof element.nodeName !== 'string') return false;
+      if (element.nodeName.toLowerCase() !== 'table') return false;
+
+      // GFM 플러그인이 이미 처리한 테이블은 건드리지 않기 위해
+      // heading row(모든 셀이 TH인 첫 행)를 가진 경우는 제외한다.
+      const rows: any[] = Array.from(element.rows ?? []);
+      if (rows.length === 0) return false;
+      const firstRow = rows[0];
+      const cells: any[] = Array.from(firstRow.cells ?? []);
+      const everyCellIsTh =
+        cells.length > 0 &&
+        cells.every((cell) => {
+          return typeof cell.nodeName === 'string' && cell.nodeName.toLowerCase() === 'th';
+        });
+      if (everyCellIsTh) return false;
+
+      return true;
+    },
+    replacement: (_content, node) => {
+      const table = node as any;
+      if (!table) return '';
+
+      // th가 아닌 경우 td로 처리하는 헬퍼 함수
+      const cleanCell = (cell: any): string => {
+        const tagName =
+          typeof cell.nodeName === 'string' && cell.nodeName.toLowerCase() === 'th' ? 'th' : 'td';
+        const inner = (cell.textContent ?? '').trim();
+        return `<${tagName}>${inner}</${tagName}>`;
+      };
+
+      const bodyRows: string[] = [];
+
+      const rowSources: any[] = [];
+      if (table.rows && typeof table.rows.length === 'number') {
+        // HTMLTableElement 호환
+        rowSources.push(...Array.from(table.rows as any));
+      } else if (typeof table.querySelectorAll === 'function') {
+        // 일반적인 경우(cheerio 등)
+        rowSources.push(...Array.from(table.querySelectorAll('tr') as any));
+      }
+
+      rowSources.forEach((tr) => {
+        // tr 요소에서 th 또는 td 셀만 필터링
+        const cellNodes: any[] = Array.from(tr.cells ?? tr.childNodes ?? []).filter((raw) => {
+          const n: any = raw;
+          return typeof n.nodeName === 'string' && ['th', 'td'].includes(n.nodeName.toLowerCase());
+        });
+        if (cellNodes.length === 0) return;
+        const cellsHtml = cellNodes.map((c) => cleanCell(c)).join('');
+        bodyRows.push(`<tr>${cellsHtml}</tr>`);
+      });
+
+      if (bodyRows.length === 0) return '';
+
+      return `\n\n<table><tbody>${bodyRows.join('')}</tbody></table>\n\n`;
+    },
+  });
+};
+
+/**
  * 주어진 요소에서 지정된 속성의 값을 안전하게 가져옵니다.
  * Turndown이 다양한 HTML 파서와 함께 사용될 때 호환성을 보장합니다.
  * @param element 속성을 가져올 요소
  * @param name 가져올 속성 이름
  * @return 속성 값 (문자열) 또는 null (존재하지 않을 경우)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAttr = (element: any, name: string): string | null => {
   // DOM API 방식 (예: jsdom 또는 브라우저 환경)
   if (typeof element.getAttribute === 'function') {
