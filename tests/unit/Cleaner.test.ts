@@ -6,6 +6,7 @@ import { createCleaner } from '../../src/services/cleaner';
 
 jest.mock('../../src/utils/config');
 
+const TMP_DIR = path.join(__dirname, '..', 'tmp');
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
 const dummyPost637Html = fs.readFileSync(
@@ -66,36 +67,28 @@ describe('Cleaner service', () => {
     jest.clearAllMocks();
   });
 
+  if (!fs.existsSync(TMP_DIR)) {
+    fs.mkdirSync(TMP_DIR);
+  };
+
   it('Just print out the cleaned HTML of post 637 for manual verification', async () => {
     const cleaner = createCleaner();
     const cleanedHtml = await cleaner.cleanHtml(dummyPost637Html);
-    fs.writeFileSync(
-      path.join(__dirname, '..', '..', 'tmp', 'post637.cleaned.html'),
-      cleanedHtml,
-      'utf8'
-    );
+    fs.writeFileSync(path.join(TMP_DIR, 'post637.cleaned.html'), cleanedHtml, 'utf8');
     console.log('Cleaned HTML of post 637 written to post637.cleaned.html');
   });
 
   it('Just print out the cleaned HTML of post 634 for manual verification', async () => {
     const cleaner = createCleaner();
     const cleanedHtml = await cleaner.cleanHtml(dummyPost634Html);
-    fs.writeFileSync(
-      path.join(__dirname, '..', '..', 'tmp', 'post634.cleaned.html'),
-      cleanedHtml,
-      'utf8'
-    );
+    fs.writeFileSync(path.join(TMP_DIR, 'post634.cleaned.html'), cleanedHtml, 'utf8');
     console.log('Cleaned HTML of post 634 written to post634.cleaned.html');
   });
 
   it('Just print out the cleaned HTML of post 384 for manual verification', async () => {
     const cleaner = createCleaner();
     const cleanedHtml = await cleaner.cleanHtml(dummyPost384Html);
-    fs.writeFileSync(
-      path.join(__dirname, '..', '..', 'tmp', 'post384.cleaned.html'),
-      cleanedHtml,
-      'utf8'
-    );
+    fs.writeFileSync(path.join(TMP_DIR, 'post384.cleaned.html'), cleanedHtml, 'utf8');
     console.log('Cleaned HTML of post 384 written to post384.cleaned.html');
   });
 
