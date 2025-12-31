@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as cheerio from 'cheerio';
 import TurndownService from 'turndown';
-import { gfm } from 'turndown-plugin-gfm';
+import * as gfm from 'turndown-plugin-gfm';
 import { marked } from 'marked';
 import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
@@ -55,12 +55,10 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
     // Rule 적용 순서가 중요. 나중에 추가한 규칙이 최종적으로 우선 적용됨
     // 따라서 아래로 갈수록 더 세부 규칙을 처리하도록 배치해야 함
     // Plugin for GitHub Flavored Markdown (GFM) support.
-    turndownService.use(gfm);
-    // Register rule to clean up generic tables without relying on GFM table heading detection.
+    turndownService.use([gfm.strikethrough, gfm.taskListItems]);
+    turndownService.use(gfm.tables);
     registerGenericTableRule(turndownService);
-    // Register rule to clean up Tistory image table HTML.
     registerImageTableRule(turndownService);
-    // Register rule to clean up iframe HTML.
     registerCleanIframeRule(turndownService);
 
     return turndownService.turndown(html);
@@ -182,13 +180,12 @@ const registerImageTableRule = (turndownService: TurndownService): void => {
       const tds = Array.from(querySelectorAll('td')) as any[];
       if (tds.length === 0) return false;
 
-      // TODO: 일부 셀에만 img가 있을 때도 처리하도록 수정해야 함.
-      // 모든 셀에 img가 있을 때만 이 규칙을 적용한다.
-      const everyCellHasImage = tds.every(
+      // 최소 하나의 셀이라도 img를 포함하면 이 규칙을 적용한다.
+      const someCellHasImage = tds.some(
         (td) => typeof td.querySelector === 'function' && td.querySelector('img')
       );
 
-      return everyCellHasImage;
+      return someCellHasImage;
     },
     replacement: (_content, node) => {
       const table = node as any;
@@ -209,7 +206,12 @@ const registerImageTableRule = (turndownService: TurndownService): void => {
             .map((td) => {
               if (typeof td.querySelector !== 'function') return '<td></td>';
               const img = td.querySelector('img');
-              if (!img) return '<td></td>';
+
+              if (!img) {
+                const text = (td.textContent ?? '').trim();
+                if (!text) return '<td></td>';
+                return `<td>${escapeHtml(text)}</td>`;
+              }
 
               let src = getAttr(img, 'src');
               if (!src) return '<td></td>';
@@ -218,9 +220,9 @@ const registerImageTableRule = (turndownService: TurndownService): void => {
               const width = getAttr(img, 'width');
               const height = getAttr(img, 'height');
 
-              const attrs: string[] = [`src="${src}"`];
-              if (width) attrs.push(`width="${width}"`);
-              if (height) attrs.push(`height="${height}"`);
+              const attrs: string[] = [`src=\"${src}\"`];
+              if (width) attrs.push(`width=\"${width}\"`);
+              if (height) attrs.push(`height=\"${height}\"`);
 
               return `<td><img ${attrs.join(' ')}></td>`;
             })

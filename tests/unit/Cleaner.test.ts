@@ -200,13 +200,25 @@ describe('Cleaner service', () => {
       metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
     const cleanedHtml = cleaner.cleanHtml(html);
 
+    expect(cleanedHtml).not.toContain('data-ke-type=');
+    expect(cleanedHtml).not.toContain('data-ke-style=');
+    expect(cleanedHtml).not.toContain('data-video-host=');
+    expect(cleanedHtml).not.toContain('data-video-url=');
+    expect(cleanedHtml).not.toContain('data-video-thumbnail=');
+    expect(cleanedHtml).not.toContain('data-video-width=');
+    expect(cleanedHtml).not.toContain('data-video-height=');
+    expect(cleanedHtml).not.toContain('data-video-origin-width=');
+    expect(cleanedHtml).not.toContain('data-video-origin-height=');
+    expect(cleanedHtml).not.toContain('data-ke-mobilestyle=');
+    expect(cleanedHtml).not.toContain('data-video-title=');
+    expect(cleanedHtml).not.toContain('data-original-url=');
+    expect(cleanedHtml).not.toContain('style=');
     expect(cleanedHtml).toContain(
       '<iframe src="https://www.youtube.com/embed/example" width="400" height="225" allowfullscreen="true"></iframe>'
     );
   });
 
-  // TODO: 표 안에 이미지 유지 (보류)
-  it('should keep side-by-side image table structure for now', () => {
+  it('should keep image tag in table (with multiple cells)', () => {
     const cleaner = createCleaner();
     const content = `
       <table style="border-collapse: collapse; width: 100%;" border="1" data-ke-align="alignLeft">
@@ -272,6 +284,148 @@ describe('Cleaner service', () => {
     expect(cleanedHtml).toContain('<tr>');
     expect(cleanedHtml).toContain('<td>');
 
+    expect(cleanedHtml).toContain(
+      '<img src="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D" width="2438" height="1640">'
+    );
+    expect(cleanedHtml).toContain(
+      '<img src="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D" width="2438" height="1640">'
+    );
+  });
+
+  it('should keep image tag in table (only one cell has image)', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <table style="border-collapse: collapse; width: 100%;" border="1" data-ke-align="alignLeft">
+        <tbody>
+          <tr>
+            <td style="width: 50%;">
+              <figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-width="2438" data-origin-height="1640">
+                <span
+                  data-url="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                  data-phocus="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                >
+                  <img
+                    src="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                    loading="lazy"
+                    width="2438"
+                    height="1640"
+                    data-origin-width="2438"
+                    data-origin-height="1640"
+                  />
+                </span>
+              </figure>
+            </td>
+            <td style="width: 50%;">
+              Some text content in the second cell.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    // 불필요한 속성들이 제거된지 확인한다.
+    expect(cleanedHtml).not.toContain('data-ke-align=');
+    expect(cleanedHtml).not.toContain('data-ke-mobilestyle=');
+    expect(cleanedHtml).not.toContain('data-origin-width=');
+    expect(cleanedHtml).not.toContain('data-origin-height=');
+    expect(cleanedHtml).not.toContain('data-url=');
+    expect(cleanedHtml).not.toContain('data-phocus=');
+    expect(cleanedHtml).not.toContain('style=');
+    expect(cleanedHtml).not.toContain('loading=');
+    expect(cleanedHtml).not.toContain('<figure');
+    expect(cleanedHtml).not.toContain('<span');
+
+    // 우선은 테이블/이미지 구조가 통째로 보존되는지만 확인한다.
+    expect(cleanedHtml).toContain('<table>');
+    expect(cleanedHtml).toContain('<tbody>');
+    expect(cleanedHtml).toContain('<tr>');
+    expect(cleanedHtml).toContain('<td>');
+
+    expect(cleanedHtml).toContain(
+      '<img src="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D" width="2438" height="1640">'
+    );
+    expect(cleanedHtml).toContain('<td>Some text content in the second cell.</td>');
+  });
+
+  it('should keep image tag in table (with table header)', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <table style="border-collapse: collapse; width: 100%;" border="1" data-ke-align="alignLeft">
+        <thead>
+          <tr>
+            <th style="width: 50%;">Header 1</th>
+            <th style="width: 50%;">Header 2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="width: 50%;">
+              <figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-width="2438" data-origin-height="1640">
+                <span
+                  data-url="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                  data-phocus="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                >
+                  <img
+                    src="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                    loading="lazy"
+                    width="2438"
+                    height="1640"
+                    data-origin-width="2438"
+                    data-origin-height="1640"
+                  />
+                </span>
+              </figure>
+            </td>
+            <td style="width: 50%;">
+              <figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-width="2438" data-origin-height="1640">
+                <span
+                  data-url="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D"
+                  data-phocus="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D"
+                >
+                  <img
+                    src="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D"
+                    loading="lazy"
+                    width="2438"
+                    height="1640"
+                    data-origin-width="2438"
+                    data-origin-height="1640"
+                  />
+                </span>
+              </figure>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    // 불필요한 속성들이 제거된지 확인한다.
+    expect(cleanedHtml).not.toContain('data-ke-align=');
+    expect(cleanedHtml).not.toContain('data-ke-mobilestyle=');
+    expect(cleanedHtml).not.toContain('data-origin-width=');
+    expect(cleanedHtml).not.toContain('data-origin-height=');
+    expect(cleanedHtml).not.toContain('data-url=');
+    expect(cleanedHtml).not.toContain('data-phocus=');
+    expect(cleanedHtml).not.toContain('style=');
+    expect(cleanedHtml).not.toContain('loading=');
+    expect(cleanedHtml).not.toContain('<figure');
+    expect(cleanedHtml).not.toContain('<span');
+
+    // 우선은 테이블/이미지 구조가 통째로 보존되는지만 확인한다.
+    expect(cleanedHtml).toContain('<table>');
+    expect(cleanedHtml).toContain('<thead>');
+    expect(cleanedHtml).toContain('<tbody>');
+    expect(cleanedHtml).toContain('<th>');
+    expect(cleanedHtml).toContain('<tr>');
+    expect(cleanedHtml).toContain('<td>');
+
+    expect(cleanedHtml).toContain('<th>Header 1</th>');
+    expect(cleanedHtml).toContain('<th>Header 2</th>');
     expect(cleanedHtml).toContain(
       '<img src="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D" width="2438" height="1640">'
     );
