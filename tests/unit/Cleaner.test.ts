@@ -69,7 +69,7 @@ describe('Cleaner service', () => {
 
   if (!fs.existsSync(TMP_DIR)) {
     fs.mkdirSync(TMP_DIR);
-  };
+  }
 
   it('Just print out the cleaned HTML of post 637 for manual verification', async () => {
     const cleaner = createCleaner();
@@ -109,6 +109,10 @@ describe('Cleaner service', () => {
     const html =
       metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
     const cleanedHtml = cleaner.cleanHtml(html);
+
+    expect(cleanedHtml).not.toContain('data-ke-align=');
+    expect(cleanedHtml).not.toContain('style=');
+    expect(cleanedHtml).not.toContain('border=');
     expect(cleanedHtml).toContain('<table>');
     expect(cleanedHtml).toContain('<thead>');
     expect(cleanedHtml).toContain('<tbody>');
@@ -170,7 +174,7 @@ describe('Cleaner service', () => {
         data-ke-style="alignLeft"
         data-video-host="youtube"
         data-video-url="https://www.youtube.com/watch?v=ddZ-f_nuQ8k"
-        data-video-thumbnail="https://blog.kakaocdn.net/dna/wiT5Z/hyZL1Q7FcY/AAAAAAAAAAAAAAAAAAAAAA5A2vLBp5FpTEf0-hZ38PH36lFG4vcDc3M-nIwL838y/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=ByC2CXcjaUhJxrtnRl4W05BhBos%3D"
+        data-video-thumbnail="https://blog.kakaocdn.net/dna/wiT5Z/hyZL1Q7FcY/AAAAAAAAAAAAAAAAAAAAAA5A2vLBp5FpTEf0-hZ38PH36lFG4vcDc3M-nIwL838y/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ByC2CXcjaUhJxrtnRl4W05BhBos%3D"
         data-video-width="400"
         data-video-height="225"
         data-video-origin-width="860"
@@ -201,8 +205,82 @@ describe('Cleaner service', () => {
     );
   });
 
-  // TODO: 코드 블록 유지. hljs 유지 (보류)
   // TODO: 표 안에 이미지 유지 (보류)
+  it('should keep side-by-side image table structure for now', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <table style="border-collapse: collapse; width: 100%;" border="1" data-ke-align="alignLeft">
+        <tbody>
+          <tr>
+            <td style="width: 50%;">
+              <figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-width="2438" data-origin-height="1640">
+                <span
+                  data-url="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                  data-phocus="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                >
+                  <img
+                    src="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D"
+                    loading="lazy"
+                    width="2438"
+                    height="1640"
+                    data-origin-width="2438"
+                    data-origin-height="1640"
+                  />
+                </span>
+              </figure>
+            </td>
+            <td style="width: 50%;">
+              <figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-width="2438" data-origin-height="1640">
+                <span
+                  data-url="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D"
+                  data-phocus="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D"
+                >
+                  <img
+                    src="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D"
+                    loading="lazy"
+                    width="2438"
+                    height="1640"
+                    data-origin-width="2438"
+                    data-origin-height="1640"
+                  />
+                </span>
+              </figure>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    // 불필요한 속성들이 제거된지 확인한다.
+    expect(cleanedHtml).not.toContain('data-ke-align=');
+    expect(cleanedHtml).not.toContain('data-ke-mobilestyle=');
+    expect(cleanedHtml).not.toContain('data-origin-width=');
+    expect(cleanedHtml).not.toContain('data-origin-height=');
+    expect(cleanedHtml).not.toContain('data-url=');
+    expect(cleanedHtml).not.toContain('data-phocus=');
+    expect(cleanedHtml).not.toContain('style=');
+    expect(cleanedHtml).not.toContain('loading=');
+    expect(cleanedHtml).not.toContain('<figure');
+    expect(cleanedHtml).not.toContain('<span');
+
+    // 우선은 테이블/이미지 구조가 통째로 보존되는지만 확인한다.
+    expect(cleanedHtml).toContain('<table>');
+    expect(cleanedHtml).toContain('<tbody>');
+    expect(cleanedHtml).toContain('<tr>');
+    expect(cleanedHtml).toContain('<td>');
+
+    expect(cleanedHtml).toContain(
+      '<img src="https://blog.kakaocdn.net/dna/ACtHu/btssUOYuIXf/AAAAAAAAAAAAAAAAAAAAAOyT88uPtEbyAToTj98ANe02cRxHsdh3tRq2OqhKHpi7/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=5QWbTCCkWs1sl1uXeuK5wMFrUoo%3D" width="2438" height="1640">'
+    );
+    expect(cleanedHtml).toContain(
+      '<img src="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D" width="2438" height="1640">'
+    );
+  });
+
+  // TODO: 코드 블록 유지. hljs 유지 (보류)
 
   // TODO: Add more tests to cover different scenarios
 });
