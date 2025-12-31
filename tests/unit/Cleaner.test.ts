@@ -433,8 +433,4 @@ describe('Cleaner service', () => {
       '<img src="https://blog.kakaocdn.net/dna/cA0Dvq/btssPwrfyzu/AAAAAAAAAAAAAAAAAAAAAOeMAhRvBHDIFBY0EMDBgPRI2MQtCI4k7cw-ywP37Mfp/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1767193199&amp;allow_ip=&amp;allow_referer=&amp;signature=ta8eEwBebfLEy0JM7kF%2FZClNwIs%3D" width="2438" height="1640">'
     );
   });
-
-  // TODO: 코드 블록 유지. hljs 유지 (보류)
-
-  // TODO: Add more tests to cover different scenarios
 });
