@@ -21,7 +21,7 @@ export interface Author {
   /**
    * Display name for the author
    */
-  display_name: wxrlang;
+  display_name: string;
 }
 
 export interface SiteInfo {
@@ -43,7 +43,7 @@ export interface SiteInfo {
   /**
    * Blog language code (e.g., ko-KR, en-US)
    */
-  language?: string;
+  language?: wxrlang;
 }
 
 export interface WXRData {
