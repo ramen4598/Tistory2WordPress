@@ -18,7 +18,7 @@ A TypeScript CLI tool that migrates Tistory blog posts directly into a target Wo
 Compared to the 003 WXR generator, the main changes are:
 
 - Final output stage: instead of building a WXR XML file, we call WordPress REST endpoints to create content in-place.
-- State management: instead of JSON `migration-state.json`, we use a SQLite DB (Notion2Wordpress-style) to persist jobs, items, and image assets.
+- State management: we use a SQLite DB (Notion2Wordpress-style) to persist jobs, items, image assets, mappings, and internal links (no JSON `migration-state.json`).
 - Error handling: introduce mandatory per-post rollback similar to Notion2Wordpress `syncOrchestrator.rollback`.
 
 ## Technical Context
@@ -373,6 +373,6 @@ Reusing 003 and Notion2Wordpress test fixtures/patterns:
 5. Implement `imageProcessor` for in-memory image download + WP media upload + URL rewrite, with DB-backed image asset tracking.
 6. Implement `migrator` to orchestrate per-post REST migration using existing crawler/cleaner and new db/wpClient/imageProcessor, including rollback.
 7. Wire `postProcessor` (worker pool) to use DB state (jobs/items) and call the new migrator for REST mode.
-8. Extend CLI to support `--mode=rest`, `--all`, `--post`, `--retry-failed` and integrate DB job lifecycle.
+8. Implement REST-only CLI supporting `--all`, `--post`, `--retry-failed` and integrate DB job lifecycle (no `--mode` switch).
 9. Add/update unit & integration tests for new modules and ensure existing 003 tests still pass.
 10. Verify end-to-end on a small Tistory blog (local test instance of WordPress recommended), including intentional failure cases to validate rollback.
