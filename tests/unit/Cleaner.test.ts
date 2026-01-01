@@ -9,20 +9,9 @@ jest.mock('../../src/utils/config');
 const TMP_DIR = path.join(__dirname, '..', 'tmp');
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
-const dummyPost637Html = fs.readFileSync(
-  path.join(__dirname, '..', 'dummy', 'post637.html'),
-  'utf8'
-);
-
-const dummyPost634Html = fs.readFileSync(
-  path.join(__dirname, '..', 'dummy', 'post634.html'),
-  'utf8'
-);
-
-const dummyPost384Html = fs.readFileSync(
-  path.join(__dirname, '..', 'dummy', 'post384.html'),
-  'utf8'
-);
+const dummyPost637Html = fs.readFileSync(path.join(__dirname, 'helpers', 'post637.html'), 'utf8');
+const dummyPost634Html = fs.readFileSync(path.join(__dirname, 'helpers', 'post634.html'), 'utf8');
+const dummyPost384Html = fs.readFileSync(path.join(__dirname, 'helpers', 'post384.html'), 'utf8');
 
 describe('Cleaner service', () => {
   const blogUrl = 'https://ramen4598.tistory.com';
