@@ -39,12 +39,6 @@ export interface Config {
   outputDir: string;
 
   /**
-   * Downloads directory path for attachments
-   * @default "./output/downloads"
-   */
-  downloadsDir: string;
-
-  /**
    * Log level for logging
    * @default "info"
    */
@@ -116,7 +110,6 @@ export const DEFAULT_CONFIG: Partial<Config> = {
   workerCount: 4,
   rateLimitPerWorker: 1000,
   outputDir: './output',
-  downloadsDir: './output/downloads',
   logLevel: 'info',
   categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
 };

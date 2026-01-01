@@ -46,9 +46,6 @@ export function loadConfig(): Config {
 
   const outputDir = process.env['OUTPUT_DIR'] || DEFAULT_CONFIG.outputDir || './output';
 
-  const downloadsDir =
-    process.env['DOWNLOADS_DIR'] || DEFAULT_CONFIG.downloadsDir || './output/downloads';
-
   const logLevel = (process.env['LOG_LEVEL'] ||
     DEFAULT_CONFIG.logLevel ||
     'info') as Config['logLevel'];
@@ -147,7 +144,6 @@ export function loadConfig(): Config {
     workerCount,
     rateLimitPerWorker,
     outputDir,
-    downloadsDir,
     logLevel,
     logFile,
     postTitleSelector,
