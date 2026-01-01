@@ -1,5 +1,5 @@
 import { config as dotenvConfig } from 'dotenv';
-import { Config, DEFAULT_CONFIG } from '../models/Config';
+import { Config, DEFAULT_CONFIG, CategoryHierarchyOrder } from '../models/Config';
 
 /**
  * Error thrown when configuration is invalid
@@ -63,6 +63,20 @@ export function loadConfig(): Config {
   const postTagSelector = process.env['TISTORY_SELECTOR_TAG'];
   const postListLinkSelector = process.env['TISTORY_SELECTOR_POST_LINK'];
   const postContentSelector = process.env['TISTORY_SELECTOR_CONTENT'];
+
+  let categoryHierarchyOrder: CategoryHierarchyOrder;
+  const rawCategoryHierarchyOrder: string | undefined = process.env['CATEGORY_HIERARCHY_ORDER'];
+  if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.FIRST_IS_PARENT) {
+    categoryHierarchyOrder = CategoryHierarchyOrder.FIRST_IS_PARENT;
+  } else if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.LAST_IS_PARENT) {
+    categoryHierarchyOrder = CategoryHierarchyOrder.LAST_IS_PARENT;
+  } else {
+    console.warn(
+      `Invalid or missing CATEGORY_HIERARCHY_ORDER. Defaulting to "${CategoryHierarchyOrder.FIRST_IS_PARENT}".`
+    );
+    categoryHierarchyOrder =
+      DEFAULT_CONFIG.categoryHierarchyOrder || CategoryHierarchyOrder.FIRST_IS_PARENT;
+  }
 
   if (!postTitleSelector) {
     throw new ConfigurationError(
@@ -143,5 +157,6 @@ export function loadConfig(): Config {
     postTagSelector,
     postListLinkSelector,
     postContentSelector,
+    categoryHierarchyOrder,
   };
 }

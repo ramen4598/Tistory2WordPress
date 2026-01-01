@@ -2,6 +2,15 @@
  * Application configuration interface
  * Loaded from environment variables via dotenv
  */
+
+/**
+ * Category hierarchy order options
+ */
+export enum CategoryHierarchyOrder {
+  FIRST_IS_PARENT = 'first-is-parent',
+  LAST_IS_PARENT = 'last-is-parent',
+}
+
 export interface Config {
   /**
    * Tistory blog URL (required)
@@ -89,6 +98,15 @@ export interface Config {
    * e.g. a.link_category
    */
   postListLinkSelector: string;
+
+  /**
+   * Category hierarchy order when two categories are present.
+   * - "first-is-parent": first crawled category is parent
+   * - "last-is-parent": last crawled category is parent
+   * Defaults to "first-is-parent" when not specified or invalid.
+   * @default first-is-parent
+   */
+  categoryHierarchyOrder: CategoryHierarchyOrder;
 }
 
 /**
@@ -100,4 +118,5 @@ export const DEFAULT_CONFIG: Partial<Config> = {
   outputDir: './output',
   downloadsDir: './output/downloads',
   logLevel: 'info',
+  categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
 };

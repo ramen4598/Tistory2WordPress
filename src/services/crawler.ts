@@ -3,6 +3,7 @@ import { loadConfig } from '../utils/config';
 import { Category } from '../models/Category';
 import { Tag } from '../models/Tag';
 import { getLogger } from '../utils/logger';
+import { CategoryHierarchyOrder } from '../models/Config';
 
 export interface CrawlerOptions {
   /**
@@ -197,6 +198,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       .replace(/[^\p{L}\p{N}-]/gu, '');
   };
 
+  // TODO: 파싱 예외 처리 강화 (전반적인 예외 처리 강화가 필요)
   const parsePostMetadata = (html: string, url: string): ParsedPostMetadata => {
     logger.debug('Crawler.parsePostMetadata: parsing metadata', { url });
 
@@ -238,10 +240,38 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       categories.push({
         name,
         slug: slugify(name),
-        parent: null, // TODO: 계층화된 카테고리 지원 방법 고려
+        parent: null,
         description: null,
       });
     });
+
+    // Tistory 카테고리는 최대 2단계만 지원된다.
+    // 가장 먼저 크롤링된 2개의 카테고리만 사용하고,
+    // 환경변수에 따라 부모-자식 관계를 설정한다.
+    const limitedCategories: Category[] = categories.slice(0, 2);
+
+    if (limitedCategories.length === 2) {
+      const [firstCategory, secondCategory] = limitedCategories;
+      const order = config.categoryHierarchyOrder;
+
+      if (!firstCategory || !secondCategory) {
+        throw new Error('Unexpected error: missing category for hierarchy assignment');
+      }
+
+      if (order === CategoryHierarchyOrder.FIRST_IS_PARENT) {
+        const parent = firstCategory;
+        const child = secondCategory;
+        child.parent = parent;
+      } else if (order === CategoryHierarchyOrder.LAST_IS_PARENT) {
+        const parent = secondCategory;
+        const child = firstCategory;
+        child.parent = parent;
+      }
+    }
+
+    // categories 배열을 제한된 결과로 교체한다.
+    categories.length = 0;
+    categories.push(...limitedCategories);
 
     const tags: Tag[] = [];
     $(metadataSelectors.tag).each((_, element) => {

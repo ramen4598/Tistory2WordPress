@@ -23,6 +23,7 @@ describe('Crawler service', () => {
       postCategorySelector: 'div.another_category h4 a',
       postTagSelector: 'div.area_tag a[rel="tag"]',
       postListLinkSelector: 'a.link_category',
+      categoryHierarchyOrder: 'first-is-parent',
     } as any);
   });
 
@@ -222,8 +223,10 @@ describe('Crawler service', () => {
     expect(metadata.categories).toHaveLength(2);
     expect(metadata.categories[0]?.name).toBe('Tech');
     expect(metadata.categories[0]?.slug).toBe('tech');
+    expect(metadata.categories[0]?.parent).toBeNull();
     expect(metadata.categories[1]?.name).toBe('Programming');
     expect(metadata.categories[1]?.slug).toBe('programming');
+    expect(metadata.categories[1]?.parent).toBe(metadata.categories[0]);
 
     expect(metadata.tags).toHaveLength(2);
     expect(metadata.tags[0]?.name).toBe('TypeScript');
@@ -245,7 +248,7 @@ describe('Crawler service', () => {
           </div>
 
           <div class="area_tag">
-            <a href="/tag/typescript" rel="tag">TypeScript</a>
+            <a href="/tag/typescripts" rel="tag">TypeScript</a>
           </div>
         </body>
       </html>
@@ -260,6 +263,7 @@ describe('Crawler service', () => {
 
     expect(metadata.modified_date).toBeNull();
     expect(metadata.categories).toHaveLength(1);
+    expect(metadata.categories[0]?.parent).toBeNull();
     expect(metadata.tags).toHaveLength(1);
   });
 
@@ -290,7 +294,63 @@ describe('Crawler service', () => {
 
     expect(metadata.categories[0]?.name).toBe('개발 일지');
     expect(metadata.categories[0]?.slug).toBe('개발-일지');
+    expect(metadata.categories[0]?.parent).toBeNull();
     expect(metadata.tags[0]?.name).toBe('자바스크립트');
     expect(metadata.tags[0]?.slug).toBe('자바스크립트');
+  });
+
+  it('should treat second category as parent when categoryHierarchyOrder is last-is-parent', () => {
+    const postHtml = `
+      <html>
+        <head>
+          <meta name="title" content="My Test Post" />
+          <meta property="article:published_time" content="2025-01-01" />
+        </head>
+        <body>
+          <div class="another_category">
+            <h4><a href="/category/cat1">Cat1</a></h4>
+            <h4><a href="/category/cat2">Cat2</a></h4>
+            <h4><a href="/category/cat3">Cat3</a></h4>
+          </div>
+
+          <div class="area_tag">
+            <a href="/tag/tag1" rel="tag">Tag1</a>
+          </div>
+        </body>
+      </html>
+    `;
+
+    mockedLoadConfig.mockReturnValue({
+      blogUrl,
+      workerCount: 4,
+      rateLimitPerWorker: 1000,
+      outputDir: './output',
+      downloadsDir: './output/downloads',
+      logLevel: 'info',
+      postTitleSelector: 'meta[name="title"]',
+      postPublishDateSelector: 'meta[property="article:published_time"]',
+      postModifiedDateSelector: 'meta[property="article:modified_time"]',
+      postCategorySelector: 'div.another_category h4 a',
+      postTagSelector: 'div.area_tag a[rel="tag"]',
+      postListLinkSelector: 'a.link_category',
+      categoryHierarchyOrder: 'last-is-parent',
+    } as any);
+
+    const crawler = createCrawler({
+      fetchFn: jest.fn() as any,
+    });
+
+    const url = `${blogUrl}/hierarchy`;
+    const metadata = crawler.parsePostMetadata(postHtml, url);
+
+    expect(metadata.categories).toHaveLength(2);
+
+    const [cat1, cat2] = metadata.categories;
+
+    expect(cat1.name).toBe('Cat1');
+    expect(cat2.name).toBe('Cat2');
+
+    expect(cat2.parent).toBeNull();
+    expect(cat1.parent).toBe(cat2);
   });
 });
