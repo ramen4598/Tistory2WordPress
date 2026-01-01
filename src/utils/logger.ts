@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { loadConfig } from './config';
 
 /**
  * Log level enumeration
@@ -33,9 +34,15 @@ export class Logger {
   private logFile?: string;
   private fileStream?: fs.WriteStream;
 
-  constructor(config: LoggerConfig) {
-    this.level = config.level;
-    this.logFile = config.logFile;
+  constructor(config?: LoggerConfig) {
+    if (config) {
+      this.level = config.level;
+      this.logFile = config.logFile;
+    } else {
+      const { logLevel, logFile } = loadConfig();
+      this.level = logLevel;
+      this.logFile = logFile;
+    }
 
     // Initialize file stream if logFile is provided
     if (this.logFile) {
@@ -158,14 +165,12 @@ let globalLogger: Logger | null = null;
 /**
  * Get global logger instance.
  * If not initialized yet, create a default one.
- *
- * Default configuration:
- * - level: 'info'
- * - no log file (console only)
+ * @param config Optional logger configuration
+ * @returns Global Logger instance
  */
-export function getLogger(): Logger {
+export function getLogger(config?: LoggerConfig): Logger {
   if (!globalLogger) {
-    globalLogger = new Logger({ level: 'info' });
+    globalLogger = new Logger(config);
   }
   return globalLogger;
 }
