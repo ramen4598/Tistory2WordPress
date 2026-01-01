@@ -2,6 +2,8 @@ import { Post } from './Post';
 import { Category } from './Category';
 import { Tag } from './Tag';
 
+export type wxrlang = 'ko-KR' | 'en-US';
+
 /**
  * Aggregated data structure for WXR generation
  */
@@ -19,7 +21,7 @@ export interface Author {
   /**
    * Display name for the author
    */
-  display_name: string;
+  display_name: wxrlang;
 }
 
 export interface SiteInfo {
@@ -37,6 +39,11 @@ export interface SiteInfo {
    * Blog base URL
    */
   url: string;
+
+  /**
+   * Blog language code (e.g., ko-KR, en-US)
+   */
+  language?: string;
 }
 
 export interface WXRData {

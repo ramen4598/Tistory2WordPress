@@ -8,6 +8,11 @@ import { Attachment } from './Attachment';
  */
 export interface Post {
   /**
+   * Post ID (for WXR generation, auto-generated)
+   */
+  id?: number;
+
+  /**
    * Original Tistory post URL (unique identifier)
    * Must be valid URL format and start with TISTORY_BLOG_URL
    */
