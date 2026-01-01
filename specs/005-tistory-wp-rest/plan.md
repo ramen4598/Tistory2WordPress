@@ -101,7 +101,7 @@ src/
 │   ├── logger.ts                # Logging (reused)
 │   ├── retry.ts                 # NEW: retryWithBackoff (from Notion2Wordpress)
 │   └── state.ts                 # May wrap DB-based state or be phased out
-└── cli.ts or index.ts           # CLI entrypoint (mode flags for WXR vs REST if needed)
+└── cli.ts                       # REST-only CLI entrypoint for 005 (no WXR mode or entrypoint)
 
 output/
 └── link_mapping.json            # Optional internal link mapping export (derived from DB)
@@ -315,7 +315,6 @@ Adaptation from 003:
 ### 3.7 CLI Entrypoint
 
 - CLI options:
-  - `--mode=rest` vs `--mode=wxr` (003 compatibility), or separate commands.
   - `--all` (default): migrate entire blog.
   - `--post=<url>`: migrate a single post for testing.
   - Optional: `--retry-failed` to only reprocess failed posts.

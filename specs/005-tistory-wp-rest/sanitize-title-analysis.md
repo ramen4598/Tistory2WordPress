@@ -142,6 +142,46 @@ $str = sanitize_title( $str );
   - 혹은 `research.md`/`wordpress-rest.md`에:
     - `sanitize_title()` 개요와 "slug 정책은 WP 코어/사이트 설정을 따른다"는 짧은 요약을 포함.
 
+## 5.1 Taxonomy 검색 (`/categories?search=`, `/tags?search=`) 사용 시 주의점
+
+- WordPress REST API의 `GET /wp-json/wp/v2/categories?search={term}` 및 `GET /wp-json/wp/v2/tags?search={term}`는:
+  - **name, slug, description** 필드에서 반(半)일치 텍스트를 모두 포함하는 범위 검색으로 동작한다.
+  - 가능한 상황:
+    - `{term}`이 카테고리 이름의 일부로만 포함돼도 결과에 포함될 수 있다.
+    - `{term}`가 description 내용에만 나타나도 검색 결과에 포함될 수 있다.
+    - slug 에도 가능한 일부 문자열 일치가 포함된다.
+- 따라서 `?search={name}`만으로 특정 슬러그/용어를 **정확히 식별된 단일 카테고리/태그**와 1:1 매핑한다고 가정하면 안 된다.
+  - 특히, description 에 `{name}`가 들어간 전혀 다른 카테고리가 선택될 위험이 있다.
+
+### 5.1.1 `ensureCategory` / `ensureTag` 설계 패턴
+
+- REST 호출 단계:
+  1. `GET /wp-json/wp/v2/categories?search={name}` 또는 `/tags?search={name}` 로 **후보 목록**을 가져온다.
+  2. 응답 배열에서 **정확한 이름 일치만 필터링**한다:
+
+     ```ts
+     const exactMatches = results.filter((term) => term.name === name);
+     ```
+
+- 결정 로직 제안:
+  - `exactMatches.length === 1` 인 경우:
+    - 해당 term 의 `id`를 재사용하고, `Category.wpId`/`Tag.wpId` 에 저장한다.
+  - `exactMatches.length === 0` 인 경우:
+    - `POST /wp-json/wp/v2/categories` (또는 `/tags`) 로 `{ name }` 만 담아 새 term 을 생성한다.
+    - 응답으로 받은 `id` (및 필요 시 `slug`)를 로컬에 캐시한다.
+  - `exactMatches.length > 1` 인 경우:
+    - - 우선 parent 나 taxonomy-specific 제약(예: 상위 카테고리)을 알고 있다면 추가 필터링에 사용한다.
+      - 그렇지 않다면, 첫 번째 항목을 선택하되 **경고 로그**를 남겨 운영자가 중복을 정리할 수 있도록 한다.
+
+- 캐싱 전략:
+  - 마이그레이션 실행 중에는 `name → termId` 매핑을 메모리에 캐시하면, 동일한 이름에 대해 WordPress 를 반복 조회하지 않아도 된다.
+  - 장기적으로는 DB 나 별도 테이블(`categories`, `tags` 등)이 이 역할을 할 수 있지만, 005 스코프에서는 `Category.wpId`/`Tag.wpId` 와 간단한 in-memory 캐시만으로도 충분하다.
+
+- 이 패턴의 장점:
+  - slug 를 직접 알거나 계산할 필요가 없다.
+  - `search` 가 description/slug 를 포함한 모호한 검색이라는 사실을 전제로, **정확한 이름 일치 후 필터링**으로 오탐을 줄인다.
+  - WordPress 코어와 사이트 설정(필터/플러그인)에 의해 생성된 slug 를 그대로 신뢰하면서도, 우리가 원하는 이름 기반 카테고리/태그 재사용 로직을 구현할 수 있다.
+
 ## 6. 요약
 
 - `sanitize_title()`은 **WordPress slug/URL용 문자열을 만드는 저수준 함수**로, 실제 동작은 `remove_accents()` + `sanitize_title` 필터(`sanitize_title_with_dashes()`)로 이루어진다.
