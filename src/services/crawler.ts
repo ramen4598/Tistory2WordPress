@@ -3,7 +3,7 @@ import { loadConfig } from '../utils/config';
 import { Category } from '../models/Category';
 import { Tag } from '../models/Tag';
 import { getLogger } from '../utils/logger';
-import { CategoryHierarchyOrder } from '../models/Config';
+import { CategoryHierarchyOrder } from '../enums/config.enum';
 
 export interface CrawlerOptions {
   /**

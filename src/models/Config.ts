@@ -1,5 +1,4 @@
-import { CategoryHierarchyOrder } from '../enums/config.enum';
-import { LogLevel } from '../utils/logger';
+import { CategoryHierarchyOrder, LogLevel } from '../enums/config.enum';
 
 /**
  * Application configuration interface
