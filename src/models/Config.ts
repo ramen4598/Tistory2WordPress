@@ -19,6 +19,52 @@ export interface Config {
   blogUrl: string;
 
   /**
+   * WordPress site base URL (REST root is derived from this)
+   * @example "https://example.com"
+   */
+  wpBaseUrl?: string;
+
+  /**
+   * WordPress Application Password username
+   */
+  wpAppUser?: string;
+
+  /**
+   * WordPress Application Password value
+   */
+  wpAppPassword?: string;
+
+  /**
+   * SQLite DB file path for REST migration state
+   * @default "./data/migration.db"
+   */
+  migrationDbPath?: string;
+
+  /**
+   * Maximum retry attempts for transient HTTP errors
+   * @default 3
+   */
+  maxRetryAttempts?: number;
+
+  /**
+   * Initial retry delay in milliseconds
+   * @default 500
+   */
+  retryInitialDelayMs?: number;
+
+  /**
+   * Maximum retry delay in milliseconds
+   * @default 10000
+   */
+  retryMaxDelayMs?: number;
+
+  /**
+   * Backoff multiplier for retries
+   * @default 2
+   */
+  retryBackoffMultiplier?: number;
+
+  /**
    * Number of concurrent workers for parallel processing
    * @default 4
    * @min 1
@@ -112,4 +158,10 @@ export const DEFAULT_CONFIG: Partial<Config> = {
   outputDir: './output',
   logLevel: 'info',
   categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
+
+  migrationDbPath: './data/migration.db',
+  maxRetryAttempts: 3,
+  retryInitialDelayMs: 500,
+  retryMaxDelayMs: 10000,
+  retryBackoffMultiplier: 2,
 };

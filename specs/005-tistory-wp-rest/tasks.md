@@ -13,8 +13,8 @@
 
 ⚠️ **Critical**: All user stories depend on these tasks.
 
-- [ ] T201 [FOUND] Update `src/utils/config.ts` to load WP REST + SQLite settings and extend `src/models/Config.ts`.
-- [ ] T202 [P] [FOUND] Refresh `.env.example` and docs to document new REST environment variables.
+- [x] T201 [FOUND] Update `src/utils/config.ts` to load WP REST + SQLite settings and extend `src/models/Config.ts`.
+- [x] T202 [P] [FOUND] Refresh `.env.example` and docs to document new REST environment variables.
 - [ ] T203 [FOUND] Add `utils/validation.ts` helpers for config/env guards reused across services.
 - [ ] T204 [FOUND] Introduce `utils/retry.ts` with exponential backoff (inspired by Notion2Wordpress).
 - [ ] T205 [P] [FOUND] Scaffold `src/db/index.ts` and wire up `better-sqlite3` dependency.

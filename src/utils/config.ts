@@ -52,6 +52,30 @@ export function loadConfig(): Config {
 
   const logFile = process.env['LOG_FILE'];
 
+  // Optional fields for WP REST migration mode (005)
+  const wpBaseUrl = process.env['WP_BASE_URL'];
+  const wpAppUser = process.env['WP_APP_USER'];
+  const wpAppPassword = process.env['WP_APP_PASSWORD'];
+
+  const migrationDbPath =
+    process.env['MIGRATION_DB_PATH'] || DEFAULT_CONFIG.migrationDbPath || './data/migration.db';
+
+  const maxRetryAttempts = process.env['MAX_RETRY_ATTEMPTS']
+    ? parseInt(process.env['MAX_RETRY_ATTEMPTS'], 10)
+    : (DEFAULT_CONFIG.maxRetryAttempts ?? 3);
+
+  const retryInitialDelayMs = process.env['RETRY_INITIAL_DELAY_MS']
+    ? parseInt(process.env['RETRY_INITIAL_DELAY_MS'], 10)
+    : (DEFAULT_CONFIG.retryInitialDelayMs ?? 500);
+
+  const retryMaxDelayMs = process.env['RETRY_MAX_DELAY_MS']
+    ? parseInt(process.env['RETRY_MAX_DELAY_MS'], 10)
+    : (DEFAULT_CONFIG.retryMaxDelayMs ?? 10000);
+
+  const retryBackoffMultiplier = process.env['RETRY_BACKOFF_MULTIPLIER']
+    ? parseFloat(process.env['RETRY_BACKOFF_MULTIPLIER'])
+    : (DEFAULT_CONFIG.retryBackoffMultiplier ?? 2);
+
   // Load required CSS selectors for post metadata
   const postTitleSelector = process.env['TISTORY_SELECTOR_TITLE'];
   const postPublishDateSelector = process.env['TISTORY_SELECTOR_PUBLISH_DATE'];
@@ -139,6 +163,52 @@ export function loadConfig(): Config {
     );
   }
 
+  // Validate retry config
+  if (isNaN(maxRetryAttempts) || maxRetryAttempts < 0) {
+    throw new ConfigurationError(
+      `MAX_RETRY_ATTEMPTS must be a positive number. Got: ${process.env['MAX_RETRY_ATTEMPTS']}`
+    );
+  }
+
+  if (isNaN(retryInitialDelayMs) || retryInitialDelayMs < 0) {
+    throw new ConfigurationError(
+      `RETRY_INITIAL_DELAY_MS must be a positive number. Got: ${process.env['RETRY_INITIAL_DELAY_MS']}`
+    );
+  }
+
+  if (isNaN(retryMaxDelayMs) || retryMaxDelayMs < 0) {
+    throw new ConfigurationError(
+      `RETRY_MAX_DELAY_MS must be a positive number. Got: ${process.env['RETRY_MAX_DELAY_MS']}`
+    );
+  }
+
+  if (isNaN(retryBackoffMultiplier) || retryBackoffMultiplier < 1) {
+    throw new ConfigurationError(
+      `RETRY_BACKOFF_MULTIPLIER must be a number >= 1. Got: ${process.env['RETRY_BACKOFF_MULTIPLIER']}`
+    );
+  }
+
+  // If any WP_* variable is set, require all of them.
+  const isRestConfigured = Boolean(wpBaseUrl || wpAppUser || wpAppPassword);
+  if (isRestConfigured) {
+    if (!wpBaseUrl) {
+      throw new ConfigurationError('WP_BASE_URL is required when using REST mode.');
+    }
+    try {
+      new URL(wpBaseUrl);
+    } catch {
+      throw new ConfigurationError(`WP_BASE_URL must be a valid URL. Got: ${wpBaseUrl}`);
+    }
+
+    if (!wpAppUser) {
+      throw new ConfigurationError('WP_APP_USER is required when using REST mode.');
+    }
+
+    if (!wpAppPassword) {
+      throw new ConfigurationError('WP_APP_PASSWORD is required when using REST mode.');
+    }
+  }
+
   return {
     blogUrl,
     workerCount,
@@ -146,6 +216,17 @@ export function loadConfig(): Config {
     outputDir,
     logLevel,
     logFile,
+
+    wpBaseUrl,
+    wpAppUser,
+    wpAppPassword,
+    migrationDbPath,
+
+    maxRetryAttempts,
+    retryInitialDelayMs,
+    retryMaxDelayMs,
+    retryBackoffMultiplier,
+
     postTitleSelector,
     postPublishDateSelector,
     postModifiedDateSelector,
