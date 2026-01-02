@@ -1,8 +1,8 @@
-import { Post } from '../../src/models/Post';
-import { Category } from '../../src/models/Category';
-import { Tag } from '../../src/models/Tag';
-import { Image } from '../../src/models/Image';
-import { Attachment } from '../../src/models/Attachment';
+import { Post } from '../../../src/models/Post';
+import { Category } from '../../../src/models/Category';
+import { Tag } from '../../../src/models/Tag';
+import { Image } from '../../../src/models/Image';
+import { Attachment } from '../../../src/models/Attachment';
 
 describe('Post', () => {
   describe('Post creation', () => {

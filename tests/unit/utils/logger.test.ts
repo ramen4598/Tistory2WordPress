@@ -6,7 +6,7 @@ import {
   closeLogger,
   configureLogger,
   LoggerConfig,
-} from '../../src/utils/logger';
+} from '../../../src/utils/logger';
 
 describe('Logger', () => {
   const testLogDir = path.join(__dirname, '../../tmp/logs');

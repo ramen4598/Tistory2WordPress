@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { loadConfig } from '../../src/utils/config';
-import { createCrawler } from '../../src/services/crawler';
+import { loadConfig } from '../../../src/utils/config';
+import { createCrawler } from '../../../src/services/crawler';
 
-jest.mock('../../src/utils/config');
+jest.mock('../../../src/utils/config');
 
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 

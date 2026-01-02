@@ -1,17 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'fs';
 import * as path from 'path';
-import { loadConfig } from '../../src/utils/config';
-import { createCleaner } from '../../src/services/cleaner';
+import { loadConfig } from '../../../src/utils/config';
+import { createCleaner } from '../../../src/services/cleaner';
 
-jest.mock('../../src/utils/config');
+jest.mock('../../../src/utils/config');
 
 const TMP_DIR = path.join(__dirname, '..', 'tmp');
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
-const dummyPost637Html = fs.readFileSync(path.join(__dirname, 'helpers', 'post637.html'), 'utf8');
-const dummyPost634Html = fs.readFileSync(path.join(__dirname, 'helpers', 'post634.html'), 'utf8');
-const dummyPost384Html = fs.readFileSync(path.join(__dirname, 'helpers', 'post384.html'), 'utf8');
+const dummyPost637Html = fs.readFileSync(
+  path.join(__dirname, '..', 'helpers', 'post637.html'),
+  'utf8'
+);
+const dummyPost634Html = fs.readFileSync(
+  path.join(__dirname, '..', 'helpers', 'post634.html'),
+  'utf8'
+);
+const dummyPost384Html = fs.readFileSync(
+  path.join(__dirname, '..', 'helpers', 'post384.html'),
+  'utf8'
+);
 
 describe('Cleaner service', () => {
   const blogUrl = 'https://ramen4598.tistory.com';

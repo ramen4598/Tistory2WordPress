@@ -1,4 +1,4 @@
-import { MigrationState } from '../../src/models/MigrationState';
+import { MigrationState } from '../../../src/models/MigrationState';
 
 describe('MigrationState', () => {
   describe('MigrationState creation', () => {

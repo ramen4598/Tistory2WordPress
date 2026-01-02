@@ -1,7 +1,7 @@
-import { WXRData } from '../../src/models/WXRData';
-import { Post } from '../../src/models/Post';
-import { Category } from '../../src/models/Category';
-import { Tag } from '../../src/models/Tag';
+import { WXRData } from '../../../src/models/WXRData';
+import { Post } from '../../../src/models/Post';
+import { Category } from '../../../src/models/Category';
+import { Tag } from '../../../src/models/Tag';
 
 describe('WXRData', () => {
   describe('WXRData creation', () => {

@@ -1,4 +1,4 @@
-import { InternalLink } from '../../src/models/InternalLink';
+import { InternalLink } from '../../../src/models/InternalLink';
 
 describe('InternalLink', () => {
   describe('InternalLink creation', () => {
