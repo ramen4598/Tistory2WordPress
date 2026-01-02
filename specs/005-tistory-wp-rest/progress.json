@@ -1,0 +1,54 @@
+{
+  "feature": "005-tistory-wp-rest",
+  "branch": "005-tistory-wp-rest",
+  "created_at": "2026-01-01T00:00:00Z",
+  "last_updated": null,
+  "phases": {
+    "specify": {
+      "status": "completed",
+      "started_at": "2026-01-01T00:00:00Z",
+      "completed_at": "2026-01-01T00:10:00Z",
+      "output_files": [
+        "spec.md",
+        "checklists/requirements.md"
+      ]
+    },
+    "clarify": {
+      "status": "completed",
+      "started_at": "2026-01-01T06:00:00Z",
+      "completed_at": "2026-01-01T06:30:00Z",
+      "output_files": [
+        "spec.md"
+      ]
+    },
+    "plan": {
+      "status": "completed",
+      "started_at": "2026-01-01T12:00:00Z",
+      "completed_at": "2026-01-01T14:00:00Z",
+      "output_files": [
+        "plan.md",
+        "data-model.md",
+        "sequence-diagram.md",
+        "quickstart.md",
+        "contracts/",
+        "research.md"
+      ]
+    },
+    "tasks": {
+      "status": "completed",
+      "started_at": "2026-01-02T00:00:00Z",
+      "completed_at": "2026-01-02T02:00:00Z",
+      "output_files": [
+        "tasks.md"
+      ]
+    },
+    "analyze": {
+      "status": "completed",
+      "started_at": "2026-01-02T02:05:00Z",
+      "completed_at": "2026-01-02T02:30:00Z",
+      "output_files": [
+        "analysis-report (virtual)"
+      ]
+    }
+  }
+}
