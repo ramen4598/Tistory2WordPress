@@ -1,16 +1,10 @@
+import { CategoryHierarchyOrder } from '../enums/config.enum';
+import { LogLevel } from '../utils/logger';
+
 /**
  * Application configuration interface
  * Loaded from environment variables via dotenv
  */
-
-/**
- * Category hierarchy order options
- */
-export enum CategoryHierarchyOrder {
-  FIRST_IS_PARENT = 'first-is-parent',
-  LAST_IS_PARENT = 'last-is-parent',
-}
-
 export interface Config {
   /**
    * Tistory blog URL (required)
@@ -22,51 +16,51 @@ export interface Config {
    * WordPress site base URL (REST root is derived from this)
    * @example "https://example.com"
    */
-  wpBaseUrl?: string;
+  wpBaseUrl: string;
 
   /**
    * WordPress Application Password username
    */
-  wpAppUser?: string;
+  wpAppUser: string;
 
   /**
    * WordPress Application Password value
    */
-  wpAppPassword?: string;
+  wpAppPassword: string;
 
   /**
    * SQLite DB file path for REST migration state
-   * @default "./data/migration.db"
+   * @default DefaultConfig.MIGRATION_DB_PATH
    */
-  migrationDbPath?: string;
+  migrationDbPath: string;
 
   /**
    * Maximum retry attempts for transient HTTP errors
-   * @default 3
+   * @default DefaultConfig.MAX_RETRY_ATTEMPTS
    */
-  maxRetryAttempts?: number;
+  maxRetryAttempts: number;
 
   /**
    * Initial retry delay in milliseconds
-   * @default 500
+   * @default DefaultConfig.RETRY_INITIAL_DELAY_MS
    */
-  retryInitialDelayMs?: number;
+  retryInitialDelayMs: number;
 
   /**
    * Maximum retry delay in milliseconds
-   * @default 10000
+   * @default DefaultConfig.RETRY_MAX_DELAY_MS
    */
-  retryMaxDelayMs?: number;
+  retryMaxDelayMs: number;
 
   /**
    * Backoff multiplier for retries
-   * @default 2
+   * @default DefaultConfig.RETRY_BACKOFF_MULTIPLIER
    */
-  retryBackoffMultiplier?: number;
+  retryBackoffMultiplier: number;
 
   /**
    * Number of concurrent workers for parallel processing
-   * @default 4
+   * @default DefaultConfig.WORKER_COUNT
    * @min 1
    * @max 16
    */
@@ -74,21 +68,21 @@ export interface Config {
 
   /**
    * Rate limit per worker in milliseconds
-   * @default 1000 (1 request per second)
+   * @default DefaultConfig.RATE_LIMIT_PER_WORKER
    */
   rateLimitPerWorker: number;
 
   /**
    * Output directory path for generated files
-   * @default "./output"
+   * @default DefaultConfig.OUTPUT_DIR
    */
   outputDir: string;
 
   /**
    * Log level for logging
-   * @default "info"
+   * @default DefaultConfig.LOG_LEVEL
    */
-  logLevel: 'debug' | 'info' | 'warn' | 'error';
+  logLevel: LogLevel;
 
   /**
    * Log file path (optional)
@@ -144,24 +138,7 @@ export interface Config {
    * - "first-is-parent": first crawled category is parent
    * - "last-is-parent": last crawled category is parent
    * Defaults to "first-is-parent" when not specified or invalid.
-   * @default first-is-parent
+   * @default DefaultConfig.CATEGORY_HIERARCHY_ORDER
    */
   categoryHierarchyOrder: CategoryHierarchyOrder;
 }
-
-/**
- * Default configuration values
- */
-export const DEFAULT_CONFIG: Partial<Config> = {
-  workerCount: 4,
-  rateLimitPerWorker: 1000,
-  outputDir: './output',
-  logLevel: 'info',
-  categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
-
-  migrationDbPath: './data/migration.db',
-  maxRetryAttempts: 3,
-  retryInitialDelayMs: 500,
-  retryMaxDelayMs: 10000,
-  retryBackoffMultiplier: 2,
-};

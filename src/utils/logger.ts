@@ -1,11 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { loadConfig } from './config';
-
-/**
- * Log level enumeration
- */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+import { LogLevel } from '../enums/config.enum';
 
 /**
  * Logger configuration
@@ -19,10 +15,10 @@ export interface LoggerConfig {
  * Log level priority for filtering
  */
 const LOG_LEVELS: Record<LogLevel, number> = {
-  debug: 0,
-  info: 1,
-  warn: 2,
-  error: 3,
+  [LogLevel.DEBUG]: 0,
+  [LogLevel.INFO]: 1,
+  [LogLevel.WARN]: 2,
+  [LogLevel.ERROR]: 3,
 };
 
 /**
@@ -98,16 +94,16 @@ export class Logger {
 
     // Console output
     switch (level) {
-      case 'debug':
+      case LogLevel.DEBUG:
         console.debug(formattedMessage);
         break;
-      case 'info':
+      case LogLevel.INFO:
         console.info(formattedMessage);
         break;
-      case 'warn':
+      case LogLevel.WARN:
         console.warn(formattedMessage);
         break;
-      case 'error':
+      case LogLevel.ERROR:
         console.error(formattedMessage);
         break;
     }
@@ -122,28 +118,28 @@ export class Logger {
    * Log debug message
    */
   debug(message: string, ...args: unknown[]): void {
-    this.log('debug', message, ...args);
+    this.log(LogLevel.DEBUG, message, ...args);
   }
 
   /**
    * Log info message
    */
   info(message: string, ...args: unknown[]): void {
-    this.log('info', message, ...args);
+    this.log(LogLevel.INFO, message, ...args);
   }
 
   /**
    * Log warning message
    */
   warn(message: string, ...args: unknown[]): void {
-    this.log('warn', message, ...args);
+    this.log(LogLevel.WARN, message, ...args);
   }
 
   /**
    * Log error message
    */
   error(message: string, ...args: unknown[]): void {
-    this.log('error', message, ...args);
+    this.log(LogLevel.ERROR, message, ...args);
   }
 
   /**

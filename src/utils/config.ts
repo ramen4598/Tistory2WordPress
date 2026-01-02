@@ -1,5 +1,6 @@
 import { config as dotenvConfig } from 'dotenv';
-import { Config, DEFAULT_CONFIG, CategoryHierarchyOrder } from '../models/Config';
+import { Config } from '../models/Config';
+import { CategoryHierarchyOrder, LogLevel, DefaultConfig } from '../enums/config.enum';
 
 /**
  * Error thrown when configuration is invalid
@@ -36,55 +37,48 @@ export function loadConfig(): Config {
   }
 
   // Load optional fields with defaults
-  const workerCount = process.env['WORKER_COUNT']
+  const workerCount: number = process.env['WORKER_COUNT']
     ? parseInt(process.env['WORKER_COUNT'], 10)
-    : (DEFAULT_CONFIG.workerCount ?? 4);
+    : DefaultConfig.WORKER_COUNT;
 
-  const rateLimitPerWorker = process.env['RATE_LIMIT_PER_WORKER']
+  const rateLimitPerWorker: number = process.env['RATE_LIMIT_PER_WORKER']
     ? parseInt(process.env['RATE_LIMIT_PER_WORKER'], 10)
-    : (DEFAULT_CONFIG.rateLimitPerWorker ?? 1000);
+    : DefaultConfig.RATE_LIMIT_PER_WORKER;
+  const outputDir: string = process.env['OUTPUT_DIR'] || DefaultConfig.OUTPUT_DIR;
 
-  const outputDir = process.env['OUTPUT_DIR'] || DEFAULT_CONFIG.outputDir || './output';
+  const logLevel: LogLevel = (process.env['LOG_LEVEL'] as LogLevel) || DefaultConfig.LOG_LEVEL;
 
-  const logLevel = (process.env['LOG_LEVEL'] ||
-    DEFAULT_CONFIG.logLevel ||
-    'info') as Config['logLevel'];
-
-  const logFile = process.env['LOG_FILE'];
+  const logFile: string | undefined = process.env['LOG_FILE'];
 
   // Optional fields for WP REST migration mode (005)
-  const wpBaseUrl = process.env['WP_BASE_URL'];
-  const wpAppUser = process.env['WP_APP_USER'];
-  const wpAppPassword = process.env['WP_APP_PASSWORD'];
+  const wpBaseUrl: string | undefined = process.env['WP_BASE_URL'];
+  const wpAppUser: string | undefined = process.env['WP_APP_USER'];
+  const wpAppPassword: string | undefined = process.env['WP_APP_PASSWORD'];
 
-  const migrationDbPath =
-    process.env['MIGRATION_DB_PATH'] || DEFAULT_CONFIG.migrationDbPath || './data/migration.db';
+  const migrationDbPath: string = process.env['MIGRATION_DB_PATH'] || DefaultConfig.MIGRATION_DB_PATH;
 
-  const maxRetryAttempts = process.env['MAX_RETRY_ATTEMPTS']
+  const maxRetryAttempts: number = process.env['MAX_RETRY_ATTEMPTS']
     ? parseInt(process.env['MAX_RETRY_ATTEMPTS'], 10)
-    : (DEFAULT_CONFIG.maxRetryAttempts ?? 3);
-
-  const retryInitialDelayMs = process.env['RETRY_INITIAL_DELAY_MS']
+    : DefaultConfig.MAX_RETRY_ATTEMPTS;
+  const retryInitialDelayMs: number = process.env['RETRY_INITIAL_DELAY_MS']
     ? parseInt(process.env['RETRY_INITIAL_DELAY_MS'], 10)
-    : (DEFAULT_CONFIG.retryInitialDelayMs ?? 500);
+    : DefaultConfig.RETRY_INITIAL_DELAY_MS;
 
-  const retryMaxDelayMs = process.env['RETRY_MAX_DELAY_MS']
+  const retryMaxDelayMs: number = process.env['RETRY_MAX_DELAY_MS']
     ? parseInt(process.env['RETRY_MAX_DELAY_MS'], 10)
-    : (DEFAULT_CONFIG.retryMaxDelayMs ?? 10000);
-
-  const retryBackoffMultiplier = process.env['RETRY_BACKOFF_MULTIPLIER']
+    : DefaultConfig.RETRY_MAX_DELAY_MS;
+  const retryBackoffMultiplier: number = process.env['RETRY_BACKOFF_MULTIPLIER']
     ? parseFloat(process.env['RETRY_BACKOFF_MULTIPLIER'])
-    : (DEFAULT_CONFIG.retryBackoffMultiplier ?? 2);
+    : DefaultConfig.RETRY_BACKOFF_MULTIPLIER;
 
   // Load required CSS selectors for post metadata
-  const postTitleSelector = process.env['TISTORY_SELECTOR_TITLE'];
-  const postPublishDateSelector = process.env['TISTORY_SELECTOR_PUBLISH_DATE'];
-  const postModifiedDateSelector = process.env['TISTORY_SELECTOR_MODIFIED_DATE'];
-  const postCategorySelector = process.env['TISTORY_SELECTOR_CATEGORY'];
-  const postTagSelector = process.env['TISTORY_SELECTOR_TAG'];
-  const postListLinkSelector = process.env['TISTORY_SELECTOR_POST_LINK'];
-  const postContentSelector = process.env['TISTORY_SELECTOR_CONTENT'];
-
+  const postTitleSelector: string | undefined = process.env['TISTORY_SELECTOR_TITLE'];
+  const postPublishDateSelector: string | undefined = process.env['TISTORY_SELECTOR_PUBLISH_DATE'];
+  const postModifiedDateSelector: string | undefined = process.env['TISTORY_SELECTOR_MODIFIED_DATE'];
+  const postCategorySelector: string | undefined = process.env['TISTORY_SELECTOR_CATEGORY'];
+  const postTagSelector: string | undefined = process.env['TISTORY_SELECTOR_TAG'];
+  const postListLinkSelector: string | undefined = process.env['TISTORY_SELECTOR_POST_LINK'];
+  const postContentSelector: string | undefined = process.env['TISTORY_SELECTOR_CONTENT'];
   let categoryHierarchyOrder: CategoryHierarchyOrder;
   const rawCategoryHierarchyOrder: string | undefined = process.env['CATEGORY_HIERARCHY_ORDER'];
   if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.FIRST_IS_PARENT) {
@@ -96,7 +90,8 @@ export function loadConfig(): Config {
       `Invalid or missing CATEGORY_HIERARCHY_ORDER. Defaulting to "${CategoryHierarchyOrder.FIRST_IS_PARENT}".`
     );
     categoryHierarchyOrder =
-      DEFAULT_CONFIG.categoryHierarchyOrder || CategoryHierarchyOrder.FIRST_IS_PARENT;
+      (DefaultConfig.CATEGORY_HIERARCHY_ORDER as unknown as CategoryHierarchyOrder) ||
+      CategoryHierarchyOrder.FIRST_IS_PARENT;
   }
 
   if (!postTitleSelector) {
@@ -189,24 +184,21 @@ export function loadConfig(): Config {
   }
 
   // If any WP_* variable is set, require all of them.
-  const isRestConfigured = Boolean(wpBaseUrl || wpAppUser || wpAppPassword);
-  if (isRestConfigured) {
-    if (!wpBaseUrl) {
-      throw new ConfigurationError('WP_BASE_URL is required when using REST mode.');
-    }
-    try {
-      new URL(wpBaseUrl);
-    } catch {
-      throw new ConfigurationError(`WP_BASE_URL must be a valid URL. Got: ${wpBaseUrl}`);
-    }
+  if (!wpBaseUrl) {
+    throw new ConfigurationError('WP_BASE_URL is required when using REST mode.');
+  }
+  try {
+    new URL(wpBaseUrl);
+  } catch {
+    throw new ConfigurationError(`WP_BASE_URL must be a valid URL. Got: ${wpBaseUrl}`);
+  }
 
-    if (!wpAppUser) {
-      throw new ConfigurationError('WP_APP_USER is required when using REST mode.');
-    }
+  if (!wpAppUser) {
+    throw new ConfigurationError('WP_APP_USER is required when using REST mode.');
+  }
 
-    if (!wpAppPassword) {
-      throw new ConfigurationError('WP_APP_PASSWORD is required when using REST mode.');
-    }
+  if (!wpAppPassword) {
+    throw new ConfigurationError('WP_APP_PASSWORD is required when using REST mode.');
   }
 
   return {
