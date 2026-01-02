@@ -29,37 +29,37 @@ export interface Config {
 
   /**
    * SQLite DB file path for REST migration state
-   * @default DefaultConfig.MIGRATION_DB_PATH
+   * @default './data/migration.db'
    */
   migrationDbPath: string;
 
   /**
    * Maximum retry attempts for transient HTTP errors
-   * @default DefaultConfig.MAX_RETRY_ATTEMPTS
+   * @default 3
    */
   maxRetryAttempts: number;
 
   /**
    * Initial retry delay in milliseconds
-   * @default DefaultConfig.RETRY_INITIAL_DELAY_MS
+   * @default 500
    */
   retryInitialDelayMs: number;
 
   /**
    * Maximum retry delay in milliseconds
-   * @default DefaultConfig.RETRY_MAX_DELAY_MS
+   * @default 10000
    */
   retryMaxDelayMs: number;
 
   /**
    * Backoff multiplier for retries
-   * @default DefaultConfig.RETRY_BACKOFF_MULTIPLIER
+   * @default 2
    */
   retryBackoffMultiplier: number;
 
   /**
    * Number of concurrent workers for parallel processing
-   * @default DefaultConfig.WORKER_COUNT
+   * @default 4
    * @min 1
    * @max 16
    */
@@ -67,19 +67,19 @@ export interface Config {
 
   /**
    * Rate limit per worker in milliseconds
-   * @default DefaultConfig.RATE_LIMIT_PER_WORKER
+   * @default 1000
    */
   rateLimitPerWorker: number;
 
   /**
    * Output directory path for generated files
-   * @default DefaultConfig.OUTPUT_DIR
+   * @default './output'
    */
   outputDir: string;
 
   /**
    * Log level for logging
-   * @default DefaultConfig.LOG_LEVEL
+   * @default LogLevel.INFO
    */
   logLevel: LogLevel;
 
@@ -137,7 +137,7 @@ export interface Config {
    * - "first-is-parent": first crawled category is parent
    * - "last-is-parent": last crawled category is parent
    * Defaults to "first-is-parent" when not specified or invalid.
-   * @default DefaultConfig.CATEGORY_HIERARCHY_ORDER
+   * @default CategoryHierarchyOrder.FIRST_IS_PARENT
    */
   categoryHierarchyOrder: CategoryHierarchyOrder;
 }

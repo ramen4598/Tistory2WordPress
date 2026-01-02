@@ -1,6 +1,23 @@
 import { config as dotenvConfig } from 'dotenv';
 import { Config } from '../models/Config';
-import { CategoryHierarchyOrder, LogLevel, DefaultConfig } from '../enums/config.enum';
+import { CategoryHierarchyOrder, LogLevel } from '../enums/config.enum';
+
+/**
+ * Default configuration values
+ * Change Config interface JSDoc defaults when modifying these
+ */
+const DEFAULT_CONFIG = {
+  WORKER_COUNT: 4,
+  RATE_LIMIT_PER_WORKER: 1000,
+  OUTPUT_DIR: './output',
+  LOG_LEVEL: LogLevel.INFO,
+  CATEGORY_HIERARCHY_ORDER: CategoryHierarchyOrder.FIRST_IS_PARENT,
+  MIGRATION_DB_PATH: './data/migration.db',
+  MAX_RETRY_ATTEMPTS: 3,
+  RETRY_INITIAL_DELAY_MS: 500,
+  RETRY_MAX_DELAY_MS: 10000,
+  RETRY_BACKOFF_MULTIPLIER: 2,
+};
 
 /**
  * Error thrown when configuration is invalid
@@ -12,12 +29,20 @@ export class ConfigurationError extends Error {
   }
 }
 
+// Cached configuration after first load
+let cachedConfig: Config | null = null;
+
 /**
  * Loads and validates application configuration from environment variables
+ * Caches the configuration after the first load to avoid redundant parsing
  * @throws {ConfigurationError} When required configuration is missing or invalid
  * @returns {Config} Validated configuration object
  */
 export function loadConfig(): Config {
+  if (cachedConfig) {
+    return cachedConfig;
+  }
+
   // Load .env file into process.env
   dotenvConfig();
 
@@ -39,14 +64,14 @@ export function loadConfig(): Config {
   // Load optional fields with defaults
   const workerCount: number = process.env['WORKER_COUNT']
     ? parseInt(process.env['WORKER_COUNT'], 10)
-    : DefaultConfig.WORKER_COUNT;
+    : DEFAULT_CONFIG.WORKER_COUNT;
 
   const rateLimitPerWorker: number = process.env['RATE_LIMIT_PER_WORKER']
     ? parseInt(process.env['RATE_LIMIT_PER_WORKER'], 10)
-    : DefaultConfig.RATE_LIMIT_PER_WORKER;
-  const outputDir: string = process.env['OUTPUT_DIR'] || DefaultConfig.OUTPUT_DIR;
+    : DEFAULT_CONFIG.RATE_LIMIT_PER_WORKER;
+  const outputDir: string = process.env['OUTPUT_DIR'] || DEFAULT_CONFIG.OUTPUT_DIR;
 
-  const logLevel: LogLevel = (process.env['LOG_LEVEL'] as LogLevel) || DefaultConfig.LOG_LEVEL;
+  const logLevel: LogLevel = (process.env['LOG_LEVEL'] as LogLevel) || DEFAULT_CONFIG.LOG_LEVEL;
 
   const logFile: string | undefined = process.env['LOG_FILE'];
 
@@ -55,21 +80,21 @@ export function loadConfig(): Config {
   const wpAppUser: string | undefined = process.env['WP_APP_USER'];
   const wpAppPassword: string | undefined = process.env['WP_APP_PASSWORD'];
 
-  const migrationDbPath: string = process.env['MIGRATION_DB_PATH'] || DefaultConfig.MIGRATION_DB_PATH;
+  const migrationDbPath: string = process.env['MIGRATION_DB_PATH'] || DEFAULT_CONFIG.MIGRATION_DB_PATH;
 
   const maxRetryAttempts: number = process.env['MAX_RETRY_ATTEMPTS']
     ? parseInt(process.env['MAX_RETRY_ATTEMPTS'], 10)
-    : DefaultConfig.MAX_RETRY_ATTEMPTS;
+    : DEFAULT_CONFIG.MAX_RETRY_ATTEMPTS;
   const retryInitialDelayMs: number = process.env['RETRY_INITIAL_DELAY_MS']
     ? parseInt(process.env['RETRY_INITIAL_DELAY_MS'], 10)
-    : DefaultConfig.RETRY_INITIAL_DELAY_MS;
+    : DEFAULT_CONFIG.RETRY_INITIAL_DELAY_MS;
 
   const retryMaxDelayMs: number = process.env['RETRY_MAX_DELAY_MS']
     ? parseInt(process.env['RETRY_MAX_DELAY_MS'], 10)
-    : DefaultConfig.RETRY_MAX_DELAY_MS;
+    : DEFAULT_CONFIG.RETRY_MAX_DELAY_MS;
   const retryBackoffMultiplier: number = process.env['RETRY_BACKOFF_MULTIPLIER']
     ? parseFloat(process.env['RETRY_BACKOFF_MULTIPLIER'])
-    : DefaultConfig.RETRY_BACKOFF_MULTIPLIER;
+    : DEFAULT_CONFIG.RETRY_BACKOFF_MULTIPLIER;
 
   // Load required CSS selectors for post metadata
   const postTitleSelector: string | undefined = process.env['TISTORY_SELECTOR_TITLE'];
@@ -90,8 +115,7 @@ export function loadConfig(): Config {
       `Invalid or missing CATEGORY_HIERARCHY_ORDER. Defaulting to "${CategoryHierarchyOrder.FIRST_IS_PARENT}".`
     );
     categoryHierarchyOrder =
-      (DefaultConfig.CATEGORY_HIERARCHY_ORDER as unknown as CategoryHierarchyOrder) ||
-      CategoryHierarchyOrder.FIRST_IS_PARENT;
+      DEFAULT_CONFIG.CATEGORY_HIERARCHY_ORDER || CategoryHierarchyOrder.FIRST_IS_PARENT;
   }
 
   if (!postTitleSelector) {
@@ -201,7 +225,7 @@ export function loadConfig(): Config {
     throw new ConfigurationError('WP_APP_PASSWORD is required when using REST mode.');
   }
 
-  return {
+  const config: Config = {
     blogUrl,
     workerCount,
     rateLimitPerWorker,
@@ -228,4 +252,7 @@ export function loadConfig(): Config {
     postContentSelector,
     categoryHierarchyOrder,
   };
+
+  cachedConfig = config;
+  return config;
 }
