@@ -18,8 +18,8 @@
 - [x] T203 [FOUND] Add `utils/validation.ts` helpers for config/env guards reused across services. -> Not needed. We already validate config at config.ts. So skipped.
 - [x] T204 [FOUND] Introduce `utils/retry.ts` with exponential backoff (inspired by Notion2Wordpress).
 - [x] T205 [P] [FOUND] Scaffold `src/db/index.ts` and wire up `better-sqlite3` dependency.
-- [ ] T206 [FOUND] Create SQLite schema migrations (tables: migration_jobs, migration_job_items, migration_image_assets, post_map, internal_links) under `db/schema.sql`.
-- [ ] T207 [P] [FOUND] Implement DB initialization + migration runner called during CLI bootstrap.
+- [x] T206 [FOUND] Create SQLite schema migrations (tables: migration_jobs, migration_job_items, migration_image_assets, post_map, internal_links) under `db/schema.sql`.
+- [x] T207 [P] [FOUND] Implement DB initialization + migration runner called during CLI bootstrap.
 - [ ] T208 [FOUND] Add DB entity types (Job, JobItem, ImageAsset, PostMap, InternalLink) in `src/models/`.
 - [ ] T209 [FOUND] Provide structured logging helpers for DB + REST operations in `src/utils/logger.ts`.
 

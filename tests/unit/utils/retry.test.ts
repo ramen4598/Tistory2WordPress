@@ -1,22 +1,5 @@
 import { retryWithBackoff } from '../../../src/utils/retry';
 import { Config } from '../../../src/models/Config';
-// import { CategoryHierarchyOrder } from '../../../src/enums/config.enum';
-
-// const baseConfig: Config = {
-//   blogUrl: 'https://example.tistory.com',
-//   workerCount: 4,
-//   rateLimitPerWorker: 1000,
-//   outputDir: './output',
-//   logLevel: 'info',
-//   postTitleSelector: 'title',
-//   postPublishDateSelector: 'meta[name="published"]',
-//   postModifiedDateSelector: 'meta[name="modified"]',
-//   postCategorySelector: '.category',
-//   postTagSelector: '.tag',
-//   postContentSelector: '.content',
-//   postListLinkSelector: '.list a',
-//   categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
-// };
 
 const retryConfig: Pick<
   Config,
