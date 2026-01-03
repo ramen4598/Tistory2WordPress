@@ -17,4 +17,13 @@ export const baseConfig: Config = {
   postListLinkSelector: 'a.link_category',
 
   categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
+
+  wpBaseUrl: 'https://example.wordpress.com',
+  wpAppUser: 'user',
+  wpAppPassword: 'password',
+  migrationDbPath: './data/migration.db',
+  maxRetryAttempts: 3,
+  retryInitialDelayMs: 500,
+  retryMaxDelayMs: 10000,
+  retryBackoffMultiplier: 2,
 };

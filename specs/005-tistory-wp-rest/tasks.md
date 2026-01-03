@@ -21,7 +21,7 @@
 - [x] T206 [FOUND] Create SQLite schema migrations (tables: migration_jobs, migration_job_items, migration_image_assets, post_map, internal_links) under `db/schema.sql`.
 - [x] T207 [P] [FOUND] Implement DB initialization + migration runner called during CLI bootstrap.
 - [x] T208 [FOUND] Add DB entity types (Job, JobItem, ImageAsset, PostMap, InternalLink) in `src/models/`.
-- [ ] T209 [FOUND] Provide structured logging helpers for DB + REST operations in `src/utils/logger.ts`.
+- [x] T209 [FOUND] Provide structured logging helpers for DB + REST operations in `src/utils/logger.ts`. -> Not needed. We already have logger.ts with structured logging.
 
 ---
 
@@ -31,7 +31,7 @@
 
 ### Tests (write first)
 
-- [ ] T210 [P] [US1] Add unit tests for config validation edge cases in `tests/unit/utils/config.test.ts`.
+- [x] T210 [P] [US1] Add unit tests for config validation edge cases in `tests/unit/utils/config.test.ts`.
 - [ ] T211 [P] [US1] Create DB layer tests covering CRUD + status transitions in `tests/unit/db/index.test.ts`.
 - [ ] T212 [P] [US1] Mocked REST client tests for happy/error paths in `tests/unit/services/wpClient.test.ts`.
 - [ ] T213 [P] [US1] Add rollback scenario test in `tests/unit/services/migrator.test.ts`.
