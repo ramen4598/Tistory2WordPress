@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance } from 'axios';
+import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import { loadConfig } from '../../../src/utils/config';
 import { getLogger } from '../../../src/utils/logger';
 import { createWpClient, type WpClient } from '../../../src/services/wpClient';
@@ -12,14 +12,15 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
 describe('wpClient', () => {
-  let axiosInstance: { post: jest.Mock; delete: jest.Mock };
+  let axiosInstance: { post: jest.Mock; delete: jest.Mock; get: jest.Mock };
   let loggerMock: { info: jest.Mock; warn: jest.Mock; error: jest.Mock; debug: jest.Mock };
 
   beforeEach(() => {
     axiosInstance = {
       post: jest.fn(),
       delete: jest.fn(),
-    } as unknown as { post: jest.Mock; delete: jest.Mock };
+      get: jest.fn(),
+    } as unknown as { post: jest.Mock; delete: jest.Mock; get: jest.Mock };
 
     mockedAxios.create.mockReturnValue(axiosInstance as unknown as AxiosInstance);
 
@@ -46,7 +47,7 @@ describe('wpClient', () => {
         status: 'draft',
         link: 'https://example.wordpress.com/?p=456',
       };
-      axiosInstance.post.mockResolvedValue({ data: responseData } as unknown);
+      axiosInstance.post.mockResolvedValue({ data: responseData } as AxiosResponse);
 
       const result = await client.createDraftPost({
         title: 'Post Title',
@@ -90,7 +91,7 @@ describe('wpClient', () => {
         mime_type: 'image/jpeg',
       };
 
-      axiosInstance.post.mockResolvedValue({ data: mediaResponse } as unknown);
+      axiosInstance.post.mockResolvedValue({ data: mediaResponse } as AxiosResponse);
 
       const buffer = Buffer.from('fake-image');
 
@@ -119,7 +120,7 @@ describe('wpClient', () => {
     it('deletes media via /media/{id}?force=true for rollback', async () => {
       const client = createClient();
 
-      axiosInstance.delete.mockResolvedValue({ data: { deleted: true } } as unknown);
+      axiosInstance.delete.mockResolvedValue({ data: { deleted: true } } as AxiosResponse);
 
       await client.deleteMedia(123);
 
@@ -134,6 +135,87 @@ describe('wpClient', () => {
       await client.deletePost(456);
 
       expect(axiosInstance.delete).toHaveBeenCalledWith('/posts/456?force=true');
+    });
+
+    it('ensures category by searching then creating and caches the result', async () => {
+      const client = createClient();
+
+      axiosInstance.get.mockResolvedValueOnce({ data: [] } as AxiosResponse); // no existing category
+
+      const createdCategory = { id: 10, name: 'Tech', parent: 0 };
+      axiosInstance.post.mockResolvedValueOnce({ data: createdCategory } as unknown);
+
+      const id1 = await client.ensureCategory('Tech', 0);
+      const id2 = await client.ensureCategory('Tech');
+
+      expect(id1).toBe(10);
+      expect(id2).toBe(10);
+
+      expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+      expect(axiosInstance.get).toHaveBeenCalledWith('/categories', {
+        params: { per_page: 100, page: 1, search: 'Tech' },
+      });
+      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
+      expect(axiosInstance.post).toHaveBeenCalledWith('/categories', {
+        name: 'Tech',
+        parent: 0,
+      });
+    });
+
+    it('returns existing category id when found and caches it', async () => {
+      const client = createClient();
+
+      const existing = { id: 42, name: 'Dev', parent: 0 };
+      axiosInstance.get.mockResolvedValueOnce({ data: [existing] } as AxiosResponse);
+
+      const id1 = await client.ensureCategory('Dev', 0);
+      const id2 = await client.ensureCategory('Dev');
+
+      expect(id1).toBe(42);
+      expect(id2).toBe(42);
+
+      expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+      expect(axiosInstance.post).not.toHaveBeenCalledWith('/categories', expect.anything());
+    });
+
+    it('ensures tag by searching then creating and caches the result', async () => {
+      const client = createClient();
+
+      axiosInstance.get.mockResolvedValueOnce({ data: [] } as AxiosResponse); // no existing tag
+
+      const createdTag = { id: 7, name: 'javascript' };
+      axiosInstance.post.mockResolvedValueOnce({ data: createdTag } as AxiosResponse);
+
+      const id1 = await client.ensureTag('javascript');
+      const id2 = await client.ensureTag('javascript');
+
+      expect(id1).toBe(7);
+      expect(id2).toBe(7);
+
+      expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+      expect(axiosInstance.get).toHaveBeenCalledWith('/tags', {
+        params: { per_page: 100, page: 1, search: 'javascript' },
+      });
+      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
+      expect(axiosInstance.post).toHaveBeenCalledWith('/tags', {
+        name: 'javascript',
+      });
+    });
+
+    it('returns existing tag id when found and caches it', async () => {
+      const client = createClient();
+
+      const existing = { id: 9, name: 'typescript' };
+      axiosInstance.get.mockResolvedValueOnce({ data: [existing] } as AxiosResponse);
+
+      const id1 = await client.ensureTag('typescript');
+      const id2 = await client.ensureTag('typescript');
+
+      expect(id1).toBe(9);
+      expect(id2).toBe(9);
+
+      expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+      expect(axiosInstance.post).not.toHaveBeenCalledWith('/tags', expect.anything());
     });
   });
 
@@ -215,7 +297,7 @@ describe('wpClient', () => {
 
       axiosInstance.post
         .mockRejectedValueOnce(transientError)
-        .mockResolvedValueOnce({ data: successResponse } as unknown);
+        .mockResolvedValueOnce({ data: successResponse } as AxiosResponse);
 
       const result = await client.createDraftPost({
         title: 'Retry',

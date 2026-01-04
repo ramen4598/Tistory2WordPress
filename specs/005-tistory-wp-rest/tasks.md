@@ -41,7 +41,7 @@
 - [x] T214 [US1] Implement DB repository methods (jobs, job items, image assets, internal links, post map) in `src/db/index.ts`.
 - [x] T215 [P] [US1] Build `src/services/wpClient.ts` for media/posts/categories/tags CRUD with retries + auth.
 - [x] T216 [P] [US1] Implement rollback helpers in `wpClient` for `DELETE /media` and `DELETE /posts`.
-- [ ] T217 [US1] Add category/tag caching + ensure\* helpers in `wpClient` following contracts.
+- [x] T217 [US1] Add category/tag caching + ensure\* helpers in `wpClient` following contracts.
 - [ ] T218 [US1] Create `src/services/imageProcessor.ts` to download images (memory), upload to WordPress, and update DB state.
 - [ ] T219 [US1] Extend `src/services/cleaner.ts` integration to capture internal links for DB recording.
 - [ ] T220 [P] [US1] Implement `src/services/linkTracker.ts` to persist internal links via DB layer.

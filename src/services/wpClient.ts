@@ -36,8 +36,7 @@ export interface UploadMediaResult {
 
 /**
  * Client for interacting with WordPress REST API.
- * Supports creating draft posts and uploading media.
- * Includes retry logic for transient failures.
+ * Supports creating draft posts, uploading media, taxonomy helpers, and rollback.
  */
 export interface WpClient {
   /**
@@ -64,6 +63,19 @@ export interface WpClient {
    * @throws Error if deletion fails.
    */
   deletePost(postId: number): Promise<void>;
+  /**
+   * Ensures a category exists in WordPress, creating it if necessary.
+   * @param name The name of the category.
+   * @param parent Optional parent category ID.
+   * @returns The ID of the ensured category.
+   */
+  ensureCategory(name: string, parent?: number): Promise<number>;
+  /**
+   * Ensures a tag exists in WordPress, creating it if necessary.
+   * @param name The name of the tag.
+   * @returns The ID of the ensured tag.
+   */
+  ensureTag(name: string): Promise<number>;
 }
 
 function isRetryableStatus(status?: number): boolean {
@@ -74,6 +86,7 @@ function isRetryableStatus(status?: number): boolean {
 }
 
 function getAxiosErrorMessage(error: unknown): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const axiosError = error as AxiosError<any>;
 
   if (axiosError && axiosError.isAxiosError) {
@@ -103,6 +116,9 @@ export function createWpClient(): WpClient {
     },
     timeout: 30000,
   });
+
+  const categoryCache = new Map<string, number>(); // key: name value: categoryId
+  const tagCache = new Map<string, number>(); // key: name value: tagId
 
   async function withRetry<T>(
     fn: () => Promise<T>,
@@ -288,5 +304,130 @@ export function createWpClient(): WpClient {
     }
   };
 
-  return { createDraftPost, uploadMedia, deleteMedia, deletePost };
+  const ensureCategory = async (name: string, parent: number = 0): Promise<number> => {
+    // parent id is 0 by default. It means it's a root category.
+    const cached = categoryCache.get(name); // categoryId
+    if (cached != null) {
+      return cached;
+    }
+
+    type WpCategory = {
+      id: number;
+      name: string;
+      parent: number;
+    };
+
+    const searchExec: () => Promise<WpCategory | undefined> = async () => {
+      let isNextPage = false;
+      let page = 1;
+      let category: WpCategory | undefined;
+      do {
+        const response = await client.get<WpCategory[]>(`/categories`, {
+          params: { per_page: 100, page, search: name },
+        });
+
+        if (!response?.data || response?.data.length === 0) break;
+
+        const fetched: WpCategory[] = response.data;
+        const matched = fetched.filter((cat) => cat.name === name);
+        if (matched.length > 0) {
+          category = matched[0];
+          break;
+        }
+        isNextPage = page < Number(response.headers['x-wp-totalpages'] || 1);
+        page++;
+      } while (isNextPage);
+      return category;
+    };
+
+    const category = await withRetry(searchExec, {
+      operation: 'searchCategory',
+      url: `${apiBase}/categories`,
+    });
+
+    if (category) {
+      categoryCache.set(name, category.id);
+      return category.id;
+    }
+
+    // --- if not found, create it ---
+    const createExec = async () => {
+      const response = await client.post<WpCategory>('/categories', {
+        name,
+        parent,
+      });
+      return response.data;
+    };
+
+    const created: WpCategory = await withRetry(createExec, {
+      operation: 'createCategory',
+      url: `${apiBase}/categories`,
+    });
+
+    categoryCache.set(name, created.id);
+    return created.id;
+  };
+
+  const ensureTag = async (name: string): Promise<number> => {
+    const cached = tagCache.get(name);
+    if (cached != null) {
+      return cached;
+    }
+
+    type WpTag = {
+      id: number;
+      name: string;
+    };
+
+    const searchExec = async (): Promise<WpTag | undefined> => {
+      let isNextPage = false;
+      let page = 1;
+      let tag: WpTag | undefined;
+      do {
+        const response = await client.get<WpTag[]>(`/tags`, {
+          params: { per_page: 100, page, search: name },
+        });
+
+        if (!response?.data || response?.data.length === 0) break;
+
+        const fetched: WpTag[] = response.data;
+        const matched = fetched.filter((tag) => tag.name === name);
+        if (matched.length > 0) {
+          tag = matched[0];
+          break;
+        }
+        isNextPage = page < Number(response.headers['x-wp-totalpages'] || 1);
+        page++;
+      } while (isNextPage);
+      return tag;
+    };
+
+    const tag: WpTag | undefined = await withRetry(searchExec, {
+      operation: 'searchTag',
+      url: `${apiBase}/tags`,
+    });
+
+    if (tag) {
+      tagCache.set(name, tag.id);
+      return tag.id;
+    }
+
+    // --- if not found, create it ---
+    const createExec = async () => {
+      const response = await client.post<WpTag>('/tags', {
+        name,
+      });
+      return response.data;
+    };
+
+    const created = await withRetry(createExec, {
+      operation: 'createTag',
+      url: `${apiBase}/tags`,
+    });
+
+    tagCache.set(name, created.id);
+    return created.id;
+  };
+
+  return { createDraftPost, uploadMedia, deleteMedia, deletePost, ensureCategory, ensureTag };
 }
