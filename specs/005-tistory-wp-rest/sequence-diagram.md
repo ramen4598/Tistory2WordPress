@@ -59,8 +59,9 @@ sequenceDiagram
 
             Migrator->>Cleaner: Clean HTML content
             Cleaner->>Cleaner: HTML→Markdown→HTML conversion
-            Cleaner->>LinkTracker: Extract links
+            Cleaner-->>Migrator: Cleaned HTML
 
+            Migrator->>LinkTracker: Extract links
             loop For each link
                 alt Internal link
                     LinkTracker->>DB: Insert InternalLinkRecord (jobItemId, source_url, target_url, ...)
@@ -68,9 +69,7 @@ sequenceDiagram
                     LinkTracker->>LinkTracker: Ignore
                 end
             end
-
-            LinkTracker-->>Cleaner: Done
-            Cleaner-->>Migrator: Cleaned HTML
+            LinkTracker-->>Migrator: Done
 
             alt Post has images
                 Migrator->>ImageProcessor: Process images(post, jobItemId)
@@ -147,7 +146,9 @@ sequenceDiagram
 
     Migrator->>Cleaner: Clean HTML
     Cleaner->>Cleaner: HTML→Markdown→HTML
-    Cleaner->>LinkTracker: Extract links
+    Cleaner-->>Migrator: Cleaned HTML
+
+    Migrator->>LinkTracker: Extract links
 
     loop For each link
         alt Internal link
@@ -157,8 +158,7 @@ sequenceDiagram
         end
     end
 
-    LinkTracker-->>Cleaner: Done
-    Cleaner-->>Migrator: Cleaned HTML
+    LinkTracker-->>Migrator: Done
 
     alt Post has images
         Migrator->>ImageProcessor: Process images(post, jobItemId)
@@ -231,11 +231,11 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant Cleaner
+    participant Migrator
     participant LinkTracker
     participant DB as SQLiteDB
 
-    Cleaner->>LinkTracker: Provide cleaned HTML and base blog URL
+    Migrator->>LinkTracker: Provide cleaned HTML and base blog URL
     LinkTracker->>LinkTracker: Extract all <a href> links
 
     loop For each link
@@ -248,7 +248,7 @@ sequenceDiagram
         end
     end
 
-    LinkTracker-->>Cleaner: Finished tracking internal links
+    LinkTracker-->>Migrator: Finished tracking internal links
 ```
 
 ---

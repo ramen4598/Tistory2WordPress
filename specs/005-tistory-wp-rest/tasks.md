@@ -46,11 +46,11 @@
 - [x] T219 [US1] Extend `src/services/cleaner.ts` integration to capture internal links for DB recording.
 - [x] T220 [P] [US1] Implement `src/services/linkTracker.ts` to persist internal links via DB layer.
 - [ ] T221 [US1] Build `src/services/migrator.ts` orchestrating per-post pipeline + rollback support.
-- [ ] T222 [US1] Wire migrator with crawler/cleaner/imageProcessor/wpClient interactions per sequence diagram.
+- [ ] T222 [US1] Wire migrator with crawler/cleaner/linkTracker/imageProcessor/wpClient interactions per sequence diagram.
 - [ ] T223 [US1] Persist job item lifecycle + failure reasons in SQLite during migration/rollback.
 - [ ] T224 [P] [US1] Add CLI option `--post` for single URL and connect to migrator + DB bootstrap.
 - [ ] T225 [US1] Export rollback-safe summary from CLI (success/failure metrics, job IDs).
-- [ ] T226 [US1] Update `tests/unit/WXRGenerator-utils.test.ts` (or new suites) to stub crawler output for REST mode.
+- [x] T226 [US1] Update `tests/unit/WXRGenerator-utils.test.ts` (or new suites) to stub crawler output for REST mode. WXRGenerator is not used, so this task is not needed. Skipped.
 - [ ] T227 [US1] Document single-post smoke test flow in `quickstart.md` & plan checklist updates.
 
 ---
@@ -91,8 +91,8 @@
 ### Implementation
 
 - [ ] T247 [US3] Finalize DB schema & repository methods for `internal_links` table (source/target/link_text/context).
-- [ ] T248 [US3] Update cleaner/linkTracker pipeline to persist links per job item.
-- [ ] T249 [US3] Implement exporter generating `output/link_mapping.json` from SQLite snapshot.
+- [ ] T248 [US3] Update migrator/linkTracker pipeline to persist links per job item.
+- [ ] T249 [US3] Implement exporter generating `output/link_mapping.json`(configurable) from SQLite snapshot.
 - [ ] T250 [P] [US3] Add CLI flag to trigger/export link mapping after runs.
 - [ ] T251 [US3] Document link review workflow in `quickstart.md` and README section.
 

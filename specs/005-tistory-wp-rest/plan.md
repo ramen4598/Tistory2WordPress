@@ -153,7 +153,7 @@ High-level flow:
      - Fetch post HTML (rate-limited HTTP to Tistory).
      - Parse metadata (title, dates, categories, tags, images).
      - Clean HTML via cleaner (HTML→MD→HTML, Tistory markup removal).
-     - Extract internal links and write `internal_links`/`link_mapping` rows to DB.
+     - Extract internal links and write internal_links rows to DB (handled by LinkTracker).
      - Download each image into memory and upload to WordPress media via `wpClient` (no `downloads/` dir).
      - Build mapping from original image URL → WordPress media URL and rewrite content.
      - Ensure categories/tags exist in WordPress (find-or-create via REST), cache IDs.
