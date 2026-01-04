@@ -7,6 +7,7 @@ import {
   configureLogger,
   LoggerConfig,
 } from '../../../src/utils/logger';
+import { LogLevel } from '../../../src/enums/config.enum';
 
 describe('Logger', () => {
   const testLogDir = path.join(__dirname, '../../tmp/logs');
@@ -29,7 +30,7 @@ describe('Logger', () => {
 
   describe('Logger class', () => {
     it('should create logger with console-only output', () => {
-      const config: LoggerConfig = { level: 'info' };
+      const config: LoggerConfig = { level: LogLevel.INFO };
       const logger = new Logger(config);
 
       expect(logger).toBeInstanceOf(Logger);
@@ -37,7 +38,7 @@ describe('Logger', () => {
     });
 
     it('should create logger with file output', () => {
-      const config: LoggerConfig = { level: 'info', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.INFO, logFile: testLogFile };
       const logger = new Logger(config);
 
       expect(logger).toBeInstanceOf(Logger);
@@ -46,7 +47,7 @@ describe('Logger', () => {
     });
 
     it('should write log messages to file', (done) => {
-      const config: LoggerConfig = { level: 'info', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.INFO, logFile: testLogFile };
       const logger = new Logger(config);
 
       logger.info('Test message');
@@ -61,7 +62,7 @@ describe('Logger', () => {
     });
 
     it('should filter logs based on log level', (done) => {
-      const config: LoggerConfig = { level: 'warn', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.WARN, logFile: testLogFile };
       const logger = new Logger(config);
 
       logger.debug('Debug message');
@@ -81,7 +82,7 @@ describe('Logger', () => {
     });
 
     it('should include timestamp in log messages', (done) => {
-      const config: LoggerConfig = { level: 'info', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.INFO, logFile: testLogFile };
       const logger = new Logger(config);
 
       logger.info('Timestamped message');
@@ -97,7 +98,7 @@ describe('Logger', () => {
     });
 
     it('should serialize additional arguments', (done) => {
-      const config: LoggerConfig = { level: 'info', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.INFO, logFile: testLogFile };
       const logger = new Logger(config);
 
       logger.info('Message with data', { key: 'value' }, [1, 2, 3]);
@@ -112,7 +113,7 @@ describe('Logger', () => {
     });
 
     it('should append to existing log file', (done) => {
-      const config: LoggerConfig = { level: 'info', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.INFO, logFile: testLogFile };
 
       const logger1 = new Logger(config);
       logger1.info('First message');
@@ -140,7 +141,7 @@ describe('Logger', () => {
     });
 
     it('should configure global logger with custom settings using configureLogger', () => {
-      const config: LoggerConfig = { level: 'debug', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.DEBUG, logFile: testLogFile };
       const logger = configureLogger(config);
 
       expect(logger).toBeInstanceOf(Logger);
@@ -149,11 +150,11 @@ describe('Logger', () => {
     });
 
     it('should reconfigure global logger and close previous instance', () => {
-      const config1: LoggerConfig = { level: 'info', logFile: testLogFile };
+      const config1: LoggerConfig = { level: LogLevel.INFO, logFile: testLogFile };
       const logger1 = configureLogger(config1);
       const closeSpy = jest.spyOn(logger1, 'close');
 
-      const config2: LoggerConfig = { level: 'debug' };
+      const config2: LoggerConfig = { level: LogLevel.DEBUG };
       const logger2 = configureLogger(config2);
 
       expect(closeSpy).toHaveBeenCalled();
@@ -177,7 +178,7 @@ describe('Logger', () => {
 
   describe('Log levels', () => {
     it('should log debug messages when level is debug', (done) => {
-      const config: LoggerConfig = { level: 'debug', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.DEBUG, logFile: testLogFile };
       const logger = new Logger(config);
 
       logger.debug('Debug message');
@@ -191,7 +192,7 @@ describe('Logger', () => {
     });
 
     it('should log info messages when level is info', (done) => {
-      const config: LoggerConfig = { level: 'info', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.INFO, logFile: testLogFile };
       const logger = new Logger(config);
 
       logger.info('Info message');
@@ -205,7 +206,7 @@ describe('Logger', () => {
     });
 
     it('should log warn messages when level is warn', (done) => {
-      const config: LoggerConfig = { level: 'warn', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.WARN, logFile: testLogFile };
       const logger = new Logger(config);
 
       logger.warn('Warn message');
@@ -219,7 +220,7 @@ describe('Logger', () => {
     });
 
     it('should log error messages when level is error', (done) => {
-      const config: LoggerConfig = { level: 'error', logFile: testLogFile };
+      const config: LoggerConfig = { level: LogLevel.ERROR, logFile: testLogFile };
       const logger = new Logger(config);
 
       logger.error('Error message');
