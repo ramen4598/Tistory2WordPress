@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance } from 'axios';
 import { loadConfig } from '../../../src/utils/config';
 import { getLogger } from '../../../src/utils/logger';
-import { createWpClient, CreateDraftPostResult } from '../../../src/services/wpClient';
+import { createWpClient, type WpClient } from '../../../src/services/wpClient';
 import { baseConfig } from '../helpers/baseConfig';
 
 jest.mock('axios');
@@ -12,29 +12,36 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
 describe('wpClient', () => {
+  let axiosInstance: { post: jest.Mock; delete: jest.Mock };
+  let loggerMock: { info: jest.Mock; warn: jest.Mock; error: jest.Mock; debug: jest.Mock };
+
   beforeEach(() => {
-    mockedAxios.create.mockReturnValue({
+    axiosInstance = {
       post: jest.fn(),
-    } as unknown as AxiosInstance);
+      delete: jest.fn(),
+    } as unknown as { post: jest.Mock; delete: jest.Mock };
+
+    mockedAxios.create.mockReturnValue(axiosInstance as unknown as AxiosInstance);
 
     mockedLoadConfig.mockReturnValue(baseConfig);
-    (getLogger as jest.Mock).mockReturnValue({
+    loggerMock = {
       info: jest.fn(),
       warn: jest.fn(),
       error: jest.fn(),
       debug: jest.fn(),
-    });
+    };
+    (getLogger as jest.Mock).mockReturnValue(loggerMock);
 
     jest.clearAllMocks();
   });
 
+  const createClient = (): WpClient => createWpClient();
+
   describe('happy paths', () => {
     it('creates a draft post via /posts', async () => {
-      const client = createWpClient();
+      const client = createClient();
 
-      const axiosInstance = mockedAxios.create.mock.results[0].value as { post: jest.Mock };
-
-      const responseData: CreateDraftPostResult = {
+      const responseData = {
         id: 456,
         status: 'draft',
         link: 'https://example.wordpress.com/?p=456',
@@ -74,9 +81,7 @@ describe('wpClient', () => {
     });
 
     it('uploads media via /media', async () => {
-      const client = createWpClient();
-
-      const axiosInstance = mockedAxios.create.mock.results[0].value as { post: jest.Mock };
+      const client = createClient();
 
       const mediaResponse = {
         id: 123,
@@ -110,13 +115,67 @@ describe('wpClient', () => {
         mimeType: 'image/jpeg',
       });
     });
+
+    it('deletes media via /media/{id}?force=true for rollback', async () => {
+      const client = createClient();
+
+      axiosInstance.delete.mockResolvedValue({ data: { deleted: true } } as unknown);
+
+      await client.deleteMedia(123);
+
+      expect(axiosInstance.delete).toHaveBeenCalledWith('/media/123?force=true');
+    });
+
+    it('deletes post via /posts/{id}?force=true for rollback', async () => {
+      const client = createClient();
+
+      axiosInstance.delete.mockResolvedValue({ data: { deleted: true } } as unknown);
+
+      await client.deletePost(456);
+
+      expect(axiosInstance.delete).toHaveBeenCalledWith('/posts/456?force=true');
+    });
+  });
+
+  describe('rollback 404 handling', () => {
+    it('treats 404 on media deletion as non-fatal, logs warning', async () => {
+      const client = createClient();
+
+      const error = {
+        isAxiosError: true,
+        response: { status: 404, statusText: 'Not Found', data: { message: 'Not found' } },
+      } as unknown as Error;
+
+      axiosInstance.delete.mockRejectedValue(error);
+
+      await expect(client.deleteMedia(999)).resolves.toBeUndefined();
+
+      expect(loggerMock.warn).toHaveBeenCalledWith('Media already absent during rollback', {
+        wpMediaId: 999,
+      });
+    });
+
+    it('treats 404 on post deletion as non-fatal, logs warning', async () => {
+      const client = createClient();
+
+      const error = {
+        isAxiosError: true,
+        response: { status: 404, statusText: 'Not Found', data: { message: 'Not found' } },
+      } as unknown as Error;
+
+      axiosInstance.delete.mockRejectedValue(error);
+
+      await expect(client.deletePost(999)).resolves.toBeUndefined();
+
+      expect(loggerMock.warn).toHaveBeenCalledWith('Post already absent during rollback', {
+        wpPostId: 999,
+      });
+    });
   });
 
   describe('error paths', () => {
     it('wraps 4xx error without extra retries (retryWithBackoff 한번만 호출)', async () => {
-      const client = createWpClient();
-
-      const axiosInstance = mockedAxios.create.mock.results[0].value as { post: jest.Mock };
+      const client = createClient();
 
       const error = {
         isAxiosError: true,
@@ -141,9 +200,7 @@ describe('wpClient', () => {
     });
 
     it('retries on 5xx using retryWithBackoff', async () => {
-      const client = createWpClient();
-
-      const axiosInstance = mockedAxios.create.mock.results[0].value as { post: jest.Mock };
+      const client = createClient();
 
       const transientError = {
         isAxiosError: true,

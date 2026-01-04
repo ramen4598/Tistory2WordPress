@@ -34,13 +34,13 @@
 - [x] T210 [P] [US1] Add unit tests for config validation edge cases in `tests/unit/utils/config.test.ts`.
 - [x] T211 [P] [US1] Create DB layer tests covering CRUD + status transitions in `tests/unit/db/index.test.ts`.
 - [x] T212 [P] [US1] Mocked REST client tests for happy/error paths in `tests/unit/services/wpClient.test.ts`.
-- [ ] T213 [P] [US1] Add rollback scenario test in `tests/unit/services/migrator.test.ts`.
+- [x] T213 [P] [US1] Add rollback scenario test in `tests/unit/services/migrator.test.ts`.
 
 ### Implementation
 
 - [x] T214 [US1] Implement DB repository methods (jobs, job items, image assets, internal links, post map) in `src/db/index.ts`.
 - [x] T215 [P] [US1] Build `src/services/wpClient.ts` for media/posts/categories/tags CRUD with retries + auth.
-- [ ] T216 [P] [US1] Implement rollback helpers in `wpClient` for `DELETE /media` and `DELETE /posts`.
+- [x] T216 [P] [US1] Implement rollback helpers in `wpClient` for `DELETE /media` and `DELETE /posts`.
 - [ ] T217 [US1] Add category/tag caching + ensure\* helpers in `wpClient` following contracts.
 - [ ] T218 [US1] Create `src/services/imageProcessor.ts` to download images (memory), upload to WordPress, and update DB state.
 - [ ] T219 [US1] Extend `src/services/cleaner.ts` integration to capture internal links for DB recording.

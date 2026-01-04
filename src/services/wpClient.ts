@@ -34,9 +34,36 @@ export interface UploadMediaResult {
   mimeType: string;
 }
 
+/**
+ * Client for interacting with WordPress REST API.
+ * Supports creating draft posts and uploading media.
+ * Includes retry logic for transient failures.
+ */
 export interface WpClient {
+  /**
+   * Creates a draft post in WordPress.
+   * @param options Options for creating the draft post.
+   * @returns Result containing the ID, status, and link of the created post.
+   */
   createDraftPost(options: CreateDraftPostOptions): Promise<CreateDraftPostResult>;
+  /**
+   * Uploads media to WordPress.
+   * @param options Options for uploading the media.
+   * @returns Result containing the ID, URL, media type, and MIME type of the uploaded media.
+   */
   uploadMedia(options: UploadMediaOptions): Promise<UploadMediaResult>;
+  /**
+   * Deletes media from WordPress.
+   * @param mediaId The ID of the media to delete.
+   * @throws Error if deletion fails.
+   */
+  deleteMedia(mediaId: number): Promise<void>;
+  /**
+   * Deletes a post from WordPress.
+   * @param postId The ID of the post to delete.
+   * @throws Error if deletion fails.
+   */
+  deletePost(postId: number): Promise<void>;
 }
 
 function isRetryableStatus(status?: number): boolean {
@@ -219,5 +246,47 @@ export function createWpClient(): WpClient {
     }
   };
 
-  return { createDraftPost, uploadMedia };
+  const deleteMedia = async (mediaId: number): Promise<void> => {
+    try {
+      await client.delete(`/media/${mediaId}?force=true`);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const status = axiosError.response?.status;
+
+      if (axiosError.isAxiosError && status === 404) {
+        logger.warn('Media already absent during rollback', { wpMediaId: mediaId });
+        return;
+      }
+
+      const message = getAxiosErrorMessage(error);
+      logger.error('Failed to delete WordPress media during rollback', {
+        error: message,
+        wpMediaId: mediaId,
+      });
+      throw error;
+    }
+  };
+
+  const deletePost = async (postId: number): Promise<void> => {
+    try {
+      await client.delete(`/posts/${postId}?force=true`);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const status = axiosError.response?.status;
+
+      if (axiosError.isAxiosError && status === 404) {
+        logger.warn('Post already absent during rollback', { wpPostId: postId });
+        return;
+      }
+
+      const message = getAxiosErrorMessage(error);
+      logger.error('Failed to delete WordPress post during rollback', {
+        error: message,
+        wpPostId: postId,
+      });
+      throw error;
+    }
+  };
+
+  return { createDraftPost, uploadMedia, deleteMedia, deletePost };
 }
