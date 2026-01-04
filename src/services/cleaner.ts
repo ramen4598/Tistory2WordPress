@@ -4,6 +4,7 @@ import * as gfm from 'turndown-plugin-gfm';
 import { marked } from 'marked';
 import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
+import { InternalLink } from '../models/InternalLink';
 
 export interface Cleaner {
   htmlToMarkdown(html: string): string;
@@ -15,6 +16,14 @@ export interface Cleaner {
    * @return 정리된 HTML 문자열
    */
   cleanHtml(html: string): string;
+
+  /**
+   * Extracts internal links from HTML that point to the same Tistory blog.
+   * @param sourceUrl The URL of the post containing the links
+   * @param html The HTML content to search for internal links
+   * @return Array of internal links with source_url, target_url, link_text, and context
+   */
+  extractInternalLinks(sourceUrl: string, html: string): InternalLink[];
 }
 
 export interface CleanerOptions {
@@ -41,7 +50,8 @@ export interface CleanerOptions {
  * @return Cleaner
  */
 export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
-  const { postContentSelector } = loadConfig();
+  const config = loadConfig();
+  const { postContentSelector } = config;
   const logger = getLogger();
 
   const defaultHtmlToMarkdown = (html: string): string => {
@@ -108,10 +118,51 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
     return cleanedHtml;
   };
 
+  const extractInternalLinks = (sourceUrl: string, html: string): InternalLink[] => {
+    const $ = cheerio.load(html);
+    const blogUrl = new URL(config.blogUrl);
+    const internalLinks: InternalLink[] = [];
+
+    $('a[href]').each((_, element) => {
+      const href = $(element).attr('href');
+      if (!href) return;
+
+      try {
+        const targetUrl = new URL(href, blogUrl.origin);
+
+        if (targetUrl.hostname === blogUrl.hostname) {
+          const linkText = $(element).text().trim();
+
+          let context: string | undefined = undefined;
+          const parent = $(element).parent();
+          const parentText = parent.text();
+          const linkIndex = parentText.indexOf(linkText);
+          if (linkIndex >= 0) {
+            const start = Math.max(0, linkIndex - 50);
+            const end = Math.min(parentText.length, linkIndex + linkText.length + 50);
+            context = parentText.slice(start, end).trim();
+          }
+
+          internalLinks.push({
+            source_url: sourceUrl,
+            target_url: targetUrl.href,
+            link_text: linkText,
+            context,
+          });
+        }
+      } catch {
+        return;
+      }
+    });
+
+    return internalLinks;
+  };
+
   return {
     htmlToMarkdown,
     markdownToHtml,
     cleanHtml,
+    extractInternalLinks,
   };
 };
 
@@ -126,7 +177,6 @@ const registerCleanIframeRule = (turndownService: TurndownService): void => {
   turndownService.addRule('cleanIframe', {
     filter: ['iframe'],
     replacement: (_content, node) => {
-
       const src: string = node.getAttribute('src') ?? '';
       if (!src) return '';
 
