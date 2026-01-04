@@ -191,6 +191,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
   };
 
   const slugify = (name: string): string => {
+    // TODO: 한국어 등 비영어권 문자 처리 개선
     return name
       .trim()
       .toLowerCase()
