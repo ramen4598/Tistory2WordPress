@@ -1,7 +1,7 @@
 import { Category } from './Category';
 import { Tag } from './Tag';
 import { Image } from './Image';
-import { Attachment } from './Attachment';
+// import { Attachment } from './Attachment';
 
 /**
  * Represents a single blog post with all associated metadata and content
@@ -62,5 +62,5 @@ export interface Post {
    * File attachments
    * One-to-many relationship
    */
-  attachments: Attachment[];
+  // attachments: Attachment[];
 }

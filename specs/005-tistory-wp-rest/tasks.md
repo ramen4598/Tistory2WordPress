@@ -45,8 +45,8 @@
 - [x] T218 [US1] Create `src/services/imageProcessor.ts` to download images (memory), upload to WordPress, and update DB state.
 - [x] T219 [US1] Extend `src/services/cleaner.ts` integration to capture internal links for DB recording.
 - [x] T220 [P] [US1] Implement `src/services/linkTracker.ts` to persist internal links via DB layer.
-- [ ] T221 [US1] Build `src/services/migrator.ts` orchestrating per-post pipeline + rollback support.
-- [ ] T222 [US1] Wire migrator with crawler/cleaner/linkTracker/imageProcessor/wpClient interactions per sequence diagram.
+- [x] T221 [US1] Build `src/services/migrator.ts` orchestrating per-post pipeline + rollback support.
+- [x] T222 [US1] Wire migrator with crawler/cleaner/linkTracker/imageProcessor/wpClient interactions per sequence diagram.
 - [ ] T223 [US1] Persist job item lifecycle + failure reasons in SQLite during migration/rollback.
 - [ ] T224 [P] [US1] Add CLI option `--post` for single URL and connect to migrator + DB bootstrap.
 - [ ] T225 [US1] Export rollback-safe summary from CLI (success/failure metrics, job IDs).

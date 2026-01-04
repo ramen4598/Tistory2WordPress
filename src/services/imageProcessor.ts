@@ -1,38 +1,46 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { Post } from '../models/Post';
-import { createWpClient } from './wpClient';
+import { createWpClient, WpClient } from './wpClient';
 import { createImageAsset, updateImageAsset } from '../db';
 import { ImageAssetStatus } from '../enums/db.enum';
 import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
 import { retryWithBackoff } from '../utils/retry';
+import { Image } from '../models/Image';
 
 export interface ImageProcessorContext {
   jobItemId: number;
 }
 
-export interface ProcessImagesResult {
-  updatedPost: Post;
-  uploadedMediaIds: number[];
+export interface ImageProcessor {
+  /**
+   * Processes images in the given post by downloading them from their original URLs,
+   * uploading them to WordPress, and rewriting the image URLs in the post content.
+   *
+   * @param post - The post containing images to be processed.
+   * @param context - The context containing job item ID for tracking.
+   * @returns A promise that resolves to the updated post with processed images.
+   */
+  processImagesForPost: (post: Post, context: ImageProcessorContext) => Promise<Post>;
 }
 
-export function createImageProcessor() {
+export function createImageProcessor(wpc?: WpClient): ImageProcessor {
   const config = loadConfig();
   const logger = getLogger();
-  const wpClient = createWpClient();
+  const wpClient = wpc ?? createWpClient();
 
   const processImagesForPost = async (
     post: Post,
     context: ImageProcessorContext
-  ): Promise<ProcessImagesResult> => {
+  ): Promise<Post> => {
     const $ = cheerio.load(post.content);
     const imgElements = $('img');
     if (imgElements.length === 0) {
-      return { updatedPost: post, uploadedMediaIds: [] };
+      return post;
     }
 
-    const uploadedMediaIds: number[] = [];
+    const uploadedImages: Image[] = [];
 
     for (let i = 0; i < imgElements.length; i++) {
       const img = imgElements.eq(i);
@@ -90,8 +98,13 @@ export function createImageProcessor() {
           wp_media_url: uploadResult.url,
         });
 
-        uploadedMediaIds.push(uploadResult.id);
         img.attr('src', uploadResult.url);
+        uploadedImages.push({
+          url: originalUrl,
+          alt_text: altText,
+          wp_media_id: uploadResult.id,
+          wp_media_url: uploadResult.url,
+        });
       } catch (error) {
         const message = (error as Error).message ?? String(error);
         updateImageAsset(asset.id, {
@@ -102,10 +115,7 @@ export function createImageProcessor() {
       }
     }
 
-    return {
-      updatedPost: { ...post, content: $.html() },
-      uploadedMediaIds,
-    };
+    return { ...post, content: $.html(), images: uploadedImages };
   };
 
   return { processImagesForPost };

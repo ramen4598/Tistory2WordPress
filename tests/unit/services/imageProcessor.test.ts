@@ -42,7 +42,7 @@ describe('imageProcessor', () => {
     categories: [],
     tags: [],
     images: [],
-    attachments: [],
+    // attachments: [],
   });
 
   it('downloads images from HTML, uploads to WordPress, creates/updates ImageAsset DB records, rewrites URLs, and returns uploaded media IDs', async () => {
@@ -110,10 +110,8 @@ describe('imageProcessor', () => {
       wp_media_url: 'https://example.wordpress.com/wp-content/uploads/image1.jpg',
     });
 
-    expect(result.uploadedMediaIds).toEqual([101]);
-    expect(result.updatedPost.content).toContain(
-      'https://example.wordpress.com/wp-content/uploads/image1.jpg'
-    );
+    expect(result.images[0].wp_media_id).toEqual(101);
+    expect(result.content).toContain('https://example.wordpress.com/wp-content/uploads/image1.jpg');
   });
 
   it('processes multiple images in content, uploading each to WordPress and rewriting all URLs', async () => {
@@ -267,16 +265,10 @@ describe('imageProcessor', () => {
       wp_media_url: 'https://example.wordpress.com/wp-content/uploads/third.gif',
     });
 
-    expect(result.uploadedMediaIds).toEqual([101, 102, 103]);
-    expect(result.updatedPost.content).toContain(
-      'https://example.wordpress.com/wp-content/uploads/first.jpg'
-    );
-    expect(result.updatedPost.content).toContain(
-      'https://example.wordpress.com/wp-content/uploads/second.png'
-    );
-    expect(result.updatedPost.content).toContain(
-      'https://example.wordpress.com/wp-content/uploads/third.gif'
-    );
+    expect(result.images.map((image) => image.wp_media_id)).toEqual([101, 102, 103]);
+    expect(result.content).toContain('https://example.wordpress.com/wp-content/uploads/first.jpg');
+    expect(result.content).toContain('https://example.wordpress.com/wp-content/uploads/second.png');
+    expect(result.content).toContain('https://example.wordpress.com/wp-content/uploads/third.gif');
   });
 
   it('returns early and updates no assets when post content has no images', async () => {
@@ -302,8 +294,8 @@ describe('imageProcessor', () => {
 
     expect(mockedCreateImageAsset).not.toHaveBeenCalled();
     expect(uploadMediaMock).not.toHaveBeenCalled();
-    expect(result.uploadedMediaIds).toEqual([]);
-    expect(result.updatedPost.content).toBe(post.content);
+    expect(result.images).toEqual([]);
+    expect(result.content).toBe(post.content);
   });
 
   it('updates ImageAsset to FAILED when download/upload fails', async () => {

@@ -199,7 +199,6 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       .replace(/[^\p{L}\p{N}-]/gu, '');
   };
 
-  // TODO: 파싱 예외 처리 강화 (전반적인 예외 처리 강화가 필요)
   const parsePostMetadata = (html: string, url: string): ParsedPostMetadata => {
     logger.debug('Crawler.parsePostMetadata: parsing metadata', { url });
 
