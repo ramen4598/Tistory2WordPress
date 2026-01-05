@@ -78,12 +78,12 @@ export interface WpClient {
   ensureTag(name: string): Promise<number>;
 }
 
-function isRetryableStatus(status?: number): boolean {
-  if (!status) return false;
-  if (status === 429) return true;
-  if (status >= 500 && status < 600) return true;
-  return false;
-}
+// function isRetryableStatus(status?: number): boolean {
+//   if (!status) return false;
+//   if (status === 429) return true;
+//   if (status >= 500 && status < 600) return true;
+//   return false;
+// }
 
 function getAxiosErrorMessage(error: unknown): string {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -124,19 +124,19 @@ export function createWpClient(): WpClient {
     fn: () => Promise<T>,
     context: { operation: string; url: string }
   ): Promise<T> {
-    const wrapped = async () => {
-      try {
-        return await fn();
-      } catch (error) {
-        const axiosError = error as AxiosError;
-        if (!axiosError.isAxiosError || !isRetryableStatus(axiosError.response?.status)) {
-          throw error;
-        }
-        throw error;
-      }
-    };
+    // const wrapped = async () => {
+    //   try {
+    //     return await fn();
+    //   } catch (error) {
+    //     const axiosError = error as AxiosError;
+    //     if (!axiosError.isAxiosError || !isRetryableStatus(axiosError.response?.status)) {
+    //       throw error;
+    //     }
+    //     throw error;
+    //   }
+    // };
 
-    return retryWithBackoff(wrapped as () => Promise<T>, config, {
+    return retryWithBackoff(fn, config, {
       onRetry: (error, attempt, delayMs) => {
         logger.warn(
           'Retrying WordPress request',
@@ -257,6 +257,10 @@ export function createWpClient(): WpClient {
       logger.error('Failed to upload WordPress media', {
         error: message,
         fileName,
+        mimeType,
+        bufferLength: buffer.length,
+        altText,
+        title,
       });
       throw error;
     }

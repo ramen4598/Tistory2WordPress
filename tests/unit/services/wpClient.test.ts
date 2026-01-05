@@ -64,7 +64,7 @@ describe('wpClient', () => {
           headers: expect.objectContaining({
             Authorization: expect.stringMatching(/^Basic /),
           }),
-          timeout: 30000,
+          timeout: 3000,
         })
       );
 
