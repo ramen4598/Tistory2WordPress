@@ -11,8 +11,10 @@ import {
 import { MigrationJobItemStatus, MigrationJobStatus, MigrationJobType } from './enums/db.enum';
 import { createMigrator } from './services/migrator';
 import { createCrawler } from './services/crawler';
+import { exportLinkMapping } from './services/linkMapper';
 import { MigrationJob } from './models/MigrationJob';
 import { createPostProcessor } from './workers/postProcessor';
+import path from 'path';
 
 function getArgValue(argv: string[], flag: string): string | undefined {
   const exact = argv.find((a) => a === flag);
@@ -39,7 +41,9 @@ function hasFlag(argv: string[], flag: string): boolean {
 
 function printUsage(): void {
   // Keep it simple; tests shouldn't depend on output.
-  console.log('Usage: ts-node src/cli.ts [--post <tistory_post_url> | --all] [--retry-failed]');
+  console.log(
+    'Usage: ts-node src/cli.ts [--post <tistory_post_url> | --all] [--retry-failed] [--export-links]'
+  );
 }
 
 export async function runCli(argv: string[]): Promise<number> {
@@ -58,6 +62,7 @@ export async function runCli(argv: string[]): Promise<number> {
   const postUrl = getArgValue(argv, '--post');
   const allFlag = hasFlag(argv, '--all');
   const retryFailedFlag = hasFlag(argv, '--retry-failed');
+  const exportLinksFlag = hasFlag(argv, '--export-links');
 
   if (!postUrl && !allFlag) {
     printUsage();
@@ -73,7 +78,7 @@ export async function runCli(argv: string[]): Promise<number> {
       new URL(postUrl);
       const job = createMigrationJob(MigrationJobType.SINGLE);
       await migrator.migratePostByUrl(postUrl, { jobId: job.id });
-      return await finalizeJob(job.id);
+      return await finalizeJob(job.id, { exportLinks: exportLinksFlag });
     }
 
     if (allFlag) {
@@ -125,6 +130,7 @@ export async function runCli(argv: string[]): Promise<number> {
 
       return await finalizeJob(job.id, {
         skippedCount,
+        exportLinks: exportLinksFlag,
       });
     }
 
@@ -137,12 +143,16 @@ export async function runCli(argv: string[]): Promise<number> {
   }
 }
 
-async function finalizeJob(jobId: number, metrics?: { skippedCount: number }): Promise<number> {
+async function finalizeJob(
+  jobId: number,
+  metrics?: { skippedCount?: number; exportLinks?: boolean }
+): Promise<number> {
   const items = getMigrationJobItemsByJobId(jobId);
   const completed = items.filter((item) => item.status === MigrationJobItemStatus.COMPLETED).length;
   const failed = items.filter((item) => item.status === MigrationJobItemStatus.FAILED).length;
   const processed = completed + failed;
   const skipped = metrics?.skippedCount ?? 0;
+  const exportLinks = metrics?.exportLinks ?? false;
 
   const jobResult: Partial<Pick<MigrationJob, 'status' | 'completed_at' | 'error_message'>> = {
     completed_at: new Date().toISOString(),
@@ -166,6 +176,13 @@ async function finalizeJob(jobId: number, metrics?: { skippedCount: number }): P
   console.log(`- Total processed: ${processed}`);
   console.log(`- Database: ${config.migrationDbPath}`);
   console.log(`- Internal links: stored in 'internal_links' table (jobId=${jobId})`);
+
+  if (exportLinks) {
+    const linkMappingPath = path.join(config.outputDir, 'link_mapping.json');
+    exportLinkMapping(linkMappingPath, jobId);
+    console.log(`- Link mapping exported to: ${linkMappingPath}`);
+  }
+
   console.log('----------------------------------------');
 
   return failed > 0 ? 1 : 0;

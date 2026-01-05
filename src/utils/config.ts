@@ -170,7 +170,7 @@ export function loadConfig(): Config {
     );
   }
 
-  if (isNaN(rateLimitPerWorker) || rateLimitPerWorker < 0) {
+  if (isNaN(rateLimitPerWorker) || rateLimitPerWorker <= 0) {
     throw new ConfigurationError(
       `RATE_LIMIT_PER_WORKER must be a positive number. Got: ${process.env['RATE_LIMIT_PER_WORKER']}`
     );

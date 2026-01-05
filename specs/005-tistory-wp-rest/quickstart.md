@@ -81,7 +81,7 @@ Expected behavior:
 
 ## 6. Run Full-Blog Migration
 
-Once single-post migration works, run the full migration:
+Once single-post migration works, run full migration:
 
 ```bash
 npx ts-node src/cli.ts --all
@@ -98,11 +98,49 @@ Outputs:
 
 - New draft posts appears in your WordPress admin with:
   - Correct title/content.
-  - Categories/tags approximating the Tistory structure.
-  - Images stored in the WordPress media library and rendered correctly.
+  - Categories/tags approximating Tistory structure.
+  - Images stored in WordPress media library and rendered correctly.
   - Original publish date (and modified date if available).
-- SQLite DB (e.g. `migration.db`) updated with a `MigrationJob` + `MigrationJobItem` row for the processed URL.
-- `output/link_mapping.json` — internal Tistory link mappings.
+- SQLite DB (e.g. `migration.db`) updated with a `MigrationJob` + `MigrationJobItem` row for processed URL.
+
+### 6.1 Export Internal Link Mapping
+
+To export a JSON file containing all internal Tistory links detected during migration:
+
+```bash
+npx ts-node src/cli.ts --all --export-links
+node dist/cli.js --all --export-links
+```
+
+This creates `output/link_mapping.json`(configurable via .env file) in your project directory.
+
+### 6.2 Understanding link_mapping.json
+
+The exported JSON file contains an array of internal link records:
+
+```json
+[
+  {
+    "source_url": "https://your-blog.tistory.com/123",
+    "target_url": "https://your-blog.tistory.com/456",
+    "link_text": "See my previous post",
+    "context": "For more details, see my previous post about..."
+  },
+  {
+    "source_url": "https://your-blog.tistory.com/123",
+    "target_url": "https://your-blog.tistory.com/789",
+    "link_text": null,
+    "context": null
+  }
+]
+```
+
+Fields:
+
+- `source_url`: The Tistory post containing the link
+- `target_url`: The Tistory post URL the link points to
+- `link_text`: The anchor text of the link (may be null)
+- `context`: Surrounding text snippet for context (may be null)
 
 ## 7. Handling Failures & Resume
 
@@ -118,8 +156,46 @@ You can also inspect the `migration_jobs`, `migration_job_items`, and `migration
 
 ## 8. Post-Migration Work
 
+### 8.1 Review Migrated Content
+
 - Review migrated drafts in WordPress.
-- Use `link_mapping.json` (exported from SQLite) to manually fix internal links (e.g., mapping Tistory URLs to new WordPress permalinks).
+- Check for:
+  - Correct content formatting
+  - Proper image uploads
+  - Accurate categories and tags
+  - Original publish/modified dates
+
+### 8.2 Fix Internal Links
+
+Internal Tistory links still point to old Tistory URLs. Use `link_mapping.json` to manually update them:
+
+**Workflow:**
+
+1. Export internal links (if not already done):
+
+   ```bash
+   npx ts-node src/cli.ts --all --export-links
+   ```
+
+2. Open `output/link_mapping.json` in your editor or review tool
+
+3. For each internal link entry:
+   - Find the `source_url` post in WordPress admin
+   - Update the link to point to the new WordPress URL for `target_url`
+   - You can find the WordPress URL using the `tistory_wp_post_map` table:
+     ```bash
+     sqlite3 migration.db "SELECT tistory_url, wp_post_id FROM post_map WHERE tistory_url = 'https://your-blog.tistory.com/456';"
+     ```
+
+4. Example manual fix:
+   - Original: `<a href="https://your-blog.tistory.com/456">See previous post</a>`
+   - Fixed: `<a href="https://your-wordpress.com/2023/previous-post">See previous post</a>`
+
+**Tips:**
+
+- Use WordPress's "Find and Replace" plugins for bulk updates
+- Search/replace `https://your-blog.tistory.com/` with new WordPress base URL
+- Verify that link text and context in `link_mapping.json` help identify which links need attention
 
 ## 9. Relation to Existing 003 (WXR) Tool
 

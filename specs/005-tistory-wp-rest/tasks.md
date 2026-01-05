@@ -86,15 +86,15 @@
 ### Tests (write first)
 
 - [x] T245 [P] [US3] Add unit tests for linkTracker DB writes + filtering.
-- [ ] T246 [US3] Add integration test verifying `link_mapping.json` export content.
+- [x] T246 [US3] Add integration test verifying `link_mapping.json` export content.
 
 ### Implementation
 
-- [ ] T247 [US3] Finalize DB schema & repository methods for `internal_links` table (source/target/link_text/context).
-- [ ] T248 [US3] Update migrator/linkTracker pipeline to persist links per job item.
-- [ ] T249 [US3] Implement exporter generating `output/link_mapping.json`(configurable) from SQLite snapshot.
-- [ ] T250 [P] [US3] Add CLI flag to trigger/export link mapping after runs.
-- [ ] T251 [US3] Document link review workflow in `quickstart.md` and README section.
+- [x] T247 [US3] Finalize DB schema & repository methods for `internal_links` table (source/target/link_text/context).
+- [x] T248 [US3] Update migrator/linkTracker pipeline to persist links per job item.
+- [x] T249 [US3] Implement exporter generating `output/link_mapping.json`(configurable) from SQLite snapshot.
+- [x] T250 [P] [US3] Add CLI flag to trigger/export link mapping after runs.
+- [x] T251 [US3] Document link review workflow in `quickstart.md` and README section.
 
 ---
 
@@ -104,7 +104,7 @@
 
 ### Tests (write first)
 
-- [ ] T255 [P] [US4] Add config parsing tests for concurrency/rate-limit defaults.
+- [x] T255 [P] [US4] Add config parsing tests for concurrency/rate-limit defaults.
 - [ ] T256 [US4] Add logger tests asserting structured fields for job items + WP requests.
 
 ### Implementation

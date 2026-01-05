@@ -128,4 +128,62 @@ describe('loadConfig', () => {
 
     warnSpy.mockRestore();
   });
+
+  it('loads concurrency config from environment variable', () => {
+    setMinimumValidEnv();
+    process.env.WORKER_COUNT = '8';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.workerCount).toBe(8);
+  });
+
+  it('loads rate limit config from environment variable', () => {
+    setMinimumValidEnv();
+    process.env.RATE_LIMIT_PER_WORKER = '500';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.rateLimitPerWorker).toBe(500);
+  });
+
+  it('validates WORKER_COUNT upper bound', () => {
+    setMinimumValidEnv();
+    process.env.WORKER_COUNT = '17';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow('WORKER_COUNT must be a number between 1 and 16');
+  });
+
+  it('validates RATE_LIMIT_PER_WORKER is positive', () => {
+    setMinimumValidEnv();
+    process.env.RATE_LIMIT_PER_WORKER = '0';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow('RATE_LIMIT_PER_WORKER must be a positive number');
+  });
+
+  it('handles string values for numeric config', () => {
+    setMinimumValidEnv();
+    process.env.WORKER_COUNT = '4';
+    process.env.RATE_LIMIT_PER_WORKER = '2000';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.workerCount).toBe(4);
+    expect(config.rateLimitPerWorker).toBe(2000);
+  });
 });

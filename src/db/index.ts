@@ -423,3 +423,26 @@ export function getInternalLinksByJobItemId(jobItemId: number): InternalLinkReco
     .prepare('SELECT * FROM internal_links WHERE job_item_id = ? ORDER BY id')
     .all(jobItemId) as InternalLinkRecord[];
 }
+
+/**
+ * Get all internal link records by job ID.
+ * @param jobId number
+ * @return InternalLinkRecord[]
+ */
+export function getInternalLinksByJobId(jobId: number): InternalLinkRecord[] {
+  const db = getDb();
+  return db
+    .prepare(
+      'SELECT il.* FROM internal_links il JOIN migration_job_items mji ON il.job_item_id = mji.id WHERE mji.job_id = ? ORDER BY il.id'
+    )
+    .all(jobId) as InternalLinkRecord[];
+}
+
+/**
+ * Get all internal link records.
+ * @return InternalLinkRecord[]
+ */
+export function getAllInternalLinks(): InternalLinkRecord[] {
+  const db = getDb();
+  return db.prepare('SELECT * FROM internal_links ORDER BY id').all() as InternalLinkRecord[];
+}
