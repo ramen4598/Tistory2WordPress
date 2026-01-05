@@ -70,7 +70,7 @@
 - [x] T233 [US2] Extend crawler to expose bulk listing API compatible with resume logic.
 - [x] T234 [US2] Implement job bootstrap in CLI for `--all` (create migration_job rows, filter completed job items).
 - [x] T235 [P] [US2] Adapt `src/workers/postProcessor.ts` to enqueue per-post tasks via migrator with concurrency controls.
-- [ ] T236 [US2] Integrate rate limit + concurrency settings from config into worker pool.
+- [x] T236 [US2] Integrate rate limit + concurrency settings from config into worker pool.
 - [ ] T237 [US2] Implement resume logic (skip completed, optional retry failed) backed by SQLite job items.
 - [ ] T238 [US2] Aggregate job metrics (processed, skipped, failed, duration) and persist to job table.
 - [ ] T239 [US2] Add CLI summary output for bulk runs including DB paths + link dump hints.

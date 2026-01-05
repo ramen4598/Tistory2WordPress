@@ -6,7 +6,6 @@ import { createMigrator } from './services/migrator';
 import { createCrawler } from './services/crawler';
 import { MigrationJob } from './models/MigrationJob';
 import { createPostProcessor } from './workers/postProcessor';
-import { Config } from './models/Config';
 
 function getArgValue(argv: string[], flag: string): string | undefined {
   const exact = argv.find((a) => a === flag);
@@ -38,10 +37,10 @@ function printUsage(): void {
 
 export async function runCli(argv: string[]): Promise<number> {
   const logger = getLogger();
-  let config: Config;
 
   try {
-    config = loadConfig();
+    // Load config early to validate and provide clear error messages
+    loadConfig();
   } catch (error) {
     logger.error('Configuration error', {
       error: (error as Error)?.message ?? String(error),
@@ -81,7 +80,7 @@ export async function runCli(argv: string[]): Promise<number> {
       const urls = await crawler.discoverPostUrls();
       logger.info('Discovered URLs for full migration', { count: urls.length });
 
-      const processor = createPostProcessor(config.workerCount);
+      const processor = createPostProcessor();
       await processor.process(urls, job.id);
 
       return await finalizeJob(job.id);

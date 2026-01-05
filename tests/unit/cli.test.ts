@@ -143,7 +143,7 @@ describe('CLI --all', () => {
     const postProcessor = await import('../../src/workers/postProcessor');
     expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.FULL);
     expect(discoverPostUrls).toHaveBeenCalled();
-    expect(postProcessor.createPostProcessor).toHaveBeenCalledWith(7);
+    expect(postProcessor.createPostProcessor).toHaveBeenCalledWith();
     expect(process).toHaveBeenCalledWith(
       ['https://example.com/post/1', 'https://example.com/post/2'],
       999

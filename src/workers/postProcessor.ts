@@ -1,6 +1,7 @@
 import PQueue from 'p-queue';
 import { createMigrator } from '../services/migrator';
 import { getLogger } from '../utils/logger';
+import { loadConfig } from '../utils/config';
 
 export interface PostProcessorOptions {
   concurrency?: number;
@@ -16,17 +17,32 @@ export interface PostProcessor {
 }
 
 /**
- * Creates a PostProcessor with the specified concurrency.
- * @param concurrency - The number of concurrent processing tasks.
+ * Creates a PostProcessor with rate limiting and concurrency settings from config.
  * @returns A PostProcessor instance.
  */
-export const createPostProcessor = (concurrency: number): PostProcessor => {
+export const createPostProcessor = (): PostProcessor => {
   const logger = getLogger();
-  const queue = new PQueue({ concurrency });
+  const config = loadConfig();
+
+  // Calculate rate limiting parameters
+  // If rateLimitPerWorker is 1000ms, allow 1 request per 1000ms
+  const intervalMs = config.rateLimitPerWorker;
+  const intervalCap = 1; // 1 request per interval
+
+  const queue = new PQueue({
+    concurrency: config.workerCount,
+    intervalCap: intervalCap,
+    interval: intervalMs,
+  });
+
   const migrator = createMigrator();
 
   const process = async (urls: string[], jobId: number): Promise<void> => {
-    logger.info('PostProcessor: starting processing', { count: urls.length, concurrency });
+    logger.info('PostProcessor: starting processing', {
+      count: urls.length,
+      concurrency: config.workerCount,
+      rateLimitPerWorker: config.rateLimitPerWorker,
+    });
 
     const tasks = urls.map((url) => {
       return async () => {
