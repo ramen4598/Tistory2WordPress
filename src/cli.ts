@@ -1,16 +1,12 @@
 import { getLogger } from './utils/logger';
 import { loadConfig } from './utils/config';
-import {
-  createMigrationJob,
-  createMigrationJobItem,
-  getDb,
-  getMigrationJobItemsByJobId,
-  updateMigrationJob,
-} from './db';
+import { createMigrationJob, getDb, getMigrationJobItemsByJobId, updateMigrationJob } from './db';
 import { MigrationJobItemStatus, MigrationJobStatus, MigrationJobType } from './enums/db.enum';
 import { createMigrator } from './services/migrator';
 import { createCrawler } from './services/crawler';
 import { MigrationJob } from './models/MigrationJob';
+import { createPostProcessor } from './workers/postProcessor';
+import { Config } from './models/Config';
 
 function getArgValue(argv: string[], flag: string): string | undefined {
   const exact = argv.find((a) => a === flag);
@@ -42,9 +38,10 @@ function printUsage(): void {
 
 export async function runCli(argv: string[]): Promise<number> {
   const logger = getLogger();
+  let config: Config;
 
   try {
-    loadConfig();
+    config = loadConfig();
   } catch (error) {
     logger.error('Configuration error', {
       error: (error as Error)?.message ?? String(error),
@@ -84,11 +81,8 @@ export async function runCli(argv: string[]): Promise<number> {
       const urls = await crawler.discoverPostUrls();
       logger.info('Discovered URLs for full migration', { count: urls.length });
 
-      for (const url of urls) {
-        createMigrationJobItem({ job_id: job.id, tistory_url: url });
-        // US2 - T235 will adapt worker pool, for now we process sequentially to pass US2 T234
-        await migrator.migratePostByUrl(url, { jobId: job.id });
-      }
+      const processor = createPostProcessor(config.workerCount);
+      await processor.process(urls, job.id);
 
       return await finalizeJob(job.id);
     }

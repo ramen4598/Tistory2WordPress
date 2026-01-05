@@ -134,7 +134,6 @@ describe('CLI --post', () => {
 
     const db = await import('../../src/db');
     expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.FULL);
-    expect(db.createMigrationJobItem).toHaveBeenCalledTimes(2);
     expect(discoverPostUrls).toHaveBeenCalled();
     expect(migratePostByUrl).toHaveBeenCalledTimes(2);
 
