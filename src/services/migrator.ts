@@ -149,6 +149,12 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         updated_at: new Date().toISOString(),
       });
 
+      logger.info('Rollback completed', {
+        url,
+        jobId: context.jobId,
+        jobItemId: jobItem.id,
+        wpPostId,
+      });
       throw error;
     }
   };
