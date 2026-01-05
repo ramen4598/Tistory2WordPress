@@ -9,7 +9,12 @@ import type { ImageAsset } from '../models/ImageAsset';
 import type { PostMap } from '../models/PostMap';
 import type { InternalLinkRecord } from '../models/InternalLinkRecord';
 // eslint-disable-next-line prettier/prettier
-import { ImageAssetStatus, MigrationJobItemStatus, MigrationJobStatus, MigrationJobType } from '../enums/db.enum';
+import {
+  ImageAssetStatus,
+  MigrationJobItemStatus,
+  MigrationJobStatus,
+  MigrationJobType,
+} from '../enums/db.enum';
 
 const SCHEMA_PATH = path.join(__dirname, '../../db/schema.sql');
 
@@ -152,7 +157,7 @@ export function createMigrationJobItem(input: {
   const stmt = db.prepare(
     'INSERT INTO migration_job_items (job_id, tistory_url, status) VALUES (?, ?, ?)'
   );
-  const info = stmt.run(input.job_id, input.tistory_url, MigrationJobItemStatus.PENDING);
+  const info = stmt.run(input.job_id, input.tistory_url, MigrationJobItemStatus.RUNNING);
   const id = Number(info.lastInsertRowid);
 
   const row = db.prepare('SELECT * FROM migration_job_items WHERE id = ?').get(id) as

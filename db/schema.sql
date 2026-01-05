@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS migration_job_items (
   job_id INTEGER NOT NULL,
   tistory_url TEXT NOT NULL,
   wp_post_id INTEGER,
-  status TEXT NOT NULL CHECK(status IN ('pending', 'success', 'failed')),
+  status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed')),
   error_message TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),

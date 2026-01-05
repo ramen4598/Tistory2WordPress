@@ -136,21 +136,21 @@ describe('db repository methods', () => {
 
     expect(item.id).toBeGreaterThan(0);
     expect(item.job_id).toBe(job.id);
-    expect(item.status).toBe(MigrationJobItemStatus.PENDING);
+    expect(item.status).toBe(MigrationJobItemStatus.RUNNING);
     expect(item.tistory_url).toBe('https://example.tistory.com/1');
     expect(item.wp_post_id).toBeNull();
 
     const updatedAt1 = new Date().toISOString();
 
     updateMigrationJobItem(item.id, {
-      status: MigrationJobItemStatus.SUCCESS,
+      status: MigrationJobItemStatus.COMPLETED,
       wp_post_id: 123,
       updated_at: updatedAt1,
     });
 
     const successItem = getMigrationJobItemById(item.id);
     expect(successItem).toBeDefined();
-    expect(successItem?.status).toBe(MigrationJobItemStatus.SUCCESS);
+    expect(successItem?.status).toBe(MigrationJobItemStatus.COMPLETED);
     expect(successItem?.wp_post_id).toBe(123);
     expect(successItem?.updated_at).toBe(updatedAt1);
 

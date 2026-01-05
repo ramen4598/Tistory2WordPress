@@ -94,7 +94,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
 
       createPostMap({ tistory_url: url, wp_post_id: wpPostId });
       updateMigrationJobItem(jobItem.id, {
-        status: MigrationJobItemStatus.SUCCESS,
+        status: MigrationJobItemStatus.COMPLETED,
         wp_post_id: wpPostId,
         error_message: null,
         updated_at: new Date().toISOString(),

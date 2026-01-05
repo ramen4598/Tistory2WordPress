@@ -10,8 +10,8 @@ export enum MigrationJobStatus {
 }
 
 export enum MigrationJobItemStatus {
-  PENDING = 'pending',
-  SUCCESS = 'success',
+  RUNNING = 'running',
+  COMPLETED = 'completed',
   FAILED = 'failed',
 }
 

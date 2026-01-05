@@ -47,7 +47,7 @@
 - [x] T220 [P] [US1] Implement `src/services/linkTracker.ts` to persist internal links via DB layer.
 - [x] T221 [US1] Build `src/services/migrator.ts` orchestrating per-post pipeline + rollback support.
 - [x] T222 [US1] Wire migrator with crawler/cleaner/linkTracker/imageProcessor/wpClient interactions per sequence diagram.
-- [ ] T223 [US1] Persist job item lifecycle + failure reasons in SQLite during migration/rollback.
+- [x] T223 [US1] Persist job item lifecycle + failure reasons in SQLite during migration/rollback.
 - [ ] T224 [P] [US1] Add CLI option `--post` for single URL and connect to migrator + DB bootstrap.
 - [ ] T225 [US1] Export rollback-safe summary from CLI (success/failure metrics, job IDs).
 - [x] T226 [US1] Update `tests/unit/WXRGenerator-utils.test.ts` (or new suites) to stub crawler output for REST mode. WXRGenerator is not used, so this task is not needed. Skipped.

@@ -33,7 +33,7 @@ jest.mock('../../../src/db', () => ({
   createPostMap: jest.fn(),
 }));
 
-describe('migrator (T221)', () => {
+describe('migrator (T221/T223)', () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
@@ -120,6 +120,7 @@ describe('migrator (T221)', () => {
       expect.objectContaining({
         status: MigrationJobItemStatus.FAILED,
         error_message: expect.any(String),
+        updated_at: expect.any(String),
       })
     );
   });
