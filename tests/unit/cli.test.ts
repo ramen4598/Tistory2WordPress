@@ -90,4 +90,54 @@ describe('CLI --post', () => {
     const code = await runCli(['node', 'cli', '--post=https://example.com/post/2']);
     expect(code).toBe(1);
   });
+
+  it('runs full blog migration with --all bootstrap', async () => {
+    const discoverPostUrls = jest
+      .fn()
+      .mockResolvedValue(['https://example.com/post/1', 'https://example.com/post/2']);
+    const migratePostByUrl = jest.fn().mockResolvedValue(undefined);
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    jest.doMock('../../src/utils/config', () => ({
+      loadConfig: jest.fn().mockReturnValue({ blogUrl: 'https://example.com' }),
+    }));
+
+    jest.doMock('../../src/db', () => ({
+      getDb: jest.fn(),
+      createMigrationJob: jest.fn().mockReturnValue({ id: 999 }),
+      createMigrationJobItem: jest.fn().mockImplementation((input) => ({
+        id: Math.random(),
+        job_id: input.job_id,
+        tistory_url: input.tistory_url,
+        status: 'running',
+      })),
+      getMigrationJobItemsByJobId: jest.fn().mockReturnValue([
+        { id: 1, job_id: 999, tistory_url: 'https://example.com/post/1', status: 'completed' },
+        { id: 2, job_id: 999, tistory_url: 'https://example.com/post/2', status: 'completed' },
+      ]),
+      updateMigrationJob: jest.fn(),
+    }));
+
+    jest.doMock('../../src/services/crawler', () => ({
+      createCrawler: jest.fn().mockReturnValue({ discoverPostUrls }),
+    }));
+
+    jest.doMock('../../src/services/migrator', () => ({
+      createMigrator: jest.fn().mockReturnValue({ migratePostByUrl }),
+    }));
+
+    const { runCli } = await import('../../src/cli');
+
+    const code = await runCli(['node', 'cli', '--all']);
+
+    expect(code).toBe(0);
+
+    const db = await import('../../src/db');
+    expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.FULL);
+    expect(db.createMigrationJobItem).toHaveBeenCalledTimes(2);
+    expect(discoverPostUrls).toHaveBeenCalled();
+    expect(migratePostByUrl).toHaveBeenCalledTimes(2);
+
+    logSpy.mockRestore();
+  });
 });

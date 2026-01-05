@@ -1,8 +1,16 @@
 import { getLogger } from './utils/logger';
 import { loadConfig } from './utils/config';
-import { createMigrationJob, getDb, getMigrationJobItemsByJobId, updateMigrationJob } from './db';
+import {
+  createMigrationJob,
+  createMigrationJobItem,
+  getDb,
+  getMigrationJobItemsByJobId,
+  updateMigrationJob,
+} from './db';
 import { MigrationJobItemStatus, MigrationJobStatus, MigrationJobType } from './enums/db.enum';
 import { createMigrator } from './services/migrator';
+import { createCrawler } from './services/crawler';
+import { MigrationJob } from './models/MigrationJob';
 
 function getArgValue(argv: string[], flag: string): string | undefined {
   const exact = argv.find((a) => a === flag);
@@ -23,13 +31,16 @@ function getArgValue(argv: string[], flag: string): string | undefined {
   return undefined;
 }
 
+function hasFlag(argv: string[], flag: string): boolean {
+  return argv.includes(flag);
+}
+
 function printUsage(): void {
   // Keep it simple; tests shouldn’t depend on output.
-  console.log('Usage: ts-node src/cli.ts --post <tistory_post_url>');
+  console.log('Usage: ts-node src/cli.ts [--post <tistory_post_url> | --all]');
 }
 
 export async function runCli(argv: string[]): Promise<number> {
-  let url: string | undefined;
   const logger = getLogger();
 
   try {
@@ -41,52 +52,73 @@ export async function runCli(argv: string[]): Promise<number> {
     return 1;
   }
 
-  try {
-    url = getArgValue(argv, '--post');
-    if (!url) {
-      printUsage(); // Print usage info if --post is missing
-      return 1;
-    }
-    new URL(url);
-  } catch (error) {
-    logger.error('Argument parsing error', {
-      error: (error as Error)?.message ?? String(error),
-    });
+  const postUrl = getArgValue(argv, '--post');
+  const allFlag = hasFlag(argv, '--all');
+
+  if (!postUrl && !allFlag) {
+    printUsage();
     return 1;
   }
 
   try {
     // Ensure DB is initialized and schema applied.
     getDb();
-
-    const job = createMigrationJob(MigrationJobType.SINGLE);
     const migrator = createMigrator();
 
-    await migrator.migratePostByUrl(url, { jobId: job.id });
+    if (postUrl) {
+      new URL(postUrl);
+      const job = createMigrationJob(MigrationJobType.SINGLE);
+      await migrator.migratePostByUrl(postUrl, { jobId: job.id });
+      return await finalizeJob(job.id);
+    }
 
-    const items = getMigrationJobItemsByJobId(job.id);
-    const completed = items.filter(
-      (item) => item.status === MigrationJobItemStatus.COMPLETED
-    ).length;
-    const failed = items.filter((item) => item.status === MigrationJobItemStatus.FAILED).length;
-    const JobResult: Partial<Pick<MigrationJob, 'status' | 'completed_at' | 'error_message'>> = {
-      completed_at: new Date().toISOString(),
-      status: failed > 0 ? MigrationJobStatus.FAILED : MigrationJobStatus.COMPLETED,
-      error_message: failed > 0 ? 'Some items failed to migrate' : null,
-    };
-    await updateMigrationJob(job.id, JobResult);
+    if (allFlag) {
+      const job = createMigrationJob(MigrationJobType.FULL);
+      const crawler = createCrawler({
+        fetchFn: async (url: string) => {
+          const res = await fetch(url);
+          return { text: () => res.text() };
+        },
+      });
 
-    console.log(`Migration Job Summary (jobId=${job.id})`);
-    console.log(`- Completed: ${completed}`);
-    console.log(`- Failed: ${failed}`);
+      const urls = await crawler.discoverPostUrls();
+      logger.info('Discovered URLs for full migration', { count: urls.length });
 
-    return failed > 0 ? 1 : 0;
+      for (const url of urls) {
+        createMigrationJobItem({ job_id: job.id, tistory_url: url });
+        // US2 - T235 will adapt worker pool, for now we process sequentially to pass US2 T234
+        await migrator.migratePostByUrl(url, { jobId: job.id });
+      }
+
+      return await finalizeJob(job.id);
+    }
+
+    return 0;
   } catch (error) {
     logger.error('CLI failed', {
       error: (error as Error)?.message ?? String(error),
     });
     return 1;
   }
+}
+
+async function finalizeJob(jobId: number): Promise<number> {
+  const items = getMigrationJobItemsByJobId(jobId);
+  const completed = items.filter((item) => item.status === MigrationJobItemStatus.COMPLETED).length;
+  const failed = items.filter((item) => item.status === MigrationJobItemStatus.FAILED).length;
+
+  const jobResult: Partial<Pick<MigrationJob, 'status' | 'completed_at' | 'error_message'>> = {
+    completed_at: new Date().toISOString(),
+    status: failed > 0 ? MigrationJobStatus.FAILED : MigrationJobStatus.COMPLETED,
+    error_message: failed > 0 ? 'Some items failed to migrate' : null,
+  };
+  await updateMigrationJob(jobId, jobResult);
+
+  console.log(`Migration Job Summary (jobId=${jobId})`);
+  console.log(`- Completed: ${completed}`);
+  console.log(`- Failed: ${failed}`);
+
+  return failed > 0 ? 1 : 0;
 }
 
 // CommonJS entrypoint

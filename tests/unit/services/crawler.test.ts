@@ -68,6 +68,35 @@ describe('Crawler service', () => {
     expect(urls).toEqual([`${blogUrl}/1`, `${blogUrl}/2`, `${blogUrl}/3`]);
   });
 
+  it('should discover post URLs from real pagination fixture across pages', async () => {
+    const page1Fixture = await import('fs/promises').then((fs) =>
+      fs.readFile(`${__dirname}/../helpers/page1.html`, 'utf8')
+    );
+
+    const page2Html = `
+      <html>
+        <body>
+          <a href="/999" class="link_category">Post 999</a>
+        </body>
+      </html>
+    `;
+
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce({ text: async () => page1Fixture })
+      .mockResolvedValueOnce({ text: async () => page2Html })
+      .mockResolvedValueOnce({ text: async () => '' });
+
+    const crawler = createCrawler({ fetchFn: fetchMock as any });
+
+    const urls = await crawler.discoverPostUrls();
+
+    expect(urls).toContain(`${blogUrl}/637`);
+    expect(urls).toContain(`${blogUrl}/634`);
+    expect(urls).toContain(`${blogUrl}/999`);
+    expect(fetchMock).toHaveBeenCalledWith(`${blogUrl}?page=2`);
+  });
+
   it('should handle blogs without pagination by stopping when next page is missing', async () => {
     const pageHtml = `
       <html>
