@@ -1,0 +1,1439 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+
+                                                                                <head>
+                <script type="text/javascript">if (!window.T) { window.T = {} }
+window.T.config = {"TOP_SSL_URL":"https://www.tistory.com","PREVIEW":false,"ROLE":"owner","PREV_PAGE":"","NEXT_PAGE":"","BLOG":{"id":5257724,"name":"ramen4598","title":"개발은 즐거워?","isDormancy":false,"nickName":"tired_i","status":"open","profileStatus":"normal"},"NEED_COMMENT_LOGIN":false,"COMMENT_LOGIN_CONFIRM_MESSAGE":"","LOGIN_URL":"https://www.tistory.com/auth/login/?redirectUrl=https://ramen4598.tistory.com/634","DEFAULT_URL":"https://ramen4598.tistory.com","USER":{"name":"tired_i","homepage":"https://ramen4598.tistory.com","id":5299898,"profileImage":"https://tistory1.daumcdn.net/tistory/5257724/attach/e7c57b0b2cd74c6993a8e101b19e21d3"},"SUBSCRIPTION":{"status":"none","isConnected":false,"isPending":false,"isWait":false,"isProcessing":false,"isNone":true},"IS_LOGIN":true,"HAS_BLOG":true,"IS_SUPPORT":false,"IS_SCRAPABLE":true,"TOP_URL":"http://www.tistory.com","JOIN_URL":"https://www.tistory.com/member/join","PHASE":"prod","ROLE_GROUP":"member"};
+window.T.entryInfo = {"entryId":634,"isAuthor":true,"categoryId":1171319,"categoryLabel":"Tools/Home Server"};
+window.appInfo = {"domain":"tistory.com","topUrl":"https://www.tistory.com","loginUrl":"https://www.tistory.com/auth/login","logoutUrl":"https://www.tistory.com/auth/logout"};
+window.initData = {"user":{"id":5299898,"loginId":"fkaus4598@naver.com","name":"tired_i"}};
+
+window.TistoryBlog = {
+    basePath: "",
+    url: "https://ramen4598.tistory.com",
+    tistoryUrl: "https://ramen4598.tistory.com",
+    manageUrl: "https://ramen4598.tistory.com/manage",
+    token: "GUjOW8qbQBCJPrZJ8/wWf+4b42Xr9MbXkj4Bty3jrbiNB22a16LOlv0DJbgY0mOr"
+};
+var servicePath = "";
+var blogURL = "";</script>
+
+                
+                
+                
+                        <!-- BusinessLicenseInfo - START -->
+        
+            <link href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/plugin/BusinessLicenseInfo/style.css" rel="stylesheet" type="text/css"/>
+
+            <script>function switchFold(entryId) {
+    var businessLayer = document.getElementById("businessInfoLayer_" + entryId);
+
+    if (businessLayer) {
+        if (businessLayer.className.indexOf("unfold_license") > 0) {
+            businessLayer.className = "business_license_layer";
+        } else {
+            businessLayer.className = "business_license_layer unfold_license";
+        }
+    }
+}
+</script>
+
+        
+        <!-- BusinessLicenseInfo - END -->
+        <!-- MetaTag - START -->
+        <meta name="naver-site-verification" content="4874eb700a5653591b3a17994e46e8e068473b0f"/>
+<meta name="google-site-verification" content="17gRArMGbJAD1brengBwGaPZrDIgoCiBGSVwQDbxdsc"/>
+        <!-- MetaTag - END -->
+
+<!-- System - START -->
+
+<!-- System - END -->
+
+        <!-- TistoryProfileLayer - START -->
+        <link href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/plugin/TistoryProfileLayer/style.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/plugin/TistoryProfileLayer/script.js"></script>
+
+        <!-- TistoryProfileLayer - END -->
+
+                
+                <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta name="format-detection" content="telephone=no">
+<script src="//t1.daumcdn.net/tistory_admin/lib/jquery/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="//t1.daumcdn.net/tiara/js/v1/tiara-1.2.0.min.js"></script><meta name="referrer" content="always"/>
+<meta name="google-adsense-platform-account" content="ca-host-pub-9691043933427338"/>
+<meta name="google-adsense-platform-domain" content="tistory.com"/>
+<meta name="description" content="1. Offisite Backup Offisite Backup은 장애나 사고에 대비하기 위해 반드시 필요하다. 로컬 스토리지에만 의존하면 화재, 침수, 하드웨어 고장 같은 문제가 발생했을 때 데이터 복구가 불가할 수 있다. 옛날에 조선왕조실록도 여러 지역에 외사고를 운영했던 것처럼 본진이 털릴 경우를 대비해서 별도의 물리적 공간이나 클라우드에 백업을 두는 게 좋다. https://cloud-pbs.com/ Proxmox VE를 사용하는 경우 S3 호환 스토리지, Cloud-PBS 같은 서비스를 고려할 수 있다. Cloud-PBS는 프랑스, 독일, 미국 등에서 호스팅 되는 원격으로 관리되는 PBS 정도로 생각하면 된다. Cloud-PBS는 관리가 편리한 만큼 요금이 비싸다.(25년 기준으로 단순 용량당 비.."/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://ramen4598.tistory.com/634"/>
+<meta property="og.article.author" content="tired_i"/>
+<meta property="og:site_name" content="개발은 즐거워?"/>
+<meta property="og:title" content="[홈서버] Offsite Backup"/>
+<meta name="by" content="tired_i"/>
+<meta property="og:description" content="1. Offisite Backup Offisite Backup은 장애나 사고에 대비하기 위해 반드시 필요하다. 로컬 스토리지에만 의존하면 화재, 침수, 하드웨어 고장 같은 문제가 발생했을 때 데이터 복구가 불가할 수 있다. 옛날에 조선왕조실록도 여러 지역에 외사고를 운영했던 것처럼 본진이 털릴 경우를 대비해서 별도의 물리적 공간이나 클라우드에 백업을 두는 게 좋다. https://cloud-pbs.com/ Proxmox VE를 사용하는 경우 S3 호환 스토리지, Cloud-PBS 같은 서비스를 고려할 수 있다. Cloud-PBS는 프랑스, 독일, 미국 등에서 호스팅 되는 원격으로 관리되는 PBS 정도로 생각하면 된다. Cloud-PBS는 관리가 편리한 만큼 요금이 비싸다.(25년 기준으로 단순 용량당 비.."/>
+<meta property="og:image" content="https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdtuDT2%2FdJMb9Miz3vs%2FAAAAAAAAAAAAAAAAAAAAAAZlwJFRN3oX18aQLSZeSN4AESfoX7_tDPsJ0rYuM8Hb%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DNP010Dp50dRQtgK2WnNH%252FMuLpzI%253D"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:site" content="@TISTORY"/>
+<meta name="twitter:title" content="[홈서버] Offsite Backup"/>
+<meta name="twitter:description" content="1. Offisite Backup Offisite Backup은 장애나 사고에 대비하기 위해 반드시 필요하다. 로컬 스토리지에만 의존하면 화재, 침수, 하드웨어 고장 같은 문제가 발생했을 때 데이터 복구가 불가할 수 있다. 옛날에 조선왕조실록도 여러 지역에 외사고를 운영했던 것처럼 본진이 털릴 경우를 대비해서 별도의 물리적 공간이나 클라우드에 백업을 두는 게 좋다. https://cloud-pbs.com/ Proxmox VE를 사용하는 경우 S3 호환 스토리지, Cloud-PBS 같은 서비스를 고려할 수 있다. Cloud-PBS는 프랑스, 독일, 미국 등에서 호스팅 되는 원격으로 관리되는 PBS 정도로 생각하면 된다. Cloud-PBS는 관리가 편리한 만큼 요금이 비싸다.(25년 기준으로 단순 용량당 비.."/>
+<meta property="twitter:image" content="https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdtuDT2%2FdJMb9Miz3vs%2FAAAAAAAAAAAAAAAAAAAAAAZlwJFRN3oX18aQLSZeSN4AESfoX7_tDPsJ0rYuM8Hb%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DNP010Dp50dRQtgK2WnNH%252FMuLpzI%253D"/>
+<meta content="https://ramen4598.tistory.com/634" property="dg:plink" content="https://ramen4598.tistory.com/634"/>
+<meta name="plink"/>
+<meta name="title" content="[홈서버] Offsite Backup"/>
+<meta name="article:media_name" content="개발은 즐거워?"/>
+<meta property="article:mobile_url" content="https://ramen4598.tistory.com/m/634"/>
+<meta property="article:pc_url" content="https://ramen4598.tistory.com/634"/>
+<meta property="article:mobile_view_url" content="https://ramen4598.tistory.com/m/634"/>
+<meta property="article:pc_view_url" content="https://ramen4598.tistory.com/634"/>
+<meta property="article:talk_channel_view_url" content="https://ramen4598.tistory.com/m/634"/>
+<meta property="article:pc_service_home" content="https://www.tistory.com"/>
+<meta property="article:mobile_service_home" content="https://www.tistory.com/m"/>
+<meta property="article:txid" content="5257724_634"/>
+<meta property="article:published_time" content="2025-10-17T17:38:48+09:00"/>
+<meta property="og:regDate" content="20251017053848"/>
+<meta property="article:modified_time" content="2025-12-25T22:02:28+09:00"/>
+<script type="module" src="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/pc/dist/index.js" defer=""></script>
+<script type="text/javascript" src="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/pc/dist/index-legacy.js" defer="" nomodule="true"></script>
+<script type="text/javascript" src="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/pc/dist/polyfills-legacy.js" defer="" nomodule="true"></script>
+<link rel="icon" sizes="any" href="https://t1.daumcdn.net/tistory_admin/favicon/tistory_favicon_32x32.ico"/>
+<link rel="icon" type="image/svg+xml" href="https://t1.daumcdn.net/tistory_admin/top_v2/bi-tistory-favicon.svg"/>
+<link rel="apple-touch-icon" href="https://t1.daumcdn.net/tistory_admin/top_v2/tistory-apple-touch-favicon.png"/>
+<link rel="stylesheet" type="text/css" href="https://t1.daumcdn.net/tistory_admin/www/style/font.css"/>
+<link rel="stylesheet" type="text/css" href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/style/content.css"/>
+<link rel="stylesheet" type="text/css" href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/pc/dist/index.css"/>
+<link rel="stylesheet" type="text/css" href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/style/uselessPMargin.css"/>
+<script type="text/javascript">(function() {
+    var tjQuery = jQuery.noConflict(true);
+    window.tjQuery = tjQuery;
+    window.orgjQuery = window.jQuery; window.jQuery = tjQuery;
+    window.jQuery = window.orgjQuery; delete window.orgjQuery;
+})()</script>
+<script type="text/javascript" src="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/script/base.js"></script>
+<script type="text/javascript" src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+                
+  <title>[홈서버] Offsite Backup</title>
+  <meta name="title" content="[홈서버] Offsite Backup :: 개발은 즐거워?" />
+  <meta charset="utf-8" />
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+  <link rel="alternate" type="application/rss+xml" title="개발은 즐거워?" href="https://ramen4598.tistory.com/rss" />
+  <link rel="stylesheet" href="https://t1.daumcdn.net/tistory_admin/static/font/SpoqaHanSans/SpoqaHanSans.css" />
+  <link rel="stylesheet" href="https://t1.daumcdn.net/tistory_admin/static/font/icomoon/icomoon.css" />
+  <link rel="stylesheet" href="https://tistory1.daumcdn.net/tistory/5257724/skin/style.css?_version_=1720272793" />
+  <link rel="stylesheet" href="https://tistory1.daumcdn.net/tistory/5257724/skin/images/slick.css?_version_=1720272793" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+  <script src="https://tistory1.daumcdn.net/tistory/5257724/skin/images/slick.js?_version_=1720272793"></script>
+  <script src="https://tistory1.daumcdn.net/tistory/5257724/skin/images/common.js?_version_=1720272793"></script>
+  <script src="https://unpkg.com/vh-check/dist/vh-check.min.js"></script>
+  <script>
+    (function () {
+      // initialize the test
+      var test = vhCheck();
+    }());
+  </script>
+
+                
+                
+                <style type="text/css">.another_category {
+    border: 1px solid #E5E5E5;
+    padding: 10px 10px 5px;
+    margin: 10px 0;
+    clear: both;
+}
+
+.another_category h4 {
+    font-size: 12px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #E5E5E5 !important;
+    padding: 2px 0 6px !important;
+}
+
+.another_category h4 a {
+    font-weight: bold !important;
+}
+
+.another_category table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100% !important;
+    margin-top: 10px !important;
+}
+
+* html .another_category table {
+    width: auto !important;
+}
+
+*:first-child + html .another_category table {
+    width: auto !important;
+}
+
+.another_category th, .another_category td {
+    padding: 0 0 4px !important;
+}
+
+.another_category th {
+    text-align: left;
+    font-size: 12px !important;
+    font-weight: normal;
+    word-break: break-all;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+.another_category td {
+    text-align: right;
+    width: 80px;
+    font-size: 11px;
+}
+
+.another_category th a {
+    font-weight: normal;
+    text-decoration: none;
+    border: none !important;
+}
+
+.another_category th a.current {
+    font-weight: bold;
+    text-decoration: none !important;
+    border-bottom: 1px solid !important;
+}
+
+.another_category th span {
+    font-weight: normal;
+    text-decoration: none;
+    font: 10px Tahoma, Sans-serif;
+    border: none !important;
+}
+
+.another_category_color_gray, .another_category_color_gray h4 {
+    border-color: #E5E5E5 !important;
+}
+
+.another_category_color_gray * {
+    color: #909090 !important;
+}
+
+.another_category_color_gray th a.current {
+    border-color: #909090 !important;
+}
+
+.another_category_color_gray h4, .another_category_color_gray h4 a {
+    color: #737373 !important;
+}
+
+.another_category_color_red, .another_category_color_red h4 {
+    border-color: #F6D4D3 !important;
+}
+
+.another_category_color_red * {
+    color: #E86869 !important;
+}
+
+.another_category_color_red th a.current {
+    border-color: #E86869 !important;
+}
+
+.another_category_color_red h4, .another_category_color_red h4 a {
+    color: #ED0908 !important;
+}
+
+.another_category_color_green, .another_category_color_green h4 {
+    border-color: #CCE7C8 !important;
+}
+
+.another_category_color_green * {
+    color: #64C05B !important;
+}
+
+.another_category_color_green th a.current {
+    border-color: #64C05B !important;
+}
+
+.another_category_color_green h4, .another_category_color_green h4 a {
+    color: #3EA731 !important;
+}
+
+.another_category_color_blue, .another_category_color_blue h4 {
+    border-color: #C8DAF2 !important;
+}
+
+.another_category_color_blue * {
+    color: #477FD6 !important;
+}
+
+.another_category_color_blue th a.current {
+    border-color: #477FD6 !important;
+}
+
+.another_category_color_blue h4, .another_category_color_blue h4 a {
+    color: #1960CA !important;
+}
+
+.another_category_color_violet, .another_category_color_violet h4 {
+    border-color: #E1CEEC !important;
+}
+
+.another_category_color_violet * {
+    color: #9D64C5 !important;
+}
+
+.another_category_color_violet th a.current {
+    border-color: #9D64C5 !important;
+}
+
+.another_category_color_violet h4, .another_category_color_violet h4 a {
+    color: #7E2CB5 !important;
+}
+</style>
+
+                
+                <link rel="stylesheet" type="text/css" href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/style/revenue.css"/>
+<link rel="canonical" href="https://ramen4598.tistory.com/634"/>
+
+<!-- BEGIN STRUCTURED_DATA -->
+<script type="application/ld+json">
+    {"@context":"http://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@id":"https://ramen4598.tistory.com/634","name":null},"url":"https://ramen4598.tistory.com/634","headline":"[홈서버] Offsite Backup","description":"1. Offisite Backup Offisite Backup은 장애나 사고에 대비하기 위해 반드시 필요하다. 로컬 스토리지에만 의존하면 화재, 침수, 하드웨어 고장 같은 문제가 발생했을 때 데이터 복구가 불가할 수 있다. 옛날에 조선왕조실록도 여러 지역에 외사고를 운영했던 것처럼 본진이 털릴 경우를 대비해서 별도의 물리적 공간이나 클라우드에 백업을 두는 게 좋다. https://cloud-pbs.com/ Proxmox VE를 사용하는 경우 S3 호환 스토리지, Cloud-PBS 같은 서비스를 고려할 수 있다. Cloud-PBS는 프랑스, 독일, 미국 등에서 호스팅 되는 원격으로 관리되는 PBS 정도로 생각하면 된다. Cloud-PBS는 관리가 편리한 만큼 요금이 비싸다.(25년 기준으로 단순 용량당 비..","author":{"@type":"Person","name":"tired_i","logo":null},"image":{"@type":"ImageObject","url":"https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdtuDT2%2FdJMb9Miz3vs%2FAAAAAAAAAAAAAAAAAAAAAAZlwJFRN3oX18aQLSZeSN4AESfoX7_tDPsJ0rYuM8Hb%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DNP010Dp50dRQtgK2WnNH%252FMuLpzI%253D","width":"800px","height":"800px"},"datePublished":"2025-10-17T17:38:48+09:00","dateModified":"2025-12-25T22:02:28+09:00","publisher":{"@type":"Organization","name":"TISTORY","logo":{"@type":"ImageObject","url":"https://t1.daumcdn.net/tistory_admin/static/images/openGraph/opengraph.png","width":"800px","height":"800px"}}}
+</script>
+<!-- END STRUCTURED_DATA -->
+<link rel="stylesheet" type="text/css" href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/style/dialog.css"/>
+<link rel="stylesheet" type="text/css" href="//t1.daumcdn.net/tistory_admin/www/style/top/font.css"/>
+<link rel="stylesheet" type="text/css" href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/style/postBtn.css"/>
+<link rel="stylesheet" type="text/css" href="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/style/tistory.css"/>
+<script type="text/javascript" src="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/script/common.js"></script>
+
+                
+                </head>
+
+                                                <body id="tt-body-page" class="theme_pink">
+                
+                
+                
+  
+    <!-- warp / 테마 변경시 theme_pink / theme_blue / theme_green / theme_gray-->
+    <div id="wrap">
+
+      
+      <!-- box_header -->
+      <header class="box_header">
+        <h1 class="title_logo">
+          <a href="https://ramen4598.tistory.com/" title="개발은 즐거워?" class="link_logo">
+            
+            
+              개발은 즐거워?
+            
+          </a>
+        </h1>
+
+        <!-- <h1 class="title_logo" style="background-image:url('https://tistory1.daumcdn.net/tistory/5257724/skin/images/logo.jpg')"></h1> -->
+        <button class="btn_search"></button>
+
+        <!-- 메뉴 및 검색 버튼 클릭시 area_sidebar / area_popup 논처리 삭제 / body 에 style="overflow:hidden" 추가 -->
+        <button type="button" class="btn_menu" title="메뉴"><span class="blind">메뉴</span></button>
+      </header>
+      <!-- // box_header -->
+
+      <!-- container -->
+      <div id="container">
+
+        <!-- area_sidebar -->
+        <aside class="area_sidebar thema_apply" style="display: none;">
+
+          <div class="inner_sidebar">
+            <div class="sidebar_header">
+              <h1 class="title_logo">
+                <a href="https://ramen4598.tistory.com/" title="개발은 즐거워?" class="link_logo">
+                  
+                  
+                    개발은 즐거워?
+                  
+                </a>
+              </h1>
+              <button type="button" class="btn_close" title="닫기"><span class="icon-Close"></span></button>
+            </div>
+
+            <div class="sidebar_contents">
+              <div class="sidebar_menu">
+                
+                    <div class="sidebar_left">
+                      <!-- 카테고리 메뉴 -->
+                      <div class="box_gnb">
+                        <nav>
+                          <ul class="tt_category"><li class=""><a href="/category" class="link_tit"> 분류 전체보기 <span class="c_cnt">(614)</span> </a>
+  <ul class="category_list"><li class=""><a href="/category/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8" class="link_item"> 프로젝트 <span class="c_cnt">(0)</span> </a></li>
+<li class=""><a href="/category/Backend" class="link_item"> Backend <span class="c_cnt">(152)</span> </a>
+  <ul class="sub_category_list"><li class=""><a href="/category/Backend/Java" class="link_sub_item"> Java <span class="c_cnt">(15)</span> </a></li>
+<li class=""><a href="/category/Backend/Node.js" class="link_sub_item"> Node.js <span class="c_cnt">(53)</span> </a></li>
+<li class=""><a href="/category/Backend/DB" class="link_sub_item"> DB <span class="c_cnt">(19)</span> </a></li>
+<li class=""><a href="/category/Backend/Linux" class="link_sub_item"> Linux <span class="c_cnt">(41)</span> </a></li>
+<li class=""><a href="/category/Backend/Servlet_JSP" class="link_sub_item"> Servlet_JSP <span class="c_cnt">(5)</span> </a></li>
+<li class=""><a href="/category/Backend/Spring" class="link_sub_item"> Spring <span class="c_cnt">(16)</span> </a></li>
+<li class=""><a href="/category/Backend/Nginx" class="link_sub_item"> Nginx <span class="c_cnt">(3)</span> </a></li>
+</ul>
+</li>
+<li class=""><a href="/category/Frontend" class="link_item"> Frontend <span class="c_cnt">(57)</span> </a>
+  <ul class="sub_category_list"><li class=""><a href="/category/Frontend/HTML" class="link_sub_item"> HTML <span class="c_cnt">(9)</span> </a></li>
+<li class=""><a href="/category/Frontend/CSS" class="link_sub_item"> CSS <span class="c_cnt">(6)</span> </a></li>
+<li class=""><a href="/category/Frontend/JavaScript" class="link_sub_item"> JavaScript <span class="c_cnt">(18)</span> </a></li>
+<li class=""><a href="/category/Frontend/Web%20clone" class="link_sub_item"> Web clone <span class="c_cnt">(7)</span> </a></li>
+<li class=""><a href="/category/Frontend/Vue.js" class="link_sub_item"> Vue.js <span class="c_cnt">(15)</span> </a></li>
+</ul>
+</li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0" class="link_item"> 소프트웨어 이론 <span class="c_cnt">(315)</span> </a>
+  <ul class="sub_category_list"><li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EB%B6%84%EC%84%9D%20%EB%B0%8F%20%EC%84%A4%EA%B3%84" class="link_sub_item"> 소프트웨어 분석 및 설계 <span class="c_cnt">(20)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%EA%B3%B5%ED%95%99" class="link_sub_item"> 소프트웨어공학 <span class="c_cnt">(13)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/Android_Studio" class="link_sub_item"> Android_Studio <span class="c_cnt">(16)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/AI%20%EC%9E%85%EB%AC%B8" class="link_sub_item"> AI 입문 <span class="c_cnt">(13)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/Arduino" class="link_sub_item"> Arduino <span class="c_cnt">(15)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%A7%88%EC%9D%B4%EB%8B%9D" class="link_sub_item"> 데이터마이닝 <span class="c_cnt">(12)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/SW%EC%A2%85%ED%95%A9%EC%84%A4%EA%B3%84" class="link_sub_item"> SW종합설계 <span class="c_cnt">(19)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/%EC%9B%B9%ED%95%B4%ED%82%B9" class="link_sub_item"> 웹해킹 <span class="c_cnt">(9)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/%EC%9B%B9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%20%28Spring%29" class="link_sub_item"> 웹프로그래밍 (Spring) <span class="c_cnt">(22)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/Network" class="link_sub_item"> Network <span class="c_cnt">(6)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/Compiler" class="link_sub_item"> Compiler <span class="c_cnt">(22)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/OS" class="link_sub_item"> OS <span class="c_cnt">(15)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/Computer%20Architecture" class="link_sub_item"> Computer Architecture <span class="c_cnt">(4)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/Algorithm%20with%20C%2B%2B" class="link_sub_item"> Algorithm with C++ <span class="c_cnt">(57)</span> </a></li>
+<li class=""><a href="/category/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%20%EC%9D%B4%EB%A1%A0/Algorithm%20with%20Java" class="link_sub_item"> Algorithm with Java <span class="c_cnt">(72)</span> </a></li>
+</ul>
+</li>
+<li class=""><a href="/category/Tools" class="link_item"> Tools <span class="c_cnt">(53)</span> </a>
+  <ul class="sub_category_list"><li class=""><a href="/category/Tools/%EA%B0%9C%EB%B0%9C%20%ED%99%98%EA%B2%BD" class="link_sub_item"> 개발 환경 <span class="c_cnt">(7)</span> </a></li>
+<li class=""><a href="/category/Tools/Home%20Server" class="link_sub_item"> Home Server <span class="c_cnt">(13)</span> </a></li>
+<li class=""><a href="/category/Tools/GitHub" class="link_sub_item"> GitHub <span class="c_cnt">(16)</span> </a></li>
+<li class=""><a href="/category/Tools/Docker" class="link_sub_item"> Docker <span class="c_cnt">(14)</span> </a></li>
+<li class=""><a href="/category/Tools/MarkDown" class="link_sub_item"> MarkDown <span class="c_cnt">(3)</span> </a></li>
+</ul>
+</li>
+<li class=""><a href="/category/ETC" class="link_item"> ETC <span class="c_cnt">(37)</span> </a>
+  <ul class="sub_category_list"><li class=""><a href="/category/ETC/%EB%8B%A8%EC%B6%95%ED%82%A4%20%26%20%EB%AA%85%EB%A0%B9%EC%96%B4" class="link_sub_item"> 단축키 &amp; 명령어 <span class="c_cnt">(8)</span> </a></li>
+<li class=""><a href="/category/ETC/%EA%B8%B0%ED%83%80" class="link_sub_item"> 기타 <span class="c_cnt">(29)</span> </a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+                        </nav>
+                      </div>
+                  
+                    <!-- 메인 메뉴 -->
+                    <div class="box_gnb">
+                      <ul>
+  <li class="t_menu_home first"><a href="/" target="">홈</a></li>
+  <li class="t_menu_tag"><a href="/tag" target="">태그</a></li>
+  <li class="t_menu_guestbook last"><a href="/guestbook" target="">방명록</a></li>
+</ul>
+                    </div>
+              </div>
+              
+                <div class="sidebar_right">
+                  <!-- 링크 -->
+                  <div class="box_sns">
+                    <ul class="list_sns">
+                      
+                        <li>
+                          <a href="https://github.com/ramen4598" class="link_add" target="_blank"
+                            data-site="Github">Github</a>
+                        </li>
+                      
+                    </ul>
+                  </div>
+              
+                <!-- RSS 피드 -->
+                <div class="add_link">
+                  <a href="https://ramen4598.tistory.com/rss" target="_blank" class="link_add">RSS 피드</a>
+                </div>
+            </div>
+            
+          </div>
+
+          <!-- 관리 -->
+          <div class="box_tool">
+            <div class="btn-for-guest">
+              <a href="#" class="link_tool" data-action="login">로그인</a>
+            </div>
+            <div class="btn-for-user">
+              <a href="#" class="link_tool" data-action="logout">로그아웃</a>
+              <a href="https://ramen4598.tistory.com/manage/entry/post" class="link_tool">글쓰기</a>
+              <a href="https://ramen4598.tistory.com/manage" class="link_tool">관리</a>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="dimmed_sidebar"></div>
+    </aside>
+
+    <!-- // area_sidebar -->
+
+    <!-- area_popup -->
+    <div class="area_popup" style="display: none;">
+      <div class="area_search thema_apply">
+        <div class="search_header">
+          <h1 class="title_logo">
+            <a href="https://ramen4598.tistory.com/" title="개발은 즐거워?" class="link_logo">
+              
+              
+                개발은 즐거워?
+              
+            </a>
+          </h1>
+          <button type="button" class="btn_close" title="닫기"><span class="icon-Close"></span></button>
+        </div>
+
+        <div class="search_content">
+          <form action="" method="get">
+            <legend><span class="blind">컨텐츠 검색</span></legend>
+            <div class="box_form">
+              <span class="icon-Search"></span>
+              
+                <label for="search" class="screen_out">블로그 내 검색</label>
+                <input type="text" name="search" title="검색어 입력" placeholder="SEARCH" value=""
+                  class="inp_search" onkeypress="if (event.keyCode == 13) { try {
+    window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);
+    document.getElementsByName('search')[0].value = '';
+    return false;
+} catch (e) {} }">
+              
+              <button type="button" title="검색어 삭제" class="btn_search_del">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 36 36" class="img_svg">
+                  <defs>
+                    <path id="textDelBtnSvg"
+                      d="M20 2C10.059 2 2 10.059 2 20s8.059 18 18 18 18-8.059 18-18S29.941 2 20 2zm8 24.6L26.6 28 20 21.4 13.4 28 12 26.6l6.6-6.6-6.6-6.6 1.4-1.4 6.6 6.6 6.6-6.6 1.4 1.4-6.6 6.6 6.6 6.6z" />
+                  </defs>
+                  <g fill="none" fill-rule="evenodd" transform="translate(-2 -2)">
+                    <path d="M0 0h40v40H0z" />
+                    <mask id="textDelBtnSvgMask" fill="#fff">
+                      <use xlink:href="#textDelBtnSvg" />
+                    </mask>
+                    <g fill="#000" fill-opacity="1" mask="url(#textDelBtnSvgMask)" class="svg_bg">
+                      <path d="M0 0h40v40H0z" />
+                    </g>
+                  </g>
+                </svg>
+              </button>
+            </div>
+          </form>
+
+          
+              <!-- 태그 -->
+              <div class="tag_zone">
+                <h3 class="title_sidebar">태그</h3>
+                <div class="box_tag">
+                  <a href="/tag/java" class="cloud1"> java</a>
+                  <a href="/tag/mysql" class="cloud4"> mysql</a>
+                  <a href="/tag/docker" class="cloud4"> docker</a>
+                  <a href="/tag/express" class="cloud4"> express</a>
+                  <a href="/tag/%EC%9B%B9" class="cloud4"> 웹</a>
+                  <a href="/tag/AI%EC%9E%85%EB%AC%B8" class="cloud4"> AI입문</a>
+                  <a href="/tag/Linux" class="cloud4"> Linux</a>
+                  <a href="/tag/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%EA%B3%B5%ED%95%99" class="cloud4"> 소프트웨어공학</a>
+                  <a href="/tag/Web" class="cloud3"> Web</a>
+                  <a href="/tag/Algorithm" class="cloud3"> Algorithm</a>
+                  <a href="/tag/%EC%BB%B4%ED%8C%8C%EC%9D%BC%EB%9F%AC" class="cloud4"> 컴파일러</a>
+                  <a href="/tag/c%2B%2B" class="cloud3"> c++</a>
+                  <a href="/tag/node.js" class="cloud3"> node.js</a>
+                  <a href="/tag/Javascript" class="cloud4"> Javascript</a>
+                  <a href="/tag/DFS" class="cloud4"> DFS</a>
+                  <a href="/tag/OS" class="cloud4"> OS</a>
+                  <a href="/tag/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C" class="cloud4"> 운영체제</a>
+                  <a href="/tag/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98" class="cloud2"> 알고리즘</a>
+                  <a href="/tag/spring" class="cloud3"> spring</a>
+                  <a href="/tag/SW%EC%A2%85%ED%95%A9%EC%84%A4%EA%B3%84" class="cloud4"> SW종합설계</a>
+                  
+                </div>
+              </div>
+            
+              <!-- 최근글 -->
+              <div class="tag_board">
+                <h3 class="title_sidebar">최근글</h3>
+                <ul class="list_sidebar">
+                  
+                    <li class="item_sidebar"><a href="/635"> [Docker] Compose로 실행 중인 이미지 업그⋯</a></li>
+                  
+                    <li class="item_sidebar"><a href="/637"> [AI] Spec-kit 사용 후기</a></li>
+                  
+                    <li class="item_sidebar"><a href="/636"> [홈서버] Proxmox 설치 후 &ldquo;No valid s⋯</a></li>
+                  
+                    <li class="item_sidebar"><a href="/634"> [홈서버] Offsite Backup</a></li>
+                  
+                </ul>
+              </div>
+            
+              <!-- 최근 댓글 -->
+              <div class="tag_board">
+                <h3 class="title_sidebar">댓글</h3>
+                <ul class="list_sidebar">
+                  
+                    <li class="item_sidebar"><a href="/623#comment22430197">글 잘 읽었습니다.덥지만 오늘도 힘내세요~</a></li>
+                  
+                    <li class="item_sidebar"><a href="/22#comment22415286">들렸다 갑니다~</a></li>
+                  
+                    <li class="item_sidebar"><a href="/622#comment22407822">들렸다 갑니다~</a></li>
+                  
+                    <li class="item_sidebar"><a href="/84#comment22393288">들렸다 갑니다~</a></li>
+                  
+                </ul>
+              </div>
+            
+              <!-- 공지사항 -->
+              
+                <div class="tag_board">
+                  <h3 class="title_sidebar">공지사항</h3>
+                  <ul class="list_sidebar">
+                    
+                  </ul>
+                </div>
+              
+            
+              <!-- 글 보관함 -->
+              <div class="tag_board">
+                <h3 class="title_sidebar">아카이브</h3>
+                <ul class="list_sidebar">
+                  
+                    <li class="item_sidebar"><a href="/archive/202511">2025/11</a></li>
+                  
+                    <li class="item_sidebar"><a href="/archive/202510">2025/10</a></li>
+                  
+                    <li class="item_sidebar"><a href="/archive/202509">2025/09</a></li>
+                  
+                    <li class="item_sidebar"><a href="/archive/202508">2025/08</a></li>
+                  
+                </ul>
+              </div>
+            
+        </div>
+
+      </div>
+    </div>
+    <!-- // area_popup -->
+
+    <main id="main">
+      <!-- area_cover -->
+      
+      <!-- // area_cover -->
+
+      
+
+      <!-- area_view -->
+      <div class="area_view">
+                  
+              
+
+    
+
+      <!-- article_content -->
+      <div class="area_article">
+
+        <!-- 뷰페이지 상단 type css 구분 / type_article_header_common or type_article_header_cover -->
+        <div class="article_header type_article_header_cover">
+          <div class="inner_header" 
+            style="background-image:url('https://img1.daumcdn.net/thumb/R750x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdtuDT2%2FdJMb9Miz3vs%2FAAAAAAAAAAAAAAAAAAAAAAZlwJFRN3oX18aQLSZeSN4AESfoX7_tDPsJ0rYuM8Hb%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DNP010Dp50dRQtgK2WnNH%252FMuLpzI%253D')">
+            <div class="info_text">
+              <strong class="title_post">[홈서버] Offsite Backup</strong>
+              <p class="info"><span
+                  class="date">2025. 10. 17. 17:38</span>ㆍ<span>Tools/Home Server</span>
+    <span class="my_edit" aria-expanded="false" aria-haspopup="true">
+        <button class="btn_etc">
+            <svg width="20px" height="20px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="ico_more">
+                <title>더보기</title>
+                <g id="s07_magazine" transform="translate(-467.000000, -226.000000)">
+                    <g id="more-copy" transform="translate(467.400000, 226.400000)">
+                        <path d="M10.1,0 C15.678076,0 20.2,4.52192403 20.2,10.1 C20.2,15.678076 15.678076,20.2 10.1,20.2 C4.52192403,20.2 0,15.678076 0,10.1 C0,4.52192403 4.52192403,0 10.1,0 Z M10.1,1.2 C5.18466573,1.2 1.2,5.18466573 1.2,10.1 C1.2,15.0153343 5.18466573,19 10.1,19 C15.0153343,19 19,15.0153343 19,10.1 C19,5.18466573 15.0153343,1.2 10.1,1.2 Z M10.1,13.3 C10.7075132,13.3 11.2,13.7924868 11.2,14.4 C11.2,15.0075132 10.7075132,15.5 10.1,15.5 C9.49248678,15.5 9,15.0075132 9,14.4 C9,13.7924868 9.49248678,13.3 10.1,13.3 Z M10.1,9 C10.7075132,9 11.2,9.49248678 11.2,10.1 C11.2,10.7075132 10.7075132,11.2 10.1,11.2 C9.49248678,11.2 9,10.7075132 9,10.1 C9,9.49248678 9.49248678,9 10.1,9 Z M10.1,4.7 C10.7075132,4.7 11.2,5.19248678 11.2,5.8 C11.2,6.40751322 10.7075132,6.9 10.1,6.9 C9.49248678,6.9 9,6.40751322 9,5.8 C9,5.19248678 9.49248678,4.7 10.1,4.7 Z" id="Combined-Shape"></path>
+                    </g>
+                </g>
+            </svg>
+        </button>
+        <span class="layer_edit" role="menu">
+            <a href="https://ramen4598.tistory.com/manage/post/634?returnURL=ENTRY" role="menuitem" class="btn_g" data-tiara-action-name="상단 옵션 버튼_클릭" data-tiara-layer="Edit">수정</a>
+             <a class="btn_g" data-tiara-action-name="상단 옵션 버튼_클릭" data-tiara-layer="Setting" href="#" role="menuitem" onclick="changeVisibility(634, 0); return false;">비공개로 변경</a>
+            <a href="#" onclick="deleteEntry(634); return false;" role="menuitem" class="btn_g" data-tiara-action-name="상단 옵션 버튼_클릭" data-tiara-layer="Del">삭제</a>
+            <span class="ico_postbtn ico_arrb"></span>
+        </span>
+    </span>
+
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 에디터 영역 -->
+        <div class="article_view" id="article-view">
+          
+            <!-- System - START -->
+
+<!-- System - END -->
+
+            <div class="tt_article_useless_p_margin contents_style"><h1>1. Offisite Backup</h1>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Offisite Backup은 장애나 사고에 대비하기 위해 반드시 필요하다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">로컬 스토리지에만 의존하면 화재, 침수, 하드웨어 고장 같은 문제가 발생했을 때 데이터 복구가 불가할 수 있다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignLeft" data-ke-mobileStyle="widthOrigin" data-origin-width="487" data-origin-height="331"><span data-url="https://blog.kakaocdn.net/dna/dgMPUV/dJMb9eF5CLf/AAAAAAAAAAAAAAAAAAAAALfEg6h2xFs4CMRSBLo0GFcBVE-QMBlp9ZzmmzEuJz4l/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=W7pPqL1nOHDky2d4vSYMZc8sZLo%3D" data-phocus="https://blog.kakaocdn.net/dna/dgMPUV/dJMb9eF5CLf/AAAAAAAAAAAAAAAAAAAAALfEg6h2xFs4CMRSBLo0GFcBVE-QMBlp9ZzmmzEuJz4l/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=W7pPqL1nOHDky2d4vSYMZc8sZLo%3D"><img src="https://blog.kakaocdn.net/dna/dgMPUV/dJMb9eF5CLf/AAAAAAAAAAAAAAAAAAAAALfEg6h2xFs4CMRSBLo0GFcBVE-QMBlp9ZzmmzEuJz4l/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=W7pPqL1nOHDky2d4vSYMZc8sZLo%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdgMPUV%2FdJMb9eF5CLf%2FAAAAAAAAAAAAAAAAAAAAALfEg6h2xFs4CMRSBLo0GFcBVE-QMBlp9ZzmmzEuJz4l%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DW7pPqL1nOHDky2d4vSYMZc8sZLo%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="487" height="331" data-origin-width="487" data-origin-height="331"/></span></figure>
+</p>
+<p data-ke-size="size16">옛날에 조선왕조실록도 여러 지역에 외사고를 운영했던 것처럼 본진이 털릴 경우를 대비해서 별도의 물리적 공간이나 클라우드에 백업을 두는 게 좋다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16"><a href="https://cloud-pbs.com/" target="_blank" rel="noopener&nbsp;noreferrer">https://cloud-pbs.com/</a></p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Proxmox VE를 사용하는 경우 S3 호환 스토리지, Cloud-PBS 같은 서비스를 고려할 수 있다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Cloud-PBS는 프랑스, 독일, 미국 등에서 호스팅 되는 원격으로 관리되는 PBS 정도로 생각하면 된다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Cloud-PBS는 관리가 편리한 만큼 요금이 비싸다.</p>
+<p data-ke-size="size16">(25년 기준으로 단순 용량당 비용만 비교했을 때 Backblaze B2 대비 약 4배 가까이 비싸다.)</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">장기간 대용량 데이터를 백업해야 한다면 꽤 부담스러운 차이다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">그런 면에서 가격 경쟁력은 S3 계열이 훨씬 낫다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">얼마전까지는 PBS가 직접 S3를 지원하지 않아 번거로움이 있었다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">하지만 PBS 4.0 버전부터는 공식적으로 S3 백업을 지원하기 시작했다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">덕분에 원하는 S3 호환 스토리지를 골라서 Offsite backup을 구현할 수 있게 됐다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h1>2. 백업 암호화</h1>
+<p data-ke-size="size16">&nbsp;</p>
+<figure data-ke-type="video" data-ke-style="alignLeft" data-video-host="youtube" data-video-url="https://www.youtube.com/watch?v=ddZ-f_nuQ8k" data-video-thumbnail="https://blog.kakaocdn.net/dna/wiT5Z/hyZL1Q7FcY/AAAAAAAAAAAAAAAAAAAAAA5A2vLBp5FpTEf0-hZ38PH36lFG4vcDc3M-nIwL838y/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ByC2CXcjaUhJxrtnRl4W05BhBos%3D" data-video-width="400" data-video-height="225" data-video-origin-width="860" data-video-origin-height="484" data-ke-mobilestyle="widthContent" data-video-title="Getting the most out of Proxmox Backup Server: Backing up other data, Offsite syncs, and more" data-original-url=""><iframe src="https://www.youtube.com/embed/ddZ-f_nuQ8k" width="400" height="225" frameborder="" allowfullscreen="true"></iframe>
+<figcaption style="display: none;"></figcaption>
+</figure>
+<p data-ke-size="size16">외부로 정보가 나가는 것이기 때문에 백업 데이터를 암호화한다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">기존에 연결된 스토리지를 수정하면 된다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignLeft" data-ke-mobileStyle="widthOrigin" data-origin-width="903" data-origin-height="606"><span data-url="https://blog.kakaocdn.net/dna/dBOAzj/dJMb862mrg4/AAAAAAAAAAAAAAAAAAAAAC4uAO3U6m2O0YQKdx-qVtv4YaxuK2jj6eiJvuxBh-KD/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ADkQLfoGBBNWsWsd38y%2BEaUvH%2FM%3D" data-phocus="https://blog.kakaocdn.net/dna/dBOAzj/dJMb862mrg4/AAAAAAAAAAAAAAAAAAAAAC4uAO3U6m2O0YQKdx-qVtv4YaxuK2jj6eiJvuxBh-KD/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ADkQLfoGBBNWsWsd38y%2BEaUvH%2FM%3D"><img src="https://blog.kakaocdn.net/dna/dBOAzj/dJMb862mrg4/AAAAAAAAAAAAAAAAAAAAAC4uAO3U6m2O0YQKdx-qVtv4YaxuK2jj6eiJvuxBh-KD/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ADkQLfoGBBNWsWsd38y%2BEaUvH%2FM%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdBOAzj%2FdJMb862mrg4%2FAAAAAAAAAAAAAAAAAAAAAC4uAO3U6m2O0YQKdx-qVtv4YaxuK2jj6eiJvuxBh-KD%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DADkQLfoGBBNWsWsd38y%252BEaUvH%252FM%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="903" height="606" data-origin-width="903" data-origin-height="606"/></span></figure>
+</p>
+<p data-ke-size="size16">데이터센터 &rarr; 스토리지 &rarr; 백업할 스토리지 선택 후 &lsquo;수정&rsquo; &rarr; 암호화 &rarr; 클라이언트 암호화 키 자동 생성</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">생성된 암호는 프린트, USB 등 안전한 여러 곳에 보관해 둔다.</p>
+<p data-ke-size="size16">(나중에 복구할 때 필요하다!)</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignCenter" data-ke-mobileStyle="widthOrigin" data-origin-width="1621" data-origin-height="77"><span data-url="https://blog.kakaocdn.net/dna/FLn71/dJMb9O8w263/AAAAAAAAAAAAAAAAAAAAAJKZFBs4Tum-Ny96YVKXQmon1AO2UW8tCw3-5VEdx7-a/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ztRUQv8vsmOlgPxflZUmMeSWMG4%3D" data-phocus="https://blog.kakaocdn.net/dna/FLn71/dJMb9O8w263/AAAAAAAAAAAAAAAAAAAAAJKZFBs4Tum-Ny96YVKXQmon1AO2UW8tCw3-5VEdx7-a/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ztRUQv8vsmOlgPxflZUmMeSWMG4%3D"><img src="https://blog.kakaocdn.net/dna/FLn71/dJMb9O8w263/AAAAAAAAAAAAAAAAAAAAAJKZFBs4Tum-Ny96YVKXQmon1AO2UW8tCw3-5VEdx7-a/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=ztRUQv8vsmOlgPxflZUmMeSWMG4%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FFLn71%2FdJMb9O8w263%2FAAAAAAAAAAAAAAAAAAAAAJKZFBs4Tum-Ny96YVKXQmon1AO2UW8tCw3-5VEdx7-a%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DztRUQv8vsmOlgPxflZUmMeSWMG4%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="1621" height="77" data-origin-width="1621" data-origin-height="77"/></span></figure>
+</p>
+<p data-ke-size="size16">암호화 후 백업하면 기존에 암호화되지 않은 스냅숏이랑 섞인다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Encrypted 항목에 Mixed라고 표시된다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">일시적으로 용량은 기존의 2배가량 차지하게 된다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">모든 암호화되지 않은 스냅숏들이 prune 및 GC 되면 다시 돌아온다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h1>3. BackBlaze B2</h1>
+<p data-ke-size="size16">&nbsp;</p>
+<figure id="og_1760689611698" contenteditable="false" data-ke-type="opengraph" data-ke-align="alignCenter" data-og-type="website" data-og-title="The Leading Open Cloud Storage Platform - Backblaze" data-og-description="Backblaze is a pioneer in robust, scalable low cost cloud backup and storage services. Enterprise hot storage, low cost backup and archive, and more." data-og-host="www.backblaze.com" data-og-source-url="https://www.backblaze.com/" data-og-url="https://www.backblaze.com/" data-og-image="https://blog.kakaocdn.net/dna/bcVjzF/hyZJ59df01/AAAAAAAAAAAAAAAAAAAAALCGOmmQcHbdmorAO7-Hacdk6Vk2HgSLDVZ0sR3Ji0Sa/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=4ECYrm0bKNzBGtsAtMuY%2F9ooIlE%3D"><a href="https://www.backblaze.com/" target="_blank" rel="noopener" data-source-url="https://www.backblaze.com/">
+<div class="og-image" style="background-image: url('https://blog.kakaocdn.net/dna/bcVjzF/hyZJ59df01/AAAAAAAAAAAAAAAAAAAAALCGOmmQcHbdmorAO7-Hacdk6Vk2HgSLDVZ0sR3Ji0Sa/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=4ECYrm0bKNzBGtsAtMuY%2F9ooIlE%3D');">&nbsp;</div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">The Leading Open Cloud Storage Platform - Backblaze</p>
+<p class="og-desc" data-ke-size="size16">Backblaze is a pioneer in robust, scalable low cost cloud backup and storage services. Enterprise hot storage, low cost backup and archive, and more.</p>
+<p class="og-host" data-ke-size="size16">www.backblaze.com</p>
+</div>
+</a></figure>
+<p data-ke-size="size16">&nbsp;</p>
+<h2 data-ke-size="size26">가. 요금 비교</h2>
+<p data-ke-size="size16">대표적인 오브젝트 스토리지 서비스 S3, Wasabi, Backblaze B2의 요금제를 비교해 보았다.</p>
+<table style="border-collapse: collapse; width: 100%; height: 207px;" border="1" data-ke-align="alignLeft" data-ke-style="style3">
+<tbody>
+<tr style="height: 38px;">
+<td style="height: 38px;">서비스</td>
+<td style="height: 38px;">저장 요금 (월/1TB 기준)</td>
+<td style="height: 38px;">다운로드 요금 (1GB 기준)</td>
+<td style="height: 38px;">최소 보관/삭제 정책</td>
+<td style="height: 38px;">특징</td>
+</tr>
+<tr style="height: 38px;">
+<td style="height: 38px;">AWS S3 Standard</td>
+<td style="height: 38px;">약 $23</td>
+<td style="height: 38px;">복잡합. 대략 $0.09 이상</td>
+<td style="height: 38px;">없음</td>
+<td style="height: 38px;">비쌈. 요청 요금까지 붙음.</td>
+</tr>
+<tr style="height: 38px;">
+<td style="height: 38px;">AWS S3 Glacier</td>
+<td style="height: 38px;">약 $4</td>
+<td style="height: 38px;">복구 시 별도 요금 높음</td>
+<td style="height: 38px;">90일 이내 삭제 시 요금 발생.</td>
+<td style="height: 38px;">장기 아카이브용.</td>
+</tr>
+<tr style="height: 38px;">
+<td style="height: 38px;">Wasabi</td>
+<td style="height: 38px;">약 $6.99</td>
+<td style="height: 38px;">무료</td>
+<td style="height: 38px;">90일 이내 삭제 시 요금 발생.</td>
+<td style="height: 38px;">저렴.</td>
+</tr>
+<tr style="height: 38px;">
+<td style="height: 38px;">Backblaze B2</td>
+<td style="height: 38px;">약 $6</td>
+<td style="height: 38px;">저장된 데이터 용량의 3배까지는 무료. 초과 시 GB당 $0.01 부과.</td>
+<td style="height: 38px;">없음</td>
+<td style="height: 38px;">단순하고 예측 가능.</td>
+</tr>
+</tbody>
+</table>
+<p data-ke-size="size16">S3는 기본적으로 비싸다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">스토리지 요금 외에도 API 요청, 다운로드(egress) 비용이 별도로 붙는다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">요금 정책이 지나치게 복잡한 것 같다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Wasabi는 저렴한 편이지만 최소 보관 기간 조건이 붙는다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">S3 Glacier 계열도 저장 요금은 낮지만 조회나 복구 요청 시 요금이 크게 붙는다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">자주 백업하는 환경에서 불리하다 판단했다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">여러 측면을 종합하면 Backblaze B2가 가장 합리적이다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">요금 정책이 단순해서 예측이 쉽고, 가격도 저렴하다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">대부분의 사용자가 활용하는 기본적인 요금 모델(Pay-as-You-Go)을 바탕으로 설명하면 다음과 같다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li>스토리지 요금<br />: 월 TB당 $6다. 환율 1400원 기준 8400원 정도.<br />: 첫 10GB는 무료임.</li>
+<li>업로드 요금<br />: 데이터를 B2에 업로드하는 비용은 무료.</li>
+<li>다운로드(데이터 전송) 요금<br />: 저장한 데이터의 월평균 저장량의 3배까지는 무료.<br />: 이 한도를 초과할 경우, 초과분에 대해 GB당 $0.01.</li>
+<li>최소 보관 기간 없음.</li>
+<li>API 요청 요금:
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li>클래스 A: <code>b2_upload_file</code>, <code>b2_hide_file</code> 등과 같은 API 호출은 무료.</li>
+<li>클래스 B<br />: <code>b2_download_file_by_id</code>, <code>b2_download_file_by_name</code>, <code>b2_get_file_info</code> 등과 같이 데이터를 다운로드하는 호출.<br />: 하루 첫 2,500회 호출까지는 무료이며, 이후 10,000회당 $0.004가 부과.</li>
+<li>클래스 C<br />: <code>b2_list_file_names</code>, <code>b2_list_buckets</code> 등과 같이 메타데이터에 접근하는 호출.<br />: 하루 첫 2,500회 호출까지는 무료이며, 이후 1,000회당 $0.004가 부과.</li>
+</ul>
+</li>
+</ul>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">대부분의 개인 또는 소규모 기업 사용자에게는 API 호출 비용이 미미하거나 발생하지 않는다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignCenter" data-ke-mobileStyle="widthOrigin" data-origin-width="400" data-origin-height="192"><span data-url="https://blog.kakaocdn.net/dna/2B9Av/dJMb9O1LDcp/AAAAAAAAAAAAAAAAAAAAANEiPIJS3nJIBP17zQrX9aj8T1fVqYTcyOAefzfHO4sk/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=MOEy%2FtzAaqwBW3cRaPmgIVRfgjU%3D" data-phocus="https://blog.kakaocdn.net/dna/2B9Av/dJMb9O1LDcp/AAAAAAAAAAAAAAAAAAAAANEiPIJS3nJIBP17zQrX9aj8T1fVqYTcyOAefzfHO4sk/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=MOEy%2FtzAaqwBW3cRaPmgIVRfgjU%3D" data-alt="광고 아닙니다 :)"><img src="https://blog.kakaocdn.net/dna/2B9Av/dJMb9O1LDcp/AAAAAAAAAAAAAAAAAAAAANEiPIJS3nJIBP17zQrX9aj8T1fVqYTcyOAefzfHO4sk/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=MOEy%2FtzAaqwBW3cRaPmgIVRfgjU%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2F2B9Av%2FdJMb9O1LDcp%2FAAAAAAAAAAAAAAAAAAAAANEiPIJS3nJIBP17zQrX9aj8T1fVqYTcyOAefzfHO4sk%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DMOEy%252FtzAaqwBW3cRaPmgIVRfgjU%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="400" height="192" data-origin-width="400" data-origin-height="192"/></span><figcaption>광고 아닙니다 :)</figcaption>
+</figure>
+</p>
+<p data-ke-size="size16">&nbsp;</p>
+<figure id="og_1760689703448" contenteditable="false" data-ke-type="opengraph" data-ke-align="alignCenter" data-og-type="website" data-og-title="Backblaze Internet Speed Test: Check Your Upload &amp; Download Speeds" data-og-description="See how fast your home Internet is. Run a free bandwidth speed test. Get your results in seconds." data-og-host="www.backblaze.com" data-og-source-url="https://www.backblaze.com/cloud-backup/resources/speedtest" data-og-url="https://www.backblaze.com/cloud-backup/resources/speedtest" data-og-image="https://blog.kakaocdn.net/dna/biRqv6/hyZL50hD9I/AAAAAAAAAAAAAAAAAAAAAKhdsOij-K_266mWoa_ABxC321m1CpYUU-XxSRv7OGaS/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=GZVK6xYGBt41DK2rsaP23vAw5yE%3D"><a href="https://www.backblaze.com/cloud-backup/resources/speedtest" target="_blank" rel="noopener" data-source-url="https://www.backblaze.com/cloud-backup/resources/speedtest">
+<div class="og-image" style="background-image: url('https://blog.kakaocdn.net/dna/biRqv6/hyZL50hD9I/AAAAAAAAAAAAAAAAAAAAAKhdsOij-K_266mWoa_ABxC321m1CpYUU-XxSRv7OGaS/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=GZVK6xYGBt41DK2rsaP23vAw5yE%3D');">&nbsp;</div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">Backblaze Internet Speed Test: Check Your Upload &amp; Download Speeds</p>
+<p class="og-desc" data-ke-size="size16">See how fast your home Internet is. Run a free bandwidth speed test. Get your results in seconds.</p>
+<p class="og-host" data-ke-size="size16">www.backblaze.com</p>
+</div>
+</a></figure>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">다만 생각보다 업로드 속도가 느리다.</p>
+<p data-ke-size="size16">속도를 테스트해 보자.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h2 data-ke-size="size26">나. Bucket 생성</h2>
+<p><figure class="imagegridblock">
+  <div class="image-container"><span data-url="https://blog.kakaocdn.net/dna/dVd3I0/dJMb9O1LDcS/AAAAAAAAAAAAAAAAAAAAAA6UpWPnhBnH6iG-QRpv0RlsYl3MciDxSTYLKsTijIhs/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=8IDUsgxJjhvWGAwQ8txGaa%2FxJWQ%3D" data-phocus="https://blog.kakaocdn.net/dna/dVd3I0/dJMb9O1LDcS/AAAAAAAAAAAAAAAAAAAAAA6UpWPnhBnH6iG-QRpv0RlsYl3MciDxSTYLKsTijIhs/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=8IDUsgxJjhvWGAwQ8txGaa%2FxJWQ%3D" data-origin-width="582" data-origin-height="859" data-is-animation="false" data-widthpercent="24.02" style="width: 23.7395%; margin-right: 10px;"><img src="https://blog.kakaocdn.net/dna/dVd3I0/dJMb9O1LDcS/AAAAAAAAAAAAAAAAAAAAAA6UpWPnhBnH6iG-QRpv0RlsYl3MciDxSTYLKsTijIhs/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=8IDUsgxJjhvWGAwQ8txGaa%2FxJWQ%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdVd3I0%2FdJMb9O1LDcS%2FAAAAAAAAAAAAAAAAAAAAAA6UpWPnhBnH6iG-QRpv0RlsYl3MciDxSTYLKsTijIhs%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3D8IDUsgxJjhvWGAwQ8txGaa%252FxJWQ%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="582" height="859"/></span><span data-url="https://blog.kakaocdn.net/dna/drfv2J/dJMb9O1LDc3/AAAAAAAAAAAAAAAAAAAAABQLoGasGtuBxqgRgKuvQyyiB80pETVik3tsvkFoau1s/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=fWtlLIDJRw2pmeV7f7pHADioAg4%3D" data-phocus="https://blog.kakaocdn.net/dna/drfv2J/dJMb9O1LDc3/AAAAAAAAAAAAAAAAAAAAABQLoGasGtuBxqgRgKuvQyyiB80pETVik3tsvkFoau1s/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=fWtlLIDJRw2pmeV7f7pHADioAg4%3D" data-origin-width="1346" data-origin-height="628" data-is-animation="false" style="width: 75.0977%;" data-widthpercent="75.98"><img src="https://blog.kakaocdn.net/dna/drfv2J/dJMb9O1LDc3/AAAAAAAAAAAAAAAAAAAAABQLoGasGtuBxqgRgKuvQyyiB80pETVik3tsvkFoau1s/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=fWtlLIDJRw2pmeV7f7pHADioAg4%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2Fdrfv2J%2FdJMb9O1LDc3%2FAAAAAAAAAAAAAAAAAAAAABQLoGasGtuBxqgRgKuvQyyiB80pETVik3tsvkFoau1s%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DfWtlLIDJRw2pmeV7f7pHADioAg4%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="1346" height="628"/></span></div>
+</figure>
+</p>
+<p data-ke-size="size16">아직 regex 인식 버그가 있다고 해서 Bucket 이름은 소문자로 지었다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">직접 확인해보진 않았습니다.<br />(출처 : <a href="https://youtu.be/iNiLr5mu864?si=G2I1-GUNrbYZXsSY&amp;t=304">https://youtu.be/iNiLr5mu864?si=G2I1-GUNrbYZXsSY&amp;t=304</a>)</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16"><b>💡2025.10.28 추가</b></p>
+<p data-ke-size="size16">GC와 prune이 정상 작동함에도 불구하고 GC 후에도 계속해서 용량이 증가하는 경우.</p>
+<p data-ke-size="size16">Backblaze B2는 기본적으로 object versioning이 켜져 있습니다.</p>
+<p data-ke-size="size16">PBS가 DELETE 요청을 보내도 B2는 파일을 &ldquo;old version&rdquo;으로 남겨둡니다.</p>
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li>B2의 Web Console &rarr; Bucket Settings &rarr; Lifecycle Rules 확인</li>
+<li>&ldquo;Keep only the last version of the file&rdquo;으로 변경해야 실제 용량이 줄어듭니다.</li>
+</ul>
+<p><figure class="imagegridblock">
+  <div class="image-container"><span data-url="https://blog.kakaocdn.net/dna/1jdAE/dJMcacH847u/AAAAAAAAAAAAAAAAAAAAAG9BQHW5rsv7nzYN-SvoLPAMihfwFHZ6W9-hiqgL80ye/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=iJ2aChNJbu9P0dulkd3OT0eJMSE%3D" data-phocus="https://blog.kakaocdn.net/dna/1jdAE/dJMcacH847u/AAAAAAAAAAAAAAAAAAAAAG9BQHW5rsv7nzYN-SvoLPAMihfwFHZ6W9-hiqgL80ye/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=iJ2aChNJbu9P0dulkd3OT0eJMSE%3D" data-is-animation="false" data-origin-width="973" data-origin-height="685" data-filename="a1.png" style="width: 51.8909%; margin-right: 10px;" data-widthpercent="52.5"><img src="https://blog.kakaocdn.net/dna/1jdAE/dJMcacH847u/AAAAAAAAAAAAAAAAAAAAAG9BQHW5rsv7nzYN-SvoLPAMihfwFHZ6W9-hiqgL80ye/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=iJ2aChNJbu9P0dulkd3OT0eJMSE%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2F1jdAE%2FdJMcacH847u%2FAAAAAAAAAAAAAAAAAAAAAG9BQHW5rsv7nzYN-SvoLPAMihfwFHZ6W9-hiqgL80ye%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DiJ2aChNJbu9P0dulkd3OT0eJMSE%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="973" height="685"/></span><span data-url="https://blog.kakaocdn.net/dna/cAb5Sm/dJMcaaDyR7y/AAAAAAAAAAAAAAAAAAAAAHevScRa0sz03er4HEo0tOzoPOyq-nHkMxfV5bvcr2RW/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=mOQLgeOOz69La8Rc7qlId409adQ%3D" data-phocus="https://blog.kakaocdn.net/dna/cAb5Sm/dJMcaaDyR7y/AAAAAAAAAAAAAAAAAAAAAHevScRa0sz03er4HEo0tOzoPOyq-nHkMxfV5bvcr2RW/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=mOQLgeOOz69La8Rc7qlId409adQ%3D" data-is-animation="false" data-origin-width="586" data-origin-height="456" data-filename="a2.png" style="width: 46.9463%;" data-widthpercent="47.5"><img src="https://blog.kakaocdn.net/dna/cAb5Sm/dJMcaaDyR7y/AAAAAAAAAAAAAAAAAAAAAHevScRa0sz03er4HEo0tOzoPOyq-nHkMxfV5bvcr2RW/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=mOQLgeOOz69La8Rc7qlId409adQ%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FcAb5Sm%2FdJMcaaDyR7y%2FAAAAAAAAAAAAAAAAAAAAAHevScRa0sz03er4HEo0tOzoPOyq-nHkMxfV5bvcr2RW%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DmOQLgeOOz69La8Rc7qlId409adQ%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="586" height="456"/></span></div>
+  <figcaption>Keep only the last version of the file 옵션 활성화</figcaption>
+</figure>
+</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h2 data-ke-size="size26">다. API Key 발급</h2>
+<p data-ke-size="size16">마스터 키를 사용하는 것은 위험하므로 최소한의 권한만 부여한 새로운 키를 발급한다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">절대 유출하면 안 된다.</p>
+<p><figure class="imagegridblock">
+  <div class="image-container"><span data-url="https://blog.kakaocdn.net/dna/xOI5T/dJMb9WSXubH/AAAAAAAAAAAAAAAAAAAAAGKzVbYGlr83ianYq5zVnqhicrFf8pE87DQrBxuYiKm0/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5wvxeevJF1qWPdv941In%2BT1gm9w%3D" data-phocus="https://blog.kakaocdn.net/dna/xOI5T/dJMb9WSXubH/AAAAAAAAAAAAAAAAAAAAAGKzVbYGlr83ianYq5zVnqhicrFf8pE87DQrBxuYiKm0/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5wvxeevJF1qWPdv941In%2BT1gm9w%3D" data-origin-width="584" data-origin-height="650" data-is-animation="false" style="width: 45.6966%; margin-right: 10px;" data-widthpercent="46.23"><img src="https://blog.kakaocdn.net/dna/xOI5T/dJMb9WSXubH/AAAAAAAAAAAAAAAAAAAAAGKzVbYGlr83ianYq5zVnqhicrFf8pE87DQrBxuYiKm0/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=5wvxeevJF1qWPdv941In%2BT1gm9w%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FxOI5T%2FdJMb9WSXubH%2FAAAAAAAAAAAAAAAAAAAAAGKzVbYGlr83ianYq5zVnqhicrFf8pE87DQrBxuYiKm0%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3D5wvxeevJF1qWPdv941In%252BT1gm9w%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="584" height="650"/></span><span data-url="https://blog.kakaocdn.net/dna/dxa8aw/dJMb9WSXubK/AAAAAAAAAAAAAAAAAAAAAA7h6Q1e_bc42bSRXhIMgsC-ORmN1tPzRbNDZ2TIdtCx/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=CSJbfYJzbFDJwmM7lcXeXuQYeXw%3D" data-phocus="https://blog.kakaocdn.net/dna/dxa8aw/dJMb9WSXubK/AAAAAAAAAAAAAAAAAAAAAA7h6Q1e_bc42bSRXhIMgsC-ORmN1tPzRbNDZ2TIdtCx/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=CSJbfYJzbFDJwmM7lcXeXuQYeXw%3D" data-origin-width="676" data-origin-height="647" data-is-animation="false" style="width: 53.1406%;" data-widthpercent="53.77"><img src="https://blog.kakaocdn.net/dna/dxa8aw/dJMb9WSXubK/AAAAAAAAAAAAAAAAAAAAAA7h6Q1e_bc42bSRXhIMgsC-ORmN1tPzRbNDZ2TIdtCx/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=CSJbfYJzbFDJwmM7lcXeXuQYeXw%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2Fdxa8aw%2FdJMb9WSXubK%2FAAAAAAAAAAAAAAAAAAAAAA7h6Q1e_bc42bSRXhIMgsC-ORmN1tPzRbNDZ2TIdtCx%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DCSJbfYJzbFDJwmM7lcXeXuQYeXw%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="676" height="647"/></span></div>
+</figure>
+</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Application Key는 생성 당시 한 번만 보여주니깐 잘 복사해 두자.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h2 data-ke-size="size26">라. Cap &amp; Alert 설정</h2>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">B2는 월별 상한선 설정 기능은 없지만, 일별 캡(Daily Cap) 기능을 전략적으로 사용하여 월 10,000원 이하로 지출을 통제할 수 있다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<h3 data-ke-size="size23">1단계: 기본값 다시 확인</h3>
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li>월 예산: 10,000원</li>
+<li>환율: 1,400원 / USD</li>
+<li>월 예산(USD): 10,000 &divide; 1,400 = 대략 $7.14</li>
+<li>일일 예산: $7.142857 &divide; 30 = $0.238095... = 대략 $0.24/day</li>
+</ul>
+<p data-ke-size="size16">&nbsp;</p>
+<h3 data-ke-size="size23">2단계: 일별 비용 배분</h3>
+<p data-ke-size="size16">일별 $0.238을 세 항목(저장 / 다운로드 / 트랜잭션)으로 배분한다.</p>
+<p data-ke-size="size16">안전성과 현실성을 고려한 예시 배분은 다음과 같음.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<table style="border-collapse: collapse; width: 100%;" border="1" data-ke-align="alignLeft" data-ke-style="style3">
+<tbody>
+<tr>
+<td style="width: 18.4884%;">&nbsp;</td>
+<td style="width: 14.0698%;">일일 예산</td>
+<td style="width: 67.3256%;">이유</td>
+</tr>
+<tr>
+<td style="width: 18.4884%;">Class B/C 트랜잭션</td>
+<td style="width: 14.0698%;">$0.01</td>
+<td style="width: 67.3256%;">일 2,500회 무료 범위가 있어 거의 요금 안 나옴. 소액만 할당해 안전망 확보.</td>
+</tr>
+<tr>
+<td style="width: 18.4884%;">Download Bandwidth</td>
+<td style="width: 14.0698%;">$0.02</td>
+<td style="width: 67.3256%;">다운로드가 변동성이 가장 크므로 약간의 여유를 둠. $0.02이면 유료 다운로드로 약 2GB 허용($0.01/GB).</td>
+</tr>
+<tr>
+<td style="width: 18.4884%;">Storage</td>
+<td style="width: 14.0698%;">$0.20</td>
+<td style="width: 67.3256%;">일일 예산 &minus; (트랜잭션 + 다운로드)</td>
+</tr>
+</tbody>
+</table>
+<h3 data-ke-size="size23">&nbsp;</h3>
+<h3 data-ke-size="size23">3단계: 저장 공간 비용 계산</h3>
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li>이제 위에서 할당한 Storage 일별 예산 $0.198을 기준으로 계산한다.</li>
+<li>B2 저장 단가는 1GB 당 월 $0.006이고 하루에 $0.006 &divide; 30 = $0.0002 정도다.</li>
+<li>따라서 하루에 저장할 수 있는 데이터량 = $0.20 &divide; $0.0002 + 무료 10GB= 대략 1000GB</li>
+</ul>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignLeft" data-ke-mobileStyle="widthOrigin" data-origin-width="1934" data-origin-height="1916"><span data-url="https://blog.kakaocdn.net/dna/F0AYW/dJMb9NV5pA8/AAAAAAAAAAAAAAAAAAAAAEbsmF_D9RkWR55-IFWF0XJoQhTIYNNQFnqsegVo5y4I/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=15Ue%2F40yploCPefBb60QGF%2BXs20%3D" data-phocus="https://blog.kakaocdn.net/dna/F0AYW/dJMb9NV5pA8/AAAAAAAAAAAAAAAAAAAAAEbsmF_D9RkWR55-IFWF0XJoQhTIYNNQFnqsegVo5y4I/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=15Ue%2F40yploCPefBb60QGF%2BXs20%3D"><img src="https://blog.kakaocdn.net/dna/F0AYW/dJMb9NV5pA8/AAAAAAAAAAAAAAAAAAAAAEbsmF_D9RkWR55-IFWF0XJoQhTIYNNQFnqsegVo5y4I/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=15Ue%2F40yploCPefBb60QGF%2BXs20%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FF0AYW%2FdJMb9NV5pA8%2FAAAAAAAAAAAAAAAAAAAAAEbsmF_D9RkWR55-IFWF0XJoQhTIYNNQFnqsegVo5y4I%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3D15Ue%252F40yploCPefBb60QGF%252BXs20%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="400" height="1916" data-origin-width="1934" data-origin-height="1916"/></span></figure>
+</p>
+<p data-ke-size="size16">결과적으로 1TB 아래로 저장 공간을 유지하면 1만 원 아래로 비용을 제한할 수 있다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">각 캡의 75%, 100% 도달 시 이메일 경고를 보낸다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">실제로 잘 지켜지는지 시간을 두고 검증할 필요가 있을 것 같다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<aside>💡<b><span style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Apple SD Gothic Neo', Arial, sans-serif; letter-spacing: 0px;">25.10.17 추가</span></b>
+<p data-ke-size="size16">Verify 시 모든 데이터를 Download 한다. 때문에 Verify를 사용하고 싶다면 Daily Download Bandwidth Caps를 저장할 용량만큼 허용해야 한다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+</aside>
+<hr data-ke-style="style1" />
+<h1>4. S3 Endpoint</h1>
+<figure id="og_1760689879906" contenteditable="false" data-ke-type="opengraph" data-ke-align="alignCenter" data-og-type="website" data-og-title="Backup Storage &mdash; Proxmox Backup 4.0.11-2 documentation" data-og-description="Proxmox Backup Server supports S3 compatible object stores as storage backend for datastores. For this, an S3 endpoint needs to be set-up under &quot;Configuration&quot; &gt; &quot;Remotes&quot; &gt; &quot;S3 Endpoints&quot;. Important Keep in mind that operating as S3 backed object store mi" data-og-host="pbs.proxmox.com" data-og-source-url="https://pbs.proxmox.com/docs/storage.html" data-og-url="https://pbs.proxmox.com/docs/storage.html" data-og-image=""><a href="https://pbs.proxmox.com/docs/storage.html" target="_blank" rel="noopener" data-source-url="https://pbs.proxmox.com/docs/storage.html">
+<div class="og-image" style="background-image: url();">&nbsp;</div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">Backup Storage &mdash; Proxmox Backup 4.0.11-2 documentation</p>
+<p class="og-desc" data-ke-size="size16">Proxmox Backup Server supports S3 compatible object stores as storage backend for datastores. For this, an S3 endpoint needs to be set-up under "Configuration" &gt; "Remotes" &gt; "S3 Endpoints". Important Keep in mind that operating as S3 backed object store mi</p>
+<p class="og-host" data-ke-size="size16">pbs.proxmox.com</p>
+</div>
+</a></figure>
+<p data-ke-size="size16">&nbsp;</p>
+<figure data-ke-type="video" data-ke-style="alignLeft" data-video-host="youtube" data-video-url="https://www.youtube.com/watch?v=iNiLr5mu864" data-video-thumbnail="https://blog.kakaocdn.net/dna/f3AFY/hyZKgv8GBg/AAAAAAAAAAAAAAAAAAAAAPYWTOnvO38QTzGWJreSle3z5JAznlmYJbuoIwLtSaLz/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=1p%2B%2BLypVS%2FiGlh33gJQOxqxEhFM%3D" data-video-width="400" data-video-height="225" data-video-origin-width="860" data-video-origin-height="484" data-ke-mobilestyle="widthContent" data-video-title="Testing PBS v4" data-original-url=""><iframe src="https://www.youtube.com/embed/iNiLr5mu864" width="400" height="225" frameborder="" allowfullscreen="true"></iframe>
+<figcaption style="display: none;"></figcaption>
+</figure>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">공식문서에 따르면 아직 preview 단계의 기술이기 때문에 요금이 많이 발생할 수 있다고 경고한다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">그래도 최대한 요금을 줄이기 위한 노력이 엿보였다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h2 data-ke-size="size26">가. Local persistent cache 확보</h2>
+<p data-ke-size="size16">성능을 높이고 백엔드에 대한 요청 수를 줄이기 위해 모든 데이터를 S3 오브젝트 스토어에 저장하더라도, 데이터스토어는 여전히 local persistent cache가 필요하다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">이를 위해 데이터스토어 생성 시, 일반 데이터스토어를 설정할 때처럼 로컬 파일시스템 경로를 지정해야 한다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">다만 일반 데이터스토어와 달리, 로컬 캐시의 크기는 제한할 수 있으며, 64 GiB에서 128 GiB 정도를 권장한다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">가장 좋은 방법은 너무 커지지 않게 전용 디스크, 파티션, 또는 쿼터가 설정된 ZFS 데이터셋을 로컬 캐시로 사용하는 것이다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">단, 기존에 존재하는 일반 데이터스토어를 로컬 캐시로 사용하는 것은 불가능하다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignLeft" data-ke-mobileStyle="widthOrigin" data-origin-width="901" data-origin-height="701"><span data-url="https://blog.kakaocdn.net/dna/b0pA4N/dJMb9NIyimV/AAAAAAAAAAAAAAAAAAAAAA7Osbsv2Ydo2ZV3HlIaXZCJAvAHmRJ2NmcprV8o21WG/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=3NI%2Bcp2i5ycZ%2B%2B27EASQ1btKtrk%3D" data-phocus="https://blog.kakaocdn.net/dna/b0pA4N/dJMb9NIyimV/AAAAAAAAAAAAAAAAAAAAAA7Osbsv2Ydo2ZV3HlIaXZCJAvAHmRJ2NmcprV8o21WG/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=3NI%2Bcp2i5ycZ%2B%2B27EASQ1btKtrk%3D"><img src="https://blog.kakaocdn.net/dna/b0pA4N/dJMb9NIyimV/AAAAAAAAAAAAAAAAAAAAAA7Osbsv2Ydo2ZV3HlIaXZCJAvAHmRJ2NmcprV8o21WG/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=3NI%2Bcp2i5ycZ%2B%2B27EASQ1btKtrk%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2Fb0pA4N%2FdJMb9NIyimV%2FAAAAAAAAAAAAAAAAAAAAAA7Osbsv2Ydo2ZV3HlIaXZCJAvAHmRJ2NmcprV8o21WG%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3D3NI%252Bcp2i5ycZ%252B%252B27EASQ1btKtrk%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="901" height="701" data-origin-width="901" data-origin-height="701"/></span></figure>
+</p>
+<p data-ke-size="size16">당장은 PBS를 PVE 안에서 실행시키고 있는 관계로 가상의 하드디스크 64 GiB를 추가했다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imagegridblock">
+  <div class="image-container"><span data-url="https://blog.kakaocdn.net/dna/ptFnk/dJMb9LYgVvK/AAAAAAAAAAAAAAAAAAAAAE2AL6kKQy5JVuZtahijOFz1SlRMIlsC9KtI0QNbCHQx/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=jLeZ1WwPMYA5srbb%2FEt0qbVjvsg%3D" data-phocus="https://blog.kakaocdn.net/dna/ptFnk/dJMb9LYgVvK/AAAAAAAAAAAAAAAAAAAAAE2AL6kKQy5JVuZtahijOFz1SlRMIlsC9KtI0QNbCHQx/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=jLeZ1WwPMYA5srbb%2FEt0qbVjvsg%3D" data-origin-width="904" data-origin-height="589" data-is-animation="false" style="width: 51.841%; margin-right: 10px;" data-widthpercent="52.45"><img src="https://blog.kakaocdn.net/dna/ptFnk/dJMb9LYgVvK/AAAAAAAAAAAAAAAAAAAAAE2AL6kKQy5JVuZtahijOFz1SlRMIlsC9KtI0QNbCHQx/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=jLeZ1WwPMYA5srbb%2FEt0qbVjvsg%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FptFnk%2FdJMb9LYgVvK%2FAAAAAAAAAAAAAAAAAAAAAE2AL6kKQy5JVuZtahijOFz1SlRMIlsC9KtI0QNbCHQx%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DjLeZ1WwPMYA5srbb%252FEt0qbVjvsg%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="904" height="589"/></span><span data-url="https://blog.kakaocdn.net/dna/JwJLg/dJMb9WZIS6F/AAAAAAAAAAAAAAAAAAAAAKrY_eWqJLyZ6OhlUpPmMk4wHmBJi20BSshnwREQCuwf/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=RVCr6qD2oyBEtx%2Fyxtzg4CcaR9s%3D" data-phocus="https://blog.kakaocdn.net/dna/JwJLg/dJMb9WZIS6F/AAAAAAAAAAAAAAAAAAAAAKrY_eWqJLyZ6OhlUpPmMk4wHmBJi20BSshnwREQCuwf/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=RVCr6qD2oyBEtx%2Fyxtzg4CcaR9s%3D" data-origin-width="903" data-origin-height="649" data-is-animation="false" style="width: 46.9962%;" data-widthpercent="47.55"><img src="https://blog.kakaocdn.net/dna/JwJLg/dJMb9WZIS6F/AAAAAAAAAAAAAAAAAAAAAKrY_eWqJLyZ6OhlUpPmMk4wHmBJi20BSshnwREQCuwf/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=RVCr6qD2oyBEtx%2Fyxtzg4CcaR9s%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FJwJLg%2FdJMb9WZIS6F%2FAAAAAAAAAAAAAAAAAAAAAKrY_eWqJLyZ6OhlUpPmMk4wHmBJi20BSshnwREQCuwf%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DRVCr6qD2oyBEtx%252Fyxtzg4CcaR9s%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="903" height="649"/></span></div>
+</figure>
+<figure class="imageblock alignCenter" data-ke-mobileStyle="widthOrigin" data-origin-width="724" data-origin-height="162"><span data-url="https://blog.kakaocdn.net/dna/bMfkk9/dJMb84co0XA/AAAAAAAAAAAAAAAAAAAAAJAQyVyKXDRz4-5ntvpKbEL8vCDTow7Dw66nVAeGYL6J/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=cO%2Fjyrv8Nz4Nc2fsQ6GM1aokaQ8%3D" data-phocus="https://blog.kakaocdn.net/dna/bMfkk9/dJMb84co0XA/AAAAAAAAAAAAAAAAAAAAAJAQyVyKXDRz4-5ntvpKbEL8vCDTow7Dw66nVAeGYL6J/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=cO%2Fjyrv8Nz4Nc2fsQ6GM1aokaQ8%3D"><img src="https://blog.kakaocdn.net/dna/bMfkk9/dJMb84co0XA/AAAAAAAAAAAAAAAAAAAAAJAQyVyKXDRz4-5ntvpKbEL8vCDTow7Dw66nVAeGYL6J/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=cO%2Fjyrv8Nz4Nc2fsQ6GM1aokaQ8%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FbMfkk9%2FdJMb84co0XA%2FAAAAAAAAAAAAAAAAAAAAAJAQyVyKXDRz4-5ntvpKbEL8vCDTow7Dw66nVAeGYL6J%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DcO%252Fjyrv8Nz4Nc2fsQ6GM1aokaQ8%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="724" height="162" data-origin-width="724" data-origin-height="162"/></span></figure>
+</p>
+<p data-ke-size="size16"><code>/mnt/datastore/b2_local_cache</code> 경로를 기억해 둔다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h2 data-ke-size="size26">나. S3 Endpoint</h2>
+<p><figure class="imageblock alignLeft" data-ke-mobileStyle="widthOrigin" data-origin-width="1806" data-origin-height="1328"><span data-url="https://blog.kakaocdn.net/dna/qYZaf/dJMb84co0Zy/AAAAAAAAAAAAAAAAAAAAACu5eFR5wCXhYw83cReOrcPgK8vrkiZDduvc1G5fQymO/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=b8HeHE0EobicdyF0cXVjgqzj%2Frs%3D" data-phocus="https://blog.kakaocdn.net/dna/qYZaf/dJMb84co0Zy/AAAAAAAAAAAAAAAAAAAAACu5eFR5wCXhYw83cReOrcPgK8vrkiZDduvc1G5fQymO/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=b8HeHE0EobicdyF0cXVjgqzj%2Frs%3D"><img src="https://blog.kakaocdn.net/dna/qYZaf/dJMb84co0Zy/AAAAAAAAAAAAAAAAAAAAACu5eFR5wCXhYw83cReOrcPgK8vrkiZDduvc1G5fQymO/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=b8HeHE0EobicdyF0cXVjgqzj%2Frs%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FqYZaf%2FdJMb84co0Zy%2FAAAAAAAAAAAAAAAAAAAAACu5eFR5wCXhYw83cReOrcPgK8vrkiZDduvc1G5fQymO%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3Db8HeHE0EobicdyF0cXVjgqzj%252Frs%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="860" height="632" data-origin-width="1806" data-origin-height="1328"/></span></figure>
+</p>
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li><code>S3 Endpoint ID</code><br />: 이 Endpoint를 구분하기 위한 PBS 내부의 ID(이름).</li>
+<li><code>Region</code><br />: 해당 스토리지가 속한 리전 이름.</li>
+<li><code>Endpoint</code><br />: 실제 S3 API 호출을 보낼 주소 템플릿.<br />: Backblaze B2는 일반적으로 <code>{{bucket}}.s3.{{region}}.backblazeb2.com</code>다.</li>
+<li><code>Port</code><br />: 기본 HTTPS 포트 <code>443</code>. 특별히 다른 포트를 쓰는 경우에만 수정합니다.</li>
+<li><code>Access Key</code><br />: S3 접근용 계정의 Access Key<br />: Backblaze B2에서는 "Application Key ID"에 해당.</li>
+<li><code>Secret Key</code><br />: S3 접근용 비밀 키 Secret Key<br />: Backblaze B2에서는 "Application Key"에 해당.<br />: 생성 당시 한 번만 보여준다.</li>
+<li><code>Path Style</code><br />: S3에 접근할 때 bucket 이름을 도메인에 넣을지(URL Style) 아니면 경로(Path Style) 로 넣을지 설정.</li>
+<li><code>Provider Quirks</code><br />: 벤더마다 약간씩 다른 S3 API 구현 차이를 해결하기 위한 옵션<br />: BackBlaze의 경우 <code>Skip if-None-Match-header</code>를 선택한다.</li>
+</ul>
+<p><figure class="imageblock alignLeft" data-ke-mobileStyle="widthOrigin" data-origin-width="631" data-origin-height="284"><span data-url="https://blog.kakaocdn.net/dna/zP6e8/dJMb9YJ0z4y/AAAAAAAAAAAAAAAAAAAAAAVFojYvtX0cTteg06fRcVNCyJa77aUhDY5pfDzKyvXA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=xOzA1nrBAK1h%2FlTGLO0sUsHWfXQ%3D" data-phocus="https://blog.kakaocdn.net/dna/zP6e8/dJMb9YJ0z4y/AAAAAAAAAAAAAAAAAAAAAAVFojYvtX0cTteg06fRcVNCyJa77aUhDY5pfDzKyvXA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=xOzA1nrBAK1h%2FlTGLO0sUsHWfXQ%3D"><img src="https://blog.kakaocdn.net/dna/zP6e8/dJMb9YJ0z4y/AAAAAAAAAAAAAAAAAAAAAAVFojYvtX0cTteg06fRcVNCyJa77aUhDY5pfDzKyvXA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=xOzA1nrBAK1h%2FlTGLO0sUsHWfXQ%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FzP6e8%2FdJMb9YJ0z4y%2FAAAAAAAAAAAAAAAAAAAAAAVFojYvtX0cTteg06fRcVNCyJa77aUhDY5pfDzKyvXA%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DxOzA1nrBAK1h%252FlTGLO0sUsHWfXQ%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="631" height="284" data-origin-width="631" data-origin-height="284"/></span></figure>
+</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h2 data-ke-size="size26">다. Datastore 추가</h2>
+<p><figure class="imageblock alignLeft" data-ke-mobileStyle="widthOrigin" data-origin-width="595" data-origin-height="339"><span data-url="https://blog.kakaocdn.net/dna/V6RhX/dJMb9WZIS7x/AAAAAAAAAAAAAAAAAAAAAFMqhnIzc4hdXu_2VcwIEro_Z7bIB33GocopVKSH6X-k/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=qMhwigfjeaf%2BF9uQNE0zlS8NoOc%3D" data-phocus="https://blog.kakaocdn.net/dna/V6RhX/dJMb9WZIS7x/AAAAAAAAAAAAAAAAAAAAAFMqhnIzc4hdXu_2VcwIEro_Z7bIB33GocopVKSH6X-k/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=qMhwigfjeaf%2BF9uQNE0zlS8NoOc%3D"><img src="https://blog.kakaocdn.net/dna/V6RhX/dJMb9WZIS7x/AAAAAAAAAAAAAAAAAAAAAFMqhnIzc4hdXu_2VcwIEro_Z7bIB33GocopVKSH6X-k/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=qMhwigfjeaf%2BF9uQNE0zlS8NoOc%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FV6RhX%2FdJMb9WZIS7x%2FAAAAAAAAAAAAAAAAAAAAAFMqhnIzc4hdXu_2VcwIEro_Z7bIB33GocopVKSH6X-k%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DqMhwigfjeaf%252BF9uQNE0zlS8NoOc%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="595" height="339" data-origin-width="595" data-origin-height="339"/></span></figure>
+</p>
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li><code>Datastore Type</code><br />: S3 (tech preview)를 선택한다.</li>
+<li><code>Local Cache</code><br />: 앞서 생성한 Local cache의 절대 경로를 입력한다.</li>
+<li><code>S3 Endpoint ID</code><br />: 앞서 생성한 S3 Endpoint를 선택한다.</li>
+<li><code>Bucket</code><br />: Bucket을 생성할 당시 &ldquo;Allow listing all bucket names &hellip;.&rdquo; 옵션을 활성화해야 목록이 표시된다.</li>
+</ul>
+<p data-ke-size="size16">아직 Sync의 정확하게 동작을 이해하지 못했기 때문에 GC와 Prune은 비워두고 추후에 추가한다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignCenter" data-ke-mobileStyle="widthOrigin" data-origin-width="1862" data-origin-height="754"><span data-url="https://blog.kakaocdn.net/dna/ejGIYQ/dJMb9NIyirj/AAAAAAAAAAAAAAAAAAAAAO8a1IUwgACXFpYsq-xmhfp9ZV98w15bRLaw7Ifx2hPW/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=3ZugdsYkrfL0qaG15lXhbExZDsM%3D" data-phocus="https://blog.kakaocdn.net/dna/ejGIYQ/dJMb9NIyirj/AAAAAAAAAAAAAAAAAAAAAO8a1IUwgACXFpYsq-xmhfp9ZV98w15bRLaw7Ifx2hPW/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=3ZugdsYkrfL0qaG15lXhbExZDsM%3D"><img src="https://blog.kakaocdn.net/dna/ejGIYQ/dJMb9NIyirj/AAAAAAAAAAAAAAAAAAAAAO8a1IUwgACXFpYsq-xmhfp9ZV98w15bRLaw7Ifx2hPW/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=3ZugdsYkrfL0qaG15lXhbExZDsM%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FejGIYQ%2FdJMb9NIyirj%2FAAAAAAAAAAAAAAAAAAAAAO8a1IUwgACXFpYsq-xmhfp9ZV98w15bRLaw7Ifx2hPW%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3D3ZugdsYkrfL0qaG15lXhbExZDsM%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="1862" height="754" data-origin-width="1862" data-origin-height="754"/></span></figure>
+</p>
+<p data-ke-size="size16">&nbsp;</p>
+<hr data-ke-style="style1" />
+<h2 data-ke-size="size26">라. Sync 작업 추가</h2>
+<p data-ke-size="size16">백업과 업로드를 동시에 수행하기엔 부담이 있기도 하고, 실패 시 모니터링도 어려울 것 같다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">일단 로컬 데이터스토어에 백업하고 후에 B2가 로컬 데이터스토어에서 Pull 하도록 했다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">즉, 먼저 PVE가 로컬 스토리지에 백업을 완료하고, 이후 Sync를 통해 B2로 안전하게 데이터를 옮기는 방식이다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Sync 작업 주기는 백업 직후 바로 실행하는 것이 좋다고 판단했다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">Backup, Prune과 Verification이 끝나면 Sync 되도록 월, 수, 금 21:00에 Sync를 예약했다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<table style="border-collapse: collapse; width: 94.5349%; height: 119px;" border="1" data-ke-align="alignLeft" data-ke-style="style3">
+<tbody>
+<tr style="height: 17px;">
+<td style="height: 17px; width: 14.5349%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">mon</td>
+<td style="height: 17px; width: 8.37209%;">tue</td>
+<td style="height: 17px; width: 12.3256%;">wed</td>
+<td style="height: 17px; width: 8.37209%;">thu</td>
+<td style="height: 17px; width: 12.3256%;">fri</td>
+<td style="height: 17px; width: 16.5116%;">sat</td>
+<td style="height: 17px; width: 9.65118%;">sun</td>
+</tr>
+<tr style="height: 17px;">
+<td style="height: 17px; width: 14.5349%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">&nbsp;</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">&nbsp;</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">&nbsp;</td>
+<td style="height: 17px; width: 16.5116%;">&nbsp;</td>
+<td style="height: 17px; width: 9.65118%;">&nbsp;</td>
+</tr>
+<tr style="height: 17px;">
+<td style="height: 17px; width: 14.5349%;">Backup</td>
+<td style="height: 17px; width: 12.3256%;">03:00</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">03:00</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">03:00</td>
+<td style="height: 17px; width: 16.5116%;">&nbsp;</td>
+<td style="height: 17px; width: 9.65118%;">&nbsp;</td>
+</tr>
+<tr style="height: 17px;">
+<td style="height: 17px; width: 14.5349%;">Prune</td>
+<td style="height: 17px; width: 12.3256%;">09:00</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">09:00</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">09:00</td>
+<td style="height: 17px; width: 16.5116%;">&nbsp;</td>
+<td style="height: 17px; width: 9.65118%;">&nbsp;</td>
+</tr>
+<tr style="height: 17px;">
+<td style="height: 17px; width: 14.5349%;">Verify</td>
+<td style="height: 17px; width: 12.3256%;">15:00</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">15:00</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">15:00</td>
+<td style="height: 17px; width: 16.5116%;">&nbsp;</td>
+<td style="height: 17px; width: 9.65118%;">&nbsp;</td>
+</tr>
+<tr style="height: 17px;">
+<td style="height: 17px; width: 14.5349%;">Sync</td>
+<td style="height: 17px; width: 12.3256%;">21:00</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">21:00</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">21:00</td>
+<td style="height: 17px; width: 16.5116%;">&nbsp;</td>
+<td style="height: 17px; width: 9.65118%;">&nbsp;</td>
+</tr>
+<tr style="height: 17px;">
+<td style="height: 17px; width: 14.5349%;">GC</td>
+<td style="height: 17px; width: 12.3256%;">&nbsp;</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">&nbsp;</td>
+<td style="height: 17px; width: 8.37209%;">&nbsp;</td>
+<td style="height: 17px; width: 12.3256%;">&nbsp;</td>
+<td style="height: 17px; width: 16.5116%;">03:00, 06:00</td>
+<td style="height: 17px; width: 9.65118%;">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignCenter" data-ke-mobileStyle="widthOrigin" data-origin-width="1434" data-origin-height="884"><span data-url="https://blog.kakaocdn.net/dna/bkIq7y/dJMb9VzKnKr/AAAAAAAAAAAAAAAAAAAAAD_TIGrSK3808RNTPy1Z-DRsA_xycidD2xmZYEJ-5HB-/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=bTIQSsFslSXVckPyS7a8tq8YUe8%3D" data-phocus="https://blog.kakaocdn.net/dna/bkIq7y/dJMb9VzKnKr/AAAAAAAAAAAAAAAAAAAAAD_TIGrSK3808RNTPy1Z-DRsA_xycidD2xmZYEJ-5HB-/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=bTIQSsFslSXVckPyS7a8tq8YUe8%3D"><img src="https://blog.kakaocdn.net/dna/bkIq7y/dJMb9VzKnKr/AAAAAAAAAAAAAAAAAAAAAD_TIGrSK3808RNTPy1Z-DRsA_xycidD2xmZYEJ-5HB-/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=bTIQSsFslSXVckPyS7a8tq8YUe8%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FbkIq7y%2FdJMb9VzKnKr%2FAAAAAAAAAAAAAAAAAAAAAD_TIGrSK3808RNTPy1Z-DRsA_xycidD2xmZYEJ-5HB-%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DbTIQSsFslSXVckPyS7a8tq8YUe8%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="1434" height="884" data-origin-width="1434" data-origin-height="884"/></span></figure>
+</p>
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li><code>Local Owner</code> : 동기화된 데이터의 소유자</li>
+<li><code>Max Depth</code> : namespace 하위 구조를 몇 단계까지 동기화할지. 보통 <code>Full</code>.</li>
+<li><code>Remove Vanished</code> : Source에서 삭제된 스냅숏/백업이 Local에도 삭제되도록 동기화.</li>
+<li><code>Re-sync Corrupt</code> : 손상된 chunk가 발견되면 원격에서 다시 가져옴.</li>
+<li><code>Verified Only</code> : 검증된 스냅숏만 동기화.</li>
+</ul>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16"><code>Remove Vanished</code>는 스냅샷 메타데이터를 맞춰주는 것일 뿐, 실제 chunk는 여전히 남아 있을 수 있음.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">따라서 가져올 source datastore와 별개로 B2도 GC를 주기적으로 돌려줘야 한다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">GC는 Verfiy는 요금 나오는 것 보고서 조금씩 시도해야겠다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<aside>💡<b><span style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Apple SD Gothic Neo', Arial, sans-serif; letter-spacing: 0px;">25.10.17 추가</span></b>
+<p data-ke-size="size16">2주 정도 운영해 본 결과 GC 자체는 별도의 요금을 발생시키지 않는 것 같다.</p>
+<p data-ke-size="size16">local cache 덕분인지 거의 다운로드가 발생하지 않았음. 아마 읽어오지 않고 지우기만 하는 듯.</p>
+<p data-ke-size="size16">다만 Verify의 경우 업로드 용량만큼 다운로드가 발생하기 때문에 요금 압박이 있다. 최소화해야 함.</p>
+<p data-ke-size="size16">&nbsp;</p>
+</aside>
+<hr data-ke-style="style1" />
+<h1>4. 요금</h1>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">역시 가장 중요한 것은 안정성과 요금이다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">몇 달간 운영해 보고 스케줄을 최적화할 필요가 있다.</p>
+<p data-ke-size="size16">&nbsp;</p>
+<table style="border-collapse: collapse; width: 100%; height: 68px;" border="1" data-ke-align="alignLeft" data-ke-style="style3">
+<tbody>
+<tr style="height: 17px;">
+<td style="width: 12.4252%; height: 17px;">Month</td>
+<td style="width: 11.2127%; height: 17px;">요금 (USD)</td>
+<td style="width: 10.9801%; height: 17px;">요금 (KRW)</td>
+<td style="width: 11.9601%; height: 17px;">평균 용량</td>
+<td style="width: 14.6346%; height: 17px;">백업</td>
+<td style="width: 12.4252%; height: 17px;">GC</td>
+<td style="width: 13.2392%; height: 17px;">Prune</td>
+<td style="width: 13.1229%; height: 17px;">Verify</td>
+</tr>
+<tr style="height: 17px;">
+<td style="width: 12.4252%; height: 17px;">10월</td>
+<td style="width: 11.2127%; height: 17px;">0.57</td>
+<td style="width: 10.9801%; height: 17px;">819원</td>
+<td style="width: 11.9601%; height: 17px;"><span style="color: #333333;"><span style="color: #666666;"><span style="background-color: #ffffff;">104 GB</span></span></span></td>
+<td style="width: 14.6346%; height: 17px;">월,수,금</td>
+<td style="width: 12.4252%; height: 17px;">토</td>
+<td style="width: 13.2392%; height: 17px;">월,수,금</td>
+<td style="width: 13.1229%; height: 17px;">로컬 O, Offisite X</td>
+</tr>
+<tr style="height: 17px;">
+<td style="width: 12.4252%; height: 17px;">11월</td>
+<td style="width: 11.2127%; height: 17px;">0.65</td>
+<td style="width: 10.9801%; height: 17px;">956원</td>
+<td style="width: 11.9601%; height: 17px;">109 GB</td>
+<td style="width: 14.6346%; height: 17px;">월,수,금</td>
+<td style="width: 12.4252%; height: 17px;">토</td>
+<td style="width: 13.2392%; height: 17px;">월,수,금</td>
+<td style="width: 13.1229%; height: 17px;">로컬 O, Offisite X</td>
+</tr>
+<tr style="height: 17px;">
+<td style="width: 12.4252%; height: 17px;">12월</td>
+<td style="width: 11.2127%; height: 17px;">0.59</td>
+<td style="width: 10.9801%; height: 17px;">874원</td>
+<td style="width: 11.9601%; height: 17px;">107 GB</td>
+<td style="width: 14.6346%; height: 17px;">월,수,금</td>
+<td style="width: 12.4252%; height: 17px;">토</td>
+<td style="width: 13.2392%; height: 17px;">월,수,금</td>
+<td style="width: 13.1229%; height: 17px;">로컬 O, Offisite X</td>
+</tr>
+</tbody>
+</table>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">(요금 최적화 전략)</p>
+<p data-ke-size="size16">달에 한번 정도는 Offisite에 저장된 백업도 Verify를 수행해도 될 듯 하다.</p>
+<hr data-ke-style="style1" />
+<p data-ke-size="size16">&nbsp;</p>
+<p><figure class="imageblock alignCenter" data-ke-mobileStyle="widthOrigin" data-origin-width="1676" data-origin-height="321"><span data-url="https://blog.kakaocdn.net/dna/bq56z8/dJMb9c2zQmt/AAAAAAAAAAAAAAAAAAAAAD8qjjUbnc5xOXt5BStUX382aNE1qGl94dE3rQqqRSFo/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=aInALcvK7X9FSwdjylm2PRyFlCg%3D" data-phocus="https://blog.kakaocdn.net/dna/bq56z8/dJMb9c2zQmt/AAAAAAAAAAAAAAAAAAAAAD8qjjUbnc5xOXt5BStUX382aNE1qGl94dE3rQqqRSFo/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=aInALcvK7X9FSwdjylm2PRyFlCg%3D"><img src="https://blog.kakaocdn.net/dna/bq56z8/dJMb9c2zQmt/AAAAAAAAAAAAAAAAAAAAAD8qjjUbnc5xOXt5BStUX382aNE1qGl94dE3rQqqRSFo/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1767193199&allow_ip=&allow_referer=&signature=aInALcvK7X9FSwdjylm2PRyFlCg%3D" srcset="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2Fbq56z8%2FdJMb9c2zQmt%2FAAAAAAAAAAAAAAAAAAAAAD8qjjUbnc5xOXt5BStUX382aNE1qGl94dE3rQqqRSFo%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DaInALcvK7X9FSwdjylm2PRyFlCg%253D" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" loading="lazy" width="1676" height="321" data-origin-width="1676" data-origin-height="321"/></span></figure>
+</p>
+<p data-ke-size="size16">외장하드에 배드섹터가 생겼다 :(</p>
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16">외장하드의 수명이 다한 거 같아서 외장 SSD로 교체했다.</p></div>
+            <!-- System - START -->
+
+<!-- System - END -->
+
+<script onerror="changeAdsenseToNaverAd()" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9527582522912841" crossorigin="anonymous"></script>
+<!-- inventory -->
+<ins class="adsbygoogle" style="margin:50px 0; display:block;" data-ad-client="ca-pub-9527582522912841" data-ad-slot="4947159016" data-ad-format="auto" data-full-width-responsive="true" data-ad-type="inventory" data-ad-adfit-unit="DAN-HCZEy0KQLPMGnGuC"></ins>
+
+<script id="adsense_script">
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<script>
+    if(window.observeAdsenseUnfilledState !== undefined){ observeAdsenseUnfilledState(); }
+</script>
+<div data-tistory-react-app="NaverAd"></div>
+
+                    <div class="container_postbtn #post_button_group">
+  <div class="postbtn_like"><script>window.ReactionButtonType = 'reaction';
+window.ReactionApiUrl = '//ramen4598.tistory.com/reaction';
+window.ReactionReqBody = {
+    entryId: 634
+}</script>
+<div class="wrap_btn" id="reaction-634" data-tistory-react-app="Reaction"></div><div class="wrap_btn wrap_btn_share"><button type="button" class="btn_post sns_btn btn_share" aria-expanded="false" data-thumbnail-url="https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdtuDT2%2FdJMb9Miz3vs%2FAAAAAAAAAAAAAAAAAAAAAAZlwJFRN3oX18aQLSZeSN4AESfoX7_tDPsJ0rYuM8Hb%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DNP010Dp50dRQtgK2WnNH%252FMuLpzI%253D" data-title="[홈서버] Offsite Backup" data-description="1. Offisite Backup Offisite Backup은 장애나 사고에 대비하기 위해 반드시 필요하다. 로컬 스토리지에만 의존하면 화재, 침수, 하드웨어 고장 같은 문제가 발생했을 때 데이터 복구가 불가할 수 있다. 옛날에 조선왕조실록도 여러 지역에 외사고를 운영했던 것처럼 본진이 털릴 경우를 대비해서 별도의 물리적 공간이나 클라우드에 백업을 두는 게 좋다. https://cloud-pbs.com/ Proxmox VE를 사용하는 경우 S3 호환 스토리지, Cloud-PBS 같은 서비스를 고려할 수 있다. Cloud-PBS는 프랑스, 독일, 미국 등에서 호스팅 되는 원격으로 관리되는 PBS 정도로 생각하면 된다. Cloud-PBS는 관리가 편리한 만큼 요금이 비싸다.(25년 기준으로 단순 용량당 비.." data-profile-image="https://tistory1.daumcdn.net/tistory/5257724/attach/e7c57b0b2cd74c6993a8e101b19e21d3" data-profile-name="tired_i" data-pc-url="https://ramen4598.tistory.com/634" data-relative-pc-url="/634" data-blog-title="개발은 즐거워?"><span class="ico_postbtn ico_share">공유하기</span></button>
+  <div class="layer_post" id="tistorySnsLayer"></div>
+</div><div class="wrap_btn"><button type="button" class="btn_post" data-entry-id="634" data-tiara-action-name="글통계_클릭"><span class="ico_postbtn ico_statistics">통계</span></button></div><div class="wrap_btn wrap_btn_etc" data-entry-id="634" data-entry-visibility="public" data-category-visibility="public"><button type="button" class="btn_post btn_etc1" aria-expanded="false"><span class="ico_postbtn ico_etc">게시글 관리</span></button>
+  <div class="layer_post" id="tistoryEtcLayer"></div>
+</div></div>
+<div class="postbtn_ccl" data-ccl-type="2" data-ccl-derive="1">
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.ko" target="_blank" class="link_ccl" rel="license">
+        <span class="bundle_ccl">
+            <span class="ico_postbtn ico_ccl1">저작자표시</span> 
+        </span>
+        <span class="screen_out">(새창열림)</span>
+    </a>
+</div>
+<!--
+<rdf:RDF xmlns="https://web.resource.org/cc/" xmlns:dc="https://purl.org/dc/elements/1.1/" xmlns:rdf="https://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <Work rdf:about="">
+        <license rdf:resource="https://creativecommons.org/licenses/by/4.0/deed.ko" />
+    </Work>
+    <License rdf:about="https://creativecommons.org/licenses/by/4.0/deed.ko">
+        <permits rdf:resource="https://web.resource.org/cc/Reproduction"/>
+        <permits rdf:resource="https://web.resource.org/cc/Distribution"/>
+        <requires rdf:resource="https://web.resource.org/cc/Notice"/>
+        <requires rdf:resource="https://web.resource.org/cc/Attribution"/>
+        <permits rdf:resource="https://web.resource.org/cc/DerivativeWorks"/>
+
+    </License>
+</rdf:RDF>
+-->  <div data-tistory-react-app="SupportButton"></div>
+</div>
+
+                    <!-- PostListinCategory - START -->
+<div class="another_category another_category_color_gray">
+  <h4>'<a href="/category/Tools">Tools</a> &gt; <a href="/category/Tools/Home%20Server">Home Server</a>' 카테고리의 다른 글</h4>
+  <table>
+    <tr>
+      <th><a href="/636">[홈서버] Proxmox 설치 후 “No valid subscription” 경고창 제거</a>&nbsp;&nbsp;<span>(1)</span></th>
+      <td>2025.11.02</td>
+    </tr>
+    <tr>
+      <th><a href="/633">[홈서버] Proxmox VE 9.0 Update</a>&nbsp;&nbsp;<span>(0)</span></th>
+      <td>2025.10.01</td>
+    </tr>
+    <tr>
+      <th><a href="/632">[홈서버] PBS 4.0 Update</a>&nbsp;&nbsp;<span>(0)</span></th>
+      <td>2025.10.01</td>
+    </tr>
+    <tr>
+      <th><a href="/623">[홈서버] 네트워크 3 - Zone-Based Firewall</a>&nbsp;&nbsp;<span>(2)</span></th>
+      <td>2025.08.28</td>
+    </tr>
+    <tr>
+      <th><a href="/613">[홈서버] Proxmox Backup Server</a>&nbsp;&nbsp;<span>(0)</span></th>
+      <td>2025.02.28</td>
+    </tr>
+  </table>
+</div>
+
+<!-- PostListinCategory - END -->
+
+        </div>
+
+        <!-- article_content -->
+        <div class="article_content">
+          <!-- <ul class="list_share list_sns">
+                                  <li class="item_share"><a href="#" class="link_share link_facebook" data-service="facebook"><span class="icon-Facebook"></span><span class="blind">페이스북</span></a></li>
+                                  <li class="item_share"><a href="#" class="link_share link_twitter" data-service="twitter"><span class="icon-Twitter"></span><span class="blind">트위터</span></a></li>
+                                  <li class="item_share"><a href="#" class="link_share link_story" data-service="kakaostory"><span class="icon-Story"></span><span class="blind">카카오스토리</span></a></li>
+                                  <li class="item_share"><a href="#" class="link_share link_kakao" data-service="kakaotalk"><span class="icon-Kakao"></span><span class="blind">카카오톡</span></a></li>
+                              </ul> -->
+
+          
+            <!-- area_tag -->
+            <div class="area_tag">
+              <h3 class="title_tag">TAG</h3>
+              <div class="tag_content thema_apply"><a href="/tag/backblaze%20b2" rel="tag">backblaze b2</a>, <a href="/tag/PBS" rel="tag">PBS</a>, <a href="/tag/PVE%20Backup" rel="tag">PVE Backup</a>, <a href="/tag/S3%20Offisite%20backup" rel="tag">S3 Offisite backup</a></div>
+            </div>
+            <!-- // area_tag -->
+          
+
+          
+            <!-- area_related -->
+            <div class="area_related">
+              <h3 class="title_related">관련글</h3>
+              <ul class="list_related">
+                
+                  <li class="item_related">
+                    <a href="/636?category=1171319" class="link_related">
+                      <span class="thumnail item-thumbnail"
+                        style="background-image:url('https://img1.daumcdn.net/thumb/R750x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FoJwI1%2FdJMcacakBBB%2FAAAAAAAAAAAAAAAAAAAAAInZxueUT4o_oVGxHZWlOfp4Kxqqn2OD6W52r2xNcy7o%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DdvBFVfAcHWcr9Ek2cj0t2Y%252F1nmw%253D')"></span>
+                      <div class="box_content">
+                        <strong>[홈서버] Proxmox 설치 후 &ldquo;No valid subscription&rdquo; 경고창 제거</strong>
+                        <span class="info">2025.11.02</span>
+                      </div>
+                    </a>
+                  </li>
+                
+                  <li class="item_related">
+                    <a href="/633?category=1171319" class="link_related">
+                      <span class="thumnail item-thumbnail"
+                        style="background-image:url('https://img1.daumcdn.net/thumb/R750x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FcSPyHN%2FbtsQ0xLP9Ab%2FAAAAAAAAAAAAAAAAAAAAAM5JTqTcl0w_dCel76pTII6c6bRYRRrbVOruJmAaVSgu%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DCjFBOXd2sfNfM7BQNbCygc81ceM%253D')"></span>
+                      <div class="box_content">
+                        <strong>[홈서버] Proxmox VE 9.0 Update</strong>
+                        <span class="info">2025.10.01</span>
+                      </div>
+                    </a>
+                  </li>
+                
+                  <li class="item_related">
+                    <a href="/632?category=1171319" class="link_related">
+                      <span class="thumnail item-thumbnail"
+                        style="background-image:url('https://img1.daumcdn.net/thumb/R750x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FcS7K3z%2FbtsQYMXAxB0%2FAAAAAAAAAAAAAAAAAAAAAKqrITDMF0uSqfmQuH6zeQ-EkkSnXwsMw3b4XmlKVo-7%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3DVAVZ2JtyQSB4%252B0grS9JmIGMIUL0%253D')"></span>
+                      <div class="box_content">
+                        <strong>[홈서버] PBS 4.0 Update</strong>
+                        <span class="info">2025.10.01</span>
+                      </div>
+                    </a>
+                  </li>
+                
+                  <li class="item_related">
+                    <a href="/623?category=1171319" class="link_related">
+                      <span class="thumnail item-thumbnail"
+                        style="background-image:url('https://img1.daumcdn.net/thumb/R750x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FdVKGOj%2FbtsQaiWXQb3%2FAAAAAAAAAAAAAAAAAAAAANkibgNjdKwqAQiT5MUTFovJdgB7aRQipgpUV0uO7kq9%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1767193199%26allow_ip%3D%26allow_referer%3D%26signature%3Dd%252BgieHoj9dr%252BYLqiAY8DoSB3G8Q%253D')"></span>
+                      <div class="box_content">
+                        <strong>[홈서버] 네트워크 3 - Zone-Based Firewall</strong>
+                        <span class="info">2025.08.28</span>
+                      </div>
+                    </a>
+                  </li>
+                
+              </ul>
+            </div>
+            <!-- // area_related -->
+          
+
+          <div class="area_reply">
+            <div class="reply_content">
+              <div data-tistory-react-app="Namecard"></div><div id="entry634Comment">
+                <div data-tistory-react-app="Comment"></div>
+
+              </div>
+<script type="text/javascript">loadedComments[634]=true;
+findFragmentAndHighlight(634);</script>
+
+            </div>
+          </div>
+        </div>
+        <!-- // article_content -->
+      </div>
+      <!-- article_content -->
+
+
+    
+  
+              
+          
+      </div>
+      <!-- // area_view -->
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+    </main>
+
+    </div>
+    <!-- // container -->
+
+    
+
+    <!-- footer -->
+    <footer id="footer">
+      <div class="inner_footer">
+        
+          <a href="https://www.tistory.com/" class="link_footer">티스토리</a>
+        
+        
+        
+        
+      </div>
+      <div>
+        <address>© 2018 TISTORY. All rights reserved.</address>
+      </div>
+
+    </footer>
+    <!-- // footer -->
+
+    </div>
+    <!-- // wrap -->
+  
+<div class="#menubar menu_toolbar ">
+  <h2 class="screen_out">티스토리툴바</h2>
+</div>
+<div class="#menubar menu_toolbar "></div>
+<div class="layer_tooltip">
+  <div class="inner_layer_tooltip">
+    <p class="desc_g"></p>
+  </div>
+</div>
+<div id="editEntry" style="position:absolute;width:1px;height:1px;left:-100px;top:-100px"></div>
+
+
+                <!-- DragSearchHandler - START -->
+<script src="//search1.daumcdn.net/search/statics/common/js/g/search_dragselection.min.js"></script>
+
+<!-- DragSearchHandler - END -->
+
+        <!-- SyntaxHighlight - START -->
+        <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/styles/atom-one-light.min.css" rel="stylesheet"/><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/delphi.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/php.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/python.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/r.min.js" defer></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/ruby.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/scala.min.js" defer></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/shell.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/sql.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/swift.min.js" defer></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/typescript.min.js" defer></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/languages/vbnet.min.js" defer></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+
+        <!-- SyntaxHighlight - END -->
+
+                
+                <div style="margin:0; padding:0; border:none; background:none; float:none; clear:none; z-index:0"></div>
+<script type="text/javascript" src="https://tistory1.daumcdn.net/tistory_admin/userblog/userblog-5b45096133ae0a24cb473dfb3b011710e93dea0d/static/script/common.js"></script>
+<script type="text/javascript">window.roosevelt_params_queue = window.roosevelt_params_queue || [{channel_id: 'dk', channel_label: '{tistory}'}]</script>
+<script type="text/javascript" src="//t1.daumcdn.net/midas/rt/dk_bt/roosevelt_dk_bt.js" async="async"></script>
+
+                
+                <script>window.tiara = {"svcDomain":"user.tistory.com","section":"글뷰","trackPage":"글뷰_보기","page":"글뷰","key":"5257724-634","customProps":{"userId":"5299898","blogId":"5257724","entryId":"634","role":"owner","trackPage":"글뷰_보기","filterTarget":false},"entry":{"entryId":"634","entryTitle":"[홈서버] Offsite Backup","entryType":"POST","categoryName":"Tools/Home Server","categoryId":"1171319","serviceCategoryName":null,"serviceCategoryId":null,"author":"5299898","authorNickname":"tired_i","blogNmae":"개발은 즐거워?","image":"kage@dtuDT2/dJMb9Miz3vs/Vur3NtLnt54Iht8Fj7IIYK","plink":"/634","tags":["backblaze b2","PBS","PVE Backup","S3 Offisite backup"]},"kakaoAppKey":"3e6ddd834b023f24221217e370daed18","appUserId":"2113741481","thirdProvideAgree":null}</script>
+<script type="module" src="https://t1.daumcdn.net/tistory_admin/frontend/tiara/v1.0.6/index.js"></script>
+<script src="https://t1.daumcdn.net/tistory_admin/frontend/tiara/v1.0.6/polyfills-legacy.js" nomodule="true" defer="true"></script>
+<script src="https://t1.daumcdn.net/tistory_admin/frontend/tiara/v1.0.6/index-legacy.js" nomodule="true" defer="true"></script>
+
+                </body>
+
+</html>

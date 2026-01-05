@@ -1,0 +1,60 @@
+{
+  "name": "tistory-wxr-generator",
+  "version": "1.0.0",
+  "description": "CLI tool to migrate Tistory blog posts to WordPress WXR format",
+  "main": "dist/cli.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "ts-node src/cli.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\" --no-error-on-unmatched-pattern",
+    "lint:fix": "eslint \"src/**/*.ts\" \"tests/**/*.ts\" --fix --no-error-on-unmatched-pattern",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\""
+  },
+  "keywords": [
+    "tistory",
+    "wordpress",
+    "migration",
+    "wxr",
+    "blog",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "cheerio": "^1.1.2",
+    "dotenv": "^17.2.3",
+    "marked": "^17.0.1",
+    "p-queue": "^9.0.1",
+    "turndown": "^7.2.2",
+    "turndown-plugin-gfm": "^1.0.2",
+    "xmlbuilder2": "^4.0.3",
+    "axios": "^1.13.2",
+    "form-data": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.3",
+    "@types/turndown": "^5.0.6",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.2.0",
+    "prettier": "^3.7.4",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

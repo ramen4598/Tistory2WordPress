@@ -17,14 +17,14 @@ This task list breaks down the Tistory to WordPress migration tool into implemen
 
 Project initialization and dependencies.
 
-- [ ] T001 Create project structure per plan.md (src/, tests/, output/)
-- [ ] T002 Initialize TypeScript project with package.json and tsconfig.json
-- [ ] T003 [P] Install core dependencies (cheerio, turndown, marked, @xmlbuilder2/builder, p-queue, dotenv)
-- [ ] T004 [P] Install dev dependencies (Jest, TypeScript types, ts-node, eslint, prettier)
-- [ ] T005 [P] Configure Jest for TypeScript in jest.config.js
-- [ ] T006 [P] Configure ESLint and Prettier in .eslintrc.js and .prettierrc
-- [ ] T007 [P] Create .env.example with required environment variables
-- [ ] T008 [P] Add npm scripts (start, build, test, lint, format) to package.json
+- [x] T001 Create project structure per plan.md (src/, tests/, output/)
+- [x] T002 Initialize TypeScript project with package.json and tsconfig.json
+- [x] T003 [P] Install core dependencies (cheerio, turndown, marked, @xmlbuilder2/builder, p-queue, dotenv)
+- [x] T004 [P] Install dev dependencies (Jest, TypeScript types, ts-node, eslint, prettier)
+- [x] T005 [P] Configure Jest for TypeScript in jest.config.js
+- [x] T006 [P] Configure ESLint and Prettier in .eslintrc.js and .prettierrc
+- [x] T007 [P] Create .env.example with required environment variables
+- [x] T008 [P] Add npm scripts (start, build, test, lint, format) to package.json
 
 ---
 
@@ -34,17 +34,17 @@ Project initialization and dependencies.
 
 Core infrastructure and shared utilities that all features depend on.
 
-- [ ] T009 Create Config interface in src/models/Config.ts
-- [ ] T010 Implement config loader in src/utils/config.ts (load from .env)
-- [ ] T011 [P] Create logger utility in src/utils/logger.ts (console + file logging)
-- [ ] T012 [P] Create Post model in src/models/Post.ts
-- [ ] T013 [P] Create Category model in src/models/Category.ts
-- [ ] T014 [P] Create Tag model in src/models/Tag.ts
-- [ ] T015 [P] Create Image model in src/models/Image.ts
-- [ ] T016 [P] Create Attachment model in src/models/Attachment.ts
-- [ ] T017 [P] Create InternalLink model in src/models/InternalLink.ts
-- [ ] T018 [P] Create MigrationState model in src/models/MigrationState.ts
-- [ ] T019 [P] Create WXRData model in src/models/WXRData.ts
+- [x] T009 Create Config interface in src/models/Config.ts
+- [x] T010 Implement config loader in src/utils/config.ts (load from .env)
+- [x] T011 [P] Create logger utility in src/utils/logger.ts (console + file logging)
+- [x] T012 [P] Create Post model in src/models/Post.ts
+- [x] T013 [P] Create Category model in src/models/Category.ts
+- [x] T014 [P] Create Tag model in src/models/Tag.ts
+- [x] T015 [P] Create Image model in src/models/Image.ts
+- [x] T016 [P] Create Attachment model in src/models/Attachment.ts
+- [x] T017 [P] Create InternalLink model in src/models/InternalLink.ts
+- [x] T018 [P] Create MigrationState model in src/models/MigrationState.ts
+- [x] T019 [P] Create WXRData model in src/models/WXRData.ts
 
 ---
 
@@ -56,15 +56,15 @@ Core infrastructure and shared utilities that all features depend on.
 
 ### Implementation for User Story 1
 
-- [ ] T020 [P] [US1] Implement Crawler service in src/services/crawler.ts (discover post URLs with pagination)
-- [ ] T021 [US1] Implement HTML post fetching in Crawler (fetch individual post HTML from Tistory)
-- [ ] T022 [US1] Implement post metadata parsing in Crawler (extract title, dates, categories, tags from HTML)
-- [ ] T023 [P] [US1] Implement Cleaner service in src/services/cleaner.ts (HTML→Markdown→HTML conversion)
-- [ ] T024 [US1] Integrate turndown library in Cleaner (HTML to Markdown)
-- [ ] T025 [US1] Integrate marked library in Cleaner (Markdown to HTML)
-- [ ] T026 [P] [US1] Implement WXRGenerator service in src/services/wxrGenerator.ts (build WXR XML structure)
-- [ ] T027 [US1] Implement addPost method in WXRGenerator (add post to WXR with categories/tags)
-- [ ] T028 [US1] Implement finalize method in WXRGenerator (write WXR to file)
+- [x] T020 [P] [US1] Implement Crawler service in src/services/crawler.ts (discover post URLs with pagination)
+- [x] T021 [US1] Implement HTML post fetching in Crawler (fetch individual post HTML from Tistory)
+- [x] T022 [US1] Implement post metadata parsing in Crawler (extract title, dates, categories, tags from HTML)
+- [x] T023 [P] [US1] Implement Cleaner service in src/services/cleaner.ts (HTML→Markdown→HTML conversion)
+- [x] T024 [US1] Integrate turndown library in Cleaner (HTML to Markdown)
+- [x] T025 [US1] Integrate marked library in Cleaner (Markdown to HTML)
+- [x] T026 [P] [US1] Implement WXRGenerator service in src/services/wxrGenerator.ts (build WXR XML structure)
+- [x] T027 [US1] Implement addPost method in WXRGenerator (add post to WXR with categories/tags)
+- [x] T028 [US1] Implement finalize method in WXRGenerator (write WXR to file)
 - [ ] T029 [P] [US1] Implement PostProcessor in src/workers/postProcessor.ts (per-post pipeline orchestration)
 - [ ] T030 [US1] Integrate all services in PostProcessor (fetch → parse → clean → add to WXR)
 - [ ] T031 [US1] Implement CLI entry point in src/cli.ts (load config, start crawler, manage processing)
@@ -144,16 +144,21 @@ Final improvements and validation.
 ## Execution Strategy
 
 ### MVP (Minimum Viable Product)
+
 Complete through **Phase 3 (User Story 1)** for basic migration functionality.
+
 - Tasks: T001-T032 (32 tasks)
 - Deliverable: Working CLI that migrates Tistory posts to WXR
 
 ### Full Feature Set
+
 Complete all phases (1-7) for production-ready tool.
+
 - Tasks: T001-T061 (61 tasks)
 - Deliverable: Complete migration tool with all features
 
 ### Parallel Execution Opportunities
+
 - **Phase 1 (Setup)**: T003-T008 can run in parallel
 - **Phase 2 (Foundational)**: T011-T019 (models) can run in parallel
 - **Phase 3**: T020, T023, T026, T029 can start in parallel
@@ -167,6 +172,7 @@ Complete all phases (1-7) for production-ready tool.
 ## Dependencies
 
 ### Phase Dependencies
+
 ```
 Phase 1 (Setup)
     ↓
@@ -181,6 +187,7 @@ Phase 7 (Polish)
 ```
 
 ### Critical Path (Sequential)
+
 1. Setup (T001-T002)
 2. Core models (T009-T019)
 3. Basic services (T020-T032)
