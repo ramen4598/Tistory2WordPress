@@ -2,7 +2,7 @@ import { MigrationJobStatus, MigrationJobType } from '../enums/db.enum';
 
 /**
  * Represents a single migration run (e.g., full blog or single post).
- * Mirrors the `migration_jobs` table in SQLite.
+ * Mirrors `migration_jobs` table in SQLite.
  */
 export interface MigrationJob {
   id: number;

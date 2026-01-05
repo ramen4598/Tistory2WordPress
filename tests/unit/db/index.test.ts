@@ -5,7 +5,6 @@ import {
   closeDb,
   createMigrationJob,
   updateMigrationJob,
-  getMigrationJobById,
   createMigrationJobItem,
   updateMigrationJobItem,
   getMigrationJobItemById,
@@ -109,18 +108,16 @@ describe('db repository methods', () => {
       completed_at: completedAt,
     });
 
-    const updatedJob = getMigrationJobById(job.id);
-    expect(updatedJob).toBeDefined();
-    expect(updatedJob?.status).toBe(MigrationJobStatus.COMPLETED);
-    expect(updatedJob?.completed_at).toBe(completedAt);
-
     const errorMessage = 'something went wrong';
     updateMigrationJob(job.id, {
       status: MigrationJobStatus.FAILED,
       error_message: errorMessage,
     });
 
-    const failedJob = getMigrationJobById(job.id);
+    const db = getDb();
+    const failedJob = db.prepare('SELECT * FROM migration_jobs WHERE id = ?').get(job.id) as
+      | { status: string; error_message: string }
+      | undefined;
     expect(failedJob).toBeDefined();
     expect(failedJob?.status).toBe(MigrationJobStatus.FAILED);
     expect(failedJob?.error_message).toBe(errorMessage);

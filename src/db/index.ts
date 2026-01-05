@@ -131,18 +131,6 @@ export function updateMigrationJob(
 }
 
 /**
- * Get a migration job by ID.
- * @param id number
- * @return MigrationJob | undefined
- */
-export function getMigrationJobById(id: number): MigrationJob | undefined {
-  const db = getDb();
-  return db.prepare('SELECT * FROM migration_jobs WHERE id = ?').get(id) as
-    | MigrationJob
-    | undefined;
-}
-
-/**
  * Get the most recent running migration job of a given type.
  * @param jobType MigrationJobType
  * @return MigrationJob | undefined

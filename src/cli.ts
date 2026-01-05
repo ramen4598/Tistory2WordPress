@@ -38,8 +38,8 @@ function hasFlag(argv: string[], flag: string): boolean {
 }
 
 function printUsage(): void {
-  // Keep it simple; tests shouldn’t depend on output.
-  console.log('Usage: ts-node src/cli.ts [--post <tistory_post_url> | --all]');
+  // Keep it simple; tests shouldn't depend on output.
+  console.log('Usage: ts-node src/cli.ts [--post <tistory_post_url> | --all] [--retry-failed]');
 }
 
 export async function runCli(argv: string[]): Promise<number> {
@@ -57,6 +57,7 @@ export async function runCli(argv: string[]): Promise<number> {
 
   const postUrl = getArgValue(argv, '--post');
   const allFlag = hasFlag(argv, '--all');
+  const retryFailedFlag = hasFlag(argv, '--retry-failed');
 
   if (!postUrl && !allFlag) {
     printUsage();
@@ -101,21 +102,30 @@ export async function runCli(argv: string[]): Promise<number> {
       );
       const failedUrls = new Set(failedItems.map((item) => item.tistory_url));
 
-      const pendingUrls = allUrls.filter((url) => !completedUrls.has(url) && !failedUrls.has(url));
+      const pendingUrls = retryFailedFlag
+        ? allUrls.filter((url) => !completedUrls.has(url))
+        : allUrls.filter((url) => !completedUrls.has(url) && !failedUrls.has(url));
+
       const skippedCount = allUrls.length - pendingUrls.length;
 
       if (skippedCount > 0) {
-        logger.info(`Resuming job ${job.id}: skipping ${skippedCount} completed/failed items`, {
-          completedCount: completedUrls.size,
-          failedCount: failedUrls.size,
-          pendingCount: pendingUrls.length,
-        });
+        logger.info(
+          `Resuming job ${job.id}: skipping ${skippedCount} ${retryFailedFlag ? 'completed' : 'completed/failed'} items`,
+          {
+            completedCount: completedUrls.size,
+            failedCount: failedUrls.size,
+            pendingCount: pendingUrls.length,
+            retryFailed: retryFailedFlag,
+          }
+        );
       }
 
       const processor = createPostProcessor();
       await processor.process(pendingUrls, job.id);
 
-      return await finalizeJob(job.id);
+      return await finalizeJob(job.id, {
+        skippedCount,
+      });
     }
 
     return 0;
@@ -127,10 +137,12 @@ export async function runCli(argv: string[]): Promise<number> {
   }
 }
 
-async function finalizeJob(jobId: number): Promise<number> {
+async function finalizeJob(jobId: number, metrics?: { skippedCount: number }): Promise<number> {
   const items = getMigrationJobItemsByJobId(jobId);
   const completed = items.filter((item) => item.status === MigrationJobItemStatus.COMPLETED).length;
   const failed = items.filter((item) => item.status === MigrationJobItemStatus.FAILED).length;
+  const processed = completed + failed;
+  const skipped = metrics?.skippedCount ?? 0;
 
   const jobResult: Partial<Pick<MigrationJob, 'status' | 'completed_at' | 'error_message'>> = {
     completed_at: new Date().toISOString(),
@@ -139,12 +151,21 @@ async function finalizeJob(jobId: number): Promise<number> {
   };
   await updateMigrationJob(jobId, jobResult);
 
+  const config = loadConfig();
+
   console.log('');
   console.log('----------------------------------------');
   console.log(`- Migration Job Summary (jobId=${jobId})`);
   console.log('----------------------------------------');
+  console.log(`- Detected : ${items.length}`);
+  if (skipped > 0) {
+    console.log(`- Skipped: ${skipped}`);
+  }
   console.log(`- Completed: ${completed}`);
   console.log(`- Failed: ${failed}`);
+  console.log(`- Total processed: ${processed}`);
+  console.log(`- Database: ${config.migrationDbPath}`);
+  console.log(`- Internal links: stored in 'internal_links' table (jobId=${jobId})`);
   console.log('----------------------------------------');
 
   return failed > 0 ? 1 : 0;
