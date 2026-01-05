@@ -90,27 +90,27 @@ describe('CLI --post', () => {
     const code = await runCli(['node', 'cli', '--post=https://example.com/post/2']);
     expect(code).toBe(1);
   });
+});
+
+describe('CLI --all', () => {
+  beforeEach(() => {
+    jest.resetModules();
+  });
 
   it('runs full blog migration with --all bootstrap', async () => {
     const discoverPostUrls = jest
       .fn()
       .mockResolvedValue(['https://example.com/post/1', 'https://example.com/post/2']);
-    const migratePostByUrl = jest.fn().mockResolvedValue(undefined);
+    const process = jest.fn();
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
     jest.doMock('../../src/utils/config', () => ({
-      loadConfig: jest.fn().mockReturnValue({ blogUrl: 'https://example.com' }),
+      loadConfig: jest.fn().mockReturnValue({ blogUrl: 'https://example.com', workerCount: 7 }),
     }));
 
     jest.doMock('../../src/db', () => ({
       getDb: jest.fn(),
       createMigrationJob: jest.fn().mockReturnValue({ id: 999 }),
-      createMigrationJobItem: jest.fn().mockImplementation((input) => ({
-        id: Math.random(),
-        job_id: input.job_id,
-        tistory_url: input.tistory_url,
-        status: 'running',
-      })),
       getMigrationJobItemsByJobId: jest.fn().mockReturnValue([
         { id: 1, job_id: 999, tistory_url: 'https://example.com/post/1', status: 'completed' },
         { id: 2, job_id: 999, tistory_url: 'https://example.com/post/2', status: 'completed' },
@@ -123,7 +123,11 @@ describe('CLI --post', () => {
     }));
 
     jest.doMock('../../src/services/migrator', () => ({
-      createMigrator: jest.fn().mockReturnValue({ migratePostByUrl }),
+      createMigrator: jest.fn().mockReturnValue({}),
+    }));
+
+    jest.doMock('../../src/workers/postProcessor', () => ({
+      createPostProcessor: jest.fn().mockReturnValue({ process }),
     }));
 
     const { runCli } = await import('../../src/cli');
@@ -133,9 +137,15 @@ describe('CLI --post', () => {
     expect(code).toBe(0);
 
     const db = await import('../../src/db');
+    const postProcessor = await import('../../src/workers/postProcessor');
     expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.FULL);
     expect(discoverPostUrls).toHaveBeenCalled();
-    expect(migratePostByUrl).toHaveBeenCalledTimes(2);
+    expect(postProcessor.createPostProcessor).toHaveBeenCalledWith(7);
+    expect(process).toHaveBeenCalledWith(
+      ['https://example.com/post/1', 'https://example.com/post/2'],
+      999
+    );
+    expect(db.getMigrationJobItemsByJobId).toHaveBeenCalledWith(999);
 
     logSpy.mockRestore();
   });

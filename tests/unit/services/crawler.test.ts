@@ -1,30 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { loadConfig } from '../../../src/utils/config';
 import { createCrawler } from '../../../src/services/crawler';
+import { baseConfig } from '../helpers/baseConfig';
 
 jest.mock('../../../src/utils/config');
 
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
 describe('Crawler service', () => {
-  const blogUrl = 'https://myblog.tistory.com';
+  const blogUrl = baseConfig.blogUrl;
 
   beforeEach(() => {
-    mockedLoadConfig.mockReturnValue({
-      blogUrl,
-      workerCount: 4,
-      rateLimitPerWorker: 1000,
-      outputDir: './output',
-      downloadsDir: './output/downloads',
-      logLevel: 'info',
-      postTitleSelector: 'meta[name="title"]',
-      postPublishDateSelector: 'meta[property="article:published_time"]',
-      postModifiedDateSelector: 'meta[property="article:modified_time"]',
-      postCategorySelector: 'div.another_category h4 a',
-      postTagSelector: 'div.area_tag a[rel="tag"]',
-      postListLinkSelector: 'a.link_category',
-      categoryHierarchyOrder: 'first-is-parent',
-    } as any);
+    mockedLoadConfig.mockReturnValue(baseConfig);
   });
 
   afterEach(() => {

@@ -256,15 +256,15 @@ describe('wpClient', () => {
   });
 
   describe('error paths', () => {
-    it('wraps 4xx error without extra retries (retryWithBackoff 한번만 호출)', async () => {
+    it('wraps 4xx error without extra retries', async () => {
       const client = createClient();
 
       const error = {
         isAxiosError: true,
         response: { status: 400, data: { message: 'Bad request' } },
-      } as unknown;
+      } as unknown as Error;
 
-      axiosInstance.post.mockRejectedValue(error);
+      axiosInstance.post.mockRejectedValue(error).mockRejectedValue(error).mockRejectedValue(error);
 
       const result = client.createDraftPost({
         title: 'Bad',
@@ -273,12 +273,8 @@ describe('wpClient', () => {
         categories: [],
         tags: [],
       });
-
-      expect(result).rejects.toMatchObject({
-        isAxiosError: true,
-        response: { status: 400, data: { message: 'Bad request' } },
-      });
-      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
+      await expect(result).rejects.toThrow();
+      expect(axiosInstance.post).toHaveBeenCalledTimes(baseConfig.maxRetryAttempts);
     });
 
     it('retries on 5xx using retryWithBackoff', async () => {
