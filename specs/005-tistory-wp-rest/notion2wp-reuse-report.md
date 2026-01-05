@@ -179,7 +179,7 @@
     - 날짜: Tistory 발행/수정일 유지
     - 분류: categories, tags, featured_media 등
   - DB에 **Tistory URL ↔ WP Post ID 매핑 테이블** 업데이트
-  - DB의 JobItem 상태를 `Success`로 갱신
+  - DB의 JobItem 상태를 `Completed`로 갱신
   - 내부 링크 매핑은 별도 테이블/칼럼으로 관리 (`link_mapping` 테이블 등)
 
 - 전체 블로그 모드 (`--all`)에서는

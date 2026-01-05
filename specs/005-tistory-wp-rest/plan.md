@@ -158,7 +158,7 @@ High-level flow:
      - Build mapping from original image URL → WordPress media URL and rewrite content.
      - Ensure categories/tags exist in WordPress (find-or-create via REST), cache IDs.
      - Create WordPress draft post with content, dates, taxonomy, and featured media.
-     - Update DB job item row with `wp_post_id`, status `Success`.
+     - Update DB job item row with `wp_post_id`, status `Completed`.
    - If any step fails after media/post creation:
      - Trigger rollback: delete uploaded media/post via REST and mark job item `Failed` with error details.
 6. At the end (or incrementally), export `link_mapping.json` from DB if desired and update overall job metrics.
@@ -264,9 +264,12 @@ Responsibilities:
   - Download each image into memory (axios `responseType: 'arraybuffer'`).
   - Compute filename based on original filename + hash, infer extension from `content-type`.
   - Call `wpClient.uploadMedia` with the in-memory buffer.
-  - Insert/update `ImageAsset` rows in DB with status (`Pending` → `Uploaded`/`Failed`).
+  - Insert/update `ImageAsset` rows in DB with status (`pending` → `uploaded`/`failed`).
+  - Insert/update `MigrationJobItem` rows in DB with status (`running` → `completed`/`failed`).
+
   - Build a mapping from original image URL → WordPress media URL.
   - Apply URL replacements to `post.cleaned_html`.
+
 - API:
   - `processImagesForPost(post, context): Promise<{ updatedPost; uploadedMediaIds: number[]; }>`.
     - `context` includes `jobItemId` for DB linkage.
@@ -281,7 +284,7 @@ Responsibilities:
 - Orchestrate the per-post migration pipeline with rollback:
   - `migratePostByUrl(url: string, jobId: number): Promise<void>`.
 - Steps per post:
-  1. Create `migration_job_item` in DB (status: `Pending`).
+  1. Create `migration_job_item` in DB (status: `Running`).
   2. Fetch HTML from Tistory with `crawler`.
   3. Parse metadata and construct `Post` model.
   4. Clean content with `cleaner`.
@@ -290,7 +293,7 @@ Responsibilities:
   7. Resolve categories/tags via `wpClient.ensureCategory/Tag` and map to term IDs.
   8. Call `wpClient.createDraftPost` to create the WordPress draft.
   9. Update DB:
-     - Set JobItem `wp_post_id`, status `Success`, timestamps.
+     - Set JobItem `wp_post_id`, status `Completed`, timestamps.
      - Create post map row (Tistory URL ↔ WP post ID).
 - Rollback:
   - On any error after images or post creation:
@@ -307,7 +310,7 @@ Adaptation from 003:
 - Keep `p-queue`-based worker design and rate limiting.
 - Instead of pushing "add to WXR", workers call `migrator.migratePostByUrl(...)`.
 - Respect DB state:
-  - Before enqueuing URLs, query DB for items already `Success` or `Failed` and skip or re-enqueue according to CLI flags (e.g. `--retry-failed`).
+  - Before enqueuing URLs, query DB for items already `Completed` or `Failed` and skip or re-enqueue according to CLI flags (e.g. `--retry-failed`).
 - Ensure that errors in individual posts:
   - Do not crash the whole job.
   - Are reflected in job/job item counters in DB.

@@ -186,7 +186,7 @@ REST flow uses SQLite to track migration jobs, per-post items, image assets, and
 - `job_id`: integer (FK → `migration_jobs.id`)
 - `tistory_url`: string - Tistory post URL
 - `wp_post_id`: integer | null - WordPress post ID created for this item
-- `status`: string - `pending`, `success`, `failed` (make it as Enum)
+- `status`: string - `running`, `completed`, `failed` (make it as Enum)
 - `error_message`: string | null - Last error encountered during migration
 - `created_at`: datetime
 - `updated_at`: datetime
@@ -287,7 +287,7 @@ Tistory HTML
     ↓
 [WPClient] -> WordPress draft post created (wp_post_id)
     ↓
-[DB] -> MigrationJobItem updated to Success, PostMap row created
+[DB] -> MigrationJobItem updated to Completed, PostMap row created
     ↓
 [CLI] -> Job metrics summarized from DB
 ```

@@ -39,7 +39,7 @@ sequenceDiagram
     end
     Crawler-->>CLI: All post URLs
 
-    CLI->>DB: Query MigrationJobItems (Success/Failed)
+    CLI->>DB: Query MigrationJobItems (Completed/Failed)
     DB-->>CLI: existing job items
     CLI->>CLI: Filter remaining post URLs (to process)
 
@@ -50,7 +50,7 @@ sequenceDiagram
         loop Each assigned post
             WorkerPool->>Migrator: migratePostByUrl(url, jobId)
 
-            Migrator->>DB: Create MigrationJobItem (status=Pending, tistory_url)
+            Migrator->>DB: Create MigrationJobItem (status=Running, tistory_url)
             DB-->>Migrator: jobItemId
 
             Migrator->>Tistory: Fetch post HTML (rate limited)
@@ -74,7 +74,7 @@ sequenceDiagram
             alt Post has images
                 Migrator->>ImageProcessor: Process images(post, jobItemId)
                 loop For each image
-                    ImageProcessor->>DB: Create ImageAsset (status=Pending)
+                    ImageProcessor->>DB: Create ImageAsset (status=pending)
                     ImageProcessor->>Tistory: Download image (rate limited)
                     Tistory-->>ImageProcessor: Image bytes
                     ImageProcessor->>WPClient: Upload media (buffer)
@@ -99,7 +99,7 @@ sequenceDiagram
             WordPress-->>WPClient: Post ID
             WPClient-->>Migrator: Post ID
 
-            Migrator->>DB: Update MigrationJobItem (wp_post_id, status=Success)
+            Migrator->>DB: Update MigrationJobItem (wp_post_id, status=completed)
             Migrator->>DB: Insert PostMap (tistory_url, wp_post_id)
         end
     end
@@ -137,7 +137,7 @@ sequenceDiagram
 
     CLI->>Migrator: migratePostByUrl(URL, jobId)
 
-    Migrator->>DB: Create MigrationJobItem (Pending)
+    Migrator->>DB: Create MigrationJobItem (Running)
     DB-->>Migrator: jobItemId
 
     Migrator->>Tistory: Fetch post HTML
@@ -163,7 +163,7 @@ sequenceDiagram
     alt Post has images
         Migrator->>ImageProcessor: Process images(post, jobItemId)
         loop For each image
-            ImageProcessor->>DB: Create ImageAsset (Pending)
+            ImageProcessor->>DB: Create ImageAsset (pending)
             ImageProcessor->>Tistory: Download image
             Tistory-->>ImageProcessor: Image bytes
             ImageProcessor->>WPClient: Upload media
@@ -186,7 +186,7 @@ sequenceDiagram
     WordPress-->>WPClient: Post ID
     WPClient-->>Migrator: Post ID
 
-    Migrator->>DB: Update MigrationJobItem (wp_post_id, status=Success)
+    Migrator->>DB: Update MigrationJobItem (wp_post_id, status=completed)
     Migrator->>DB: Insert PostMap (tistory_url, wp_post_id)
     Migrator-->>CLI: Post migrated successfully
 
@@ -268,11 +268,11 @@ sequenceDiagram
     CLI->>Crawler: Discover all post URLs
     Crawler-->>CLI: all_post_urls
 
-    CLI->>CLI: remaining = all_post_urls - Success items (and optionally Failed if not retrying)
+    CLI->>CLI: remaining = all_post_urls - Completed items (and optionally Failed if not retrying)
     CLI->>WorkerPool: Enqueue remaining URLs with jobId
 
     loop For each URL in remaining
-        WorkerPool->>DB: On success, set MigrationJobItem.status = Success
+        WorkerPool->>DB: On success, set MigrationJobItem.status = completed
         WorkerPool->>DB: On failure, set status = Failed, error_message
     end
 

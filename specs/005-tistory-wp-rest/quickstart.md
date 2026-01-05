@@ -66,7 +66,7 @@ node dist/cli.js --all
 Behavior:
 
 - Crawls all posts from `TISTORY_BLOG_URL` with pagination.
-- Uses SQLite (`migration.db`) to skip posts whose `MigrationJobItem.status` is already `Success` (and, depending on flags, optionally `Failed`).
+- Uses SQLite (`migration.db`) to skip posts whose `MigrationJobItem.status` is already `Completed` (and, depending on flags, optionally `Failed`).
 - Processes posts in parallel using a worker pool while respecting `RATE_LIMIT_PER_WORKER`.
 
 Outputs:
@@ -86,7 +86,7 @@ If the process is interrupted or some posts fail:
 1. Inspect logs to identify error types (network, auth, parsing, etc.).
 2. Fix configuration or connectivity issues (e.g., wrong credentials, base URL).
 3. Re-run the same command (`--post` or `--all`).
-   - The tool will consult SQLite (`migration_job_items.status`) and skip items already marked `Success`.
+   - The tool will consult SQLite (`migration_job_items.status`) and skip items already marked `Completed`.
    - Depending on CLI flags (e.g. `--retry-failed`), it may re-attempt items marked `Failed`.
 
 You can also inspect the `migration_jobs`, `migration_job_items`, and `migration_image_assets` tables in `migration.db` to understand which posts or images failed and why.

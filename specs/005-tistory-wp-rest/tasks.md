@@ -49,7 +49,7 @@
 - [x] T222 [US1] Wire migrator with crawler/cleaner/linkTracker/imageProcessor/wpClient interactions per sequence diagram.
 - [x] T223 [US1] Persist job item lifecycle + failure reasons in SQLite during migration/rollback.
 - [ ] T224 [P] [US1] Add CLI option `--post` for single URL and connect to migrator + DB bootstrap.
-- [ ] T225 [US1] Export rollback-safe summary from CLI (success/failure metrics, job IDs).
+- [ ] T225 [US1] Export rollback-safe summary from CLI (completed/failed metrics, job IDs).
 - [x] T226 [US1] Update `tests/unit/WXRGenerator-utils.test.ts` (or new suites) to stub crawler output for REST mode. WXRGenerator is not used, so this task is not needed. Skipped.
 - [ ] T227 [US1] Document single-post smoke test flow in `quickstart.md` & plan checklist updates.
 
@@ -71,7 +71,7 @@
 - [ ] T234 [US2] Implement job bootstrap in CLI for `--all` (create migration_job rows, filter completed job items).
 - [ ] T235 [P] [US2] Adapt `src/workers/postProcessor.ts` to enqueue per-post tasks via migrator with concurrency controls.
 - [ ] T236 [US2] Integrate rate limit + concurrency settings from config into worker pool.
-- [ ] T237 [US2] Implement resume logic (skip success, optional retry failed) backed by SQLite job items.
+- [ ] T237 [US2] Implement resume logic (skip completed, optional retry failed) backed by SQLite job items.
 - [ ] T238 [US2] Aggregate job metrics (processed, skipped, failed, duration) and persist to job table.
 - [ ] T239 [US2] Add CLI summary output for bulk runs including DB paths + link dump hints.
 - [ ] T240 [US2] Implement optional `--retry-failed` flag controlling job item selection.
@@ -121,7 +121,7 @@
 
 - [ ] T270 [P] Update `specs/005-tistory-wp-rest/checklists/requirements.md` to trace task coverage.
 - [ ] T271 [P] Ensure quickstart + README instructions match final CLI flags.
-- [ ] T272 [P] Run end-to-end dry run against fixtures (no live WordPress) verifying success metrics.
+- [ ] T272 [P] Run end-to-end dry run against fixtures (no live WordPress) verifying completed/failed metrics.
 - [ ] T273 [P] Conduct performance test (100-post fixture) to validate concurrency benefits.
 - [ ] T274 [P] Final review for non-scope items (comments, attachments) to confirm excluded paths remain disabled.
 - [ ] T275 Close feature by updating `progress.json` and preparing for implementation handoff.
