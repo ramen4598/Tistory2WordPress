@@ -48,7 +48,7 @@
 - [x] T221 [US1] Build `src/services/migrator.ts` orchestrating per-post pipeline + rollback support.
 - [x] T222 [US1] Wire migrator with crawler/cleaner/linkTracker/imageProcessor/wpClient interactions per sequence diagram.
 - [x] T223 [US1] Persist job item lifecycle + failure reasons in SQLite during migration/rollback.
-- [ ] T224 [P] [US1] Add CLI option `--post` for single URL and connect to migrator + DB bootstrap.
+- [x] T224 [P] [US1] Add CLI option `--post` for single URL and connect to migrator + DB bootstrap.
 - [ ] T225 [US1] Export rollback-safe summary from CLI (completed/failed metrics, job IDs).
 - [x] T226 [US1] Update `tests/unit/WXRGenerator-utils.test.ts` (or new suites) to stub crawler output for REST mode. WXRGenerator is not used, so this task is not needed. Skipped.
 - [ ] T227 [US1] Document single-post smoke test flow in `quickstart.md` & plan checklist updates.
