@@ -80,7 +80,8 @@ export function loadConfig(): Config {
   const wpAppUser: string | undefined = process.env['WP_APP_USER'];
   const wpAppPassword: string | undefined = process.env['WP_APP_PASSWORD'];
 
-  const migrationDbPath: string = process.env['MIGRATION_DB_PATH'] || DEFAULT_CONFIG.MIGRATION_DB_PATH;
+  const migrationDbPath: string =
+    process.env['MIGRATION_DB_PATH'] || DEFAULT_CONFIG.MIGRATION_DB_PATH;
 
   const maxRetryAttempts: number = process.env['MAX_RETRY_ATTEMPTS']
     ? parseInt(process.env['MAX_RETRY_ATTEMPTS'], 10)
@@ -99,7 +100,8 @@ export function loadConfig(): Config {
   // Load required CSS selectors for post metadata
   const postTitleSelector: string | undefined = process.env['TISTORY_SELECTOR_TITLE'];
   const postPublishDateSelector: string | undefined = process.env['TISTORY_SELECTOR_PUBLISH_DATE'];
-  const postModifiedDateSelector: string | undefined = process.env['TISTORY_SELECTOR_MODIFIED_DATE'];
+  const postModifiedDateSelector: string | undefined =
+    process.env['TISTORY_SELECTOR_MODIFIED_DATE'];
   const postCategorySelector: string | undefined = process.env['TISTORY_SELECTOR_CATEGORY'];
   const postTagSelector: string | undefined = process.env['TISTORY_SELECTOR_TAG'];
   const postListLinkSelector: string | undefined = process.env['TISTORY_SELECTOR_POST_LINK'];

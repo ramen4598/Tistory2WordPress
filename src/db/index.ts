@@ -8,7 +8,7 @@ import type { MigrationJobItem } from '../models/MigrationJobItem';
 import type { ImageAsset } from '../models/ImageAsset';
 import type { PostMap } from '../models/PostMap';
 import type { InternalLinkRecord } from '../models/InternalLinkRecord';
-// eslint-disable-next-line prettier/prettier
+
 import {
   ImageAssetStatus,
   MigrationJobItemStatus,
@@ -396,8 +396,8 @@ export function insertInternalLink(
     record.job_item_id,
     record.source_url,
     record.target_url,
-    record.link_text ?? null,
-    record.context ?? null
+    record.link_text?.trim() ?? null,
+    record.context?.trim() ?? null
   );
   const id = Number(info.lastInsertRowid);
 

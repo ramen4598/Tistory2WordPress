@@ -43,7 +43,7 @@ export function createImageProcessor(wpc?: WpClient): ImageProcessor {
     return mimeToExt[mimeType] || 'bin';
   };
 
-  const makeFileName = (post: Post, index: number,mimeType: string): string => {
+  const makeFileName = (post: Post, index: number, mimeType: string): string => {
     // Make a safe file name based on post title and index
     const safeTitle = post.title
       .toLowerCase()

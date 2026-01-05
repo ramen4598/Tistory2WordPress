@@ -266,7 +266,7 @@ export const createWxrGenerator = (options: WxrGeneratorOptions = {}): WxrGenera
       item.ele('wp:post_password').txt('').up();
       item.ele('wp:is_sticky').txt('0').up();
 
-      post.categories.forEach(cat => {
+      post.categories.forEach((cat) => {
         item
           .ele('category', {
             domain: 'category',
@@ -276,7 +276,7 @@ export const createWxrGenerator = (options: WxrGeneratorOptions = {}): WxrGenera
           .up();
       });
 
-      post.tags.forEach(tag => {
+      post.tags.forEach((tag) => {
         item
           .ele('category', {
             domain: 'post_tag',
