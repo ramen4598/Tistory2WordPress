@@ -30,6 +30,31 @@ export function createImageProcessor(wpc?: WpClient): ImageProcessor {
   const logger = getLogger();
   const wpClient = wpc ?? createWpClient();
 
+  const getExtensionFromMimeType = (mimeType: string): string => {
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/gif': 'gif',
+      'image/webp': 'webp',
+      'image/svg+xml': 'svg',
+      'image/bmp': 'bmp',
+      'image/tiff': 'tiff',
+    };
+    return mimeToExt[mimeType] || 'bin';
+  };
+
+  const makeFileName = (post: Post, index: number,mimeType: string): string => {
+    // Make a safe file name based on post title and index
+    const safeTitle = post.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric characters with hyphens
+      .replace(/^-+|-+$/g, '') // Trim leading/trailing hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with a single hyphen
+      .substring(0, 15); // Limit length to 15 characters
+    const extension = getExtensionFromMimeType(mimeType);
+    return `${safeTitle}-image-${index + 1}.${extension}`;
+  };
+
   const processImagesForPost = async (
     post: Post,
     context: ImageProcessorContext
@@ -76,14 +101,7 @@ export function createImageProcessor(wpc?: WpClient): ImageProcessor {
 
         const buffer = Buffer.from(response.data as ArrayBuffer);
         const mimeType = response.headers['content-type'] || 'application/octet-stream';
-
-        // const fileName = post.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '').append(`-image-${i + 1}`);
-        const fileName = post.title
-          .toLowerCase()
-          .replace(/\s+/g, '-') // replace multiple spaces with single hyphen
-          .replace(/[^a-z0-9\-]/g, '') // keep a-z, 0-9, hyphen and remove others
-          .substring(0, 20) // limit length
-          .concat(`-image-${i + 1}`); // append image index
+        const fileName = makeFileName(post, i, mimeType);
 
         const uploadResult = await wpClient.uploadMedia({
           fileName,

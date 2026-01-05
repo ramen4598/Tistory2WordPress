@@ -97,7 +97,7 @@ describe('imageProcessor', () => {
 
     expect(uploadMediaMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        fileName: 'test-post-image-1',
+        fileName: 'test-post-image-1.jpg',
         mimeType: 'image/jpeg',
         buffer: expect.any(Buffer),
         altText: 'one',
@@ -224,7 +224,7 @@ describe('imageProcessor', () => {
     expect(uploadMediaMock).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        fileName: 'test-post-image-1',
+        fileName: 'test-post-image-1.jpg',
         mimeType: 'image/jpeg',
         buffer: expect.any(Buffer),
         altText: 'first',
@@ -233,7 +233,7 @@ describe('imageProcessor', () => {
     expect(uploadMediaMock).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
-        fileName: 'test-post-image-2',
+        fileName: 'test-post-image-2.png',
         mimeType: 'image/png',
         buffer: expect.any(Buffer),
         altText: 'second',
@@ -242,7 +242,7 @@ describe('imageProcessor', () => {
     expect(uploadMediaMock).toHaveBeenNthCalledWith(
       3,
       expect.objectContaining({
-        fileName: 'test-post-image-3',
+        fileName: 'test-post-image-3.gif',
         mimeType: 'image/gif',
         buffer: expect.any(Buffer),
         altText: 'third',
