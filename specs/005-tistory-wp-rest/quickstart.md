@@ -197,7 +197,105 @@ Internal Tistory links still point to old Tistory URLs. Use `link_mapping.json` 
 - Search/replace `https://your-blog.tistory.com/` with new WordPress base URL
 - Verify that link text and context in `link_mapping.json` help identify which links need attention
 
-## 9. Relation to Existing 003 (WXR) Tool
+## 9. Performance Tuning
+
+### 9.1 Adjusting Worker Count
+
+`WORKER_COUNT` controls how many posts are processed concurrently.
+
+- **Default: 4 workers**
+- **Range: 1-16 workers**
+- **When to increase:**
+  - Fast network and server response times
+  - Large number of posts (> 100)
+  - Testing/staging environments
+- **When to decrease:**
+  - Slow WordPress server
+  - Rate limiting from WordPress or Tistory
+  - Limited system resources
+
+**Example configurations:**
+
+```bash
+# Conservative (production with slow server)
+WORKER_COUNT=2
+RATE_LIMIT_PER_WORKER=2000
+
+# Balanced (default)
+WORKER_COUNT=4
+RATE_LIMIT_PER_WORKER=1000
+
+# Aggressive (testing with fast server)
+WORKER_COUNT=8
+RATE_LIMIT_PER_WORKER=500
+```
+
+### 9.2 Rate Limiting Best Practices
+
+The `RATE_LIMIT_PER_WORKER` setting works with `WORKER_COUNT`:
+
+- **Total requests/second = WORKER_COUNT × (1000 / RATE_LIMIT_PER_WORKER)**
+- Example: `WORKER_COUNT=4` + `RATE_LIMIT_PER_WORKER=1000` = 4 requests/second
+
+**Guidelines:**
+
+1. **Start conservative** (1000-2000ms per worker)
+2. **Monitor logs** for rate limit errors (HTTP 429)
+3. **Adjust incrementally** until optimal
+4. **Consider server load** - too aggressive may cause failures
+
+**Common scenarios:**
+
+- **Shared hosting**: Use lower values (WORKER_COUNT=2-4, RATE_LIMIT_PER_WORKER=1500-2000)
+- **Dedicated server**: Can use higher values (WORKER_COUNT=4-8, RATE_LIMIT_PER_WORKER=500-1000)
+- **Tistory rate limits**: If you see HTTP 429 from Tistory, increase `RATE_LIMIT_PER_WORKER`
+
+### 9.3 Retry Configuration
+
+Retry settings help handle transient failures:
+
+```bash
+# Maximum number of retry attempts per request
+MAX_RETRY_ATTEMPTS=3  # default: 3
+
+# Initial delay before first retry (milliseconds)
+RETRY_INITIAL_DELAY_MS=500  # default: 500
+
+# Maximum delay between retries (milliseconds)
+RETRY_MAX_DELAY_MS=10000  # default: 10000
+
+# Backoff multiplier (delay = previous_delay * multiplier)
+RETRY_BACKOFF_MULTIPLIER=2  # default: 2
+```
+
+**When to adjust:**
+
+- **Unreliable network**: Increase `MAX_RETRY_ATTEMPTS` to 5-10
+- **Fast recovery**: Decrease `RETRY_INITIAL_DELAY_MS` to 100-300
+- **Long operations**: Increase `RETRY_MAX_DELAY_MS` to 15000-30000
+
+### 9.4 Troubleshooting Performance Issues
+
+**Migration is slow:**
+
+1. Check `WORKER_COUNT` - increase if network and server are fast
+2. Check `RATE_LIMIT_PER_WORKER` - decrease if no rate limiting errors
+3. Monitor CPU/memory usage - decrease if hitting limits
+
+**Getting rate limit errors:**
+
+1. Look for HTTP 429 status codes in logs
+2. Increase `RATE_LIMIT_PER_WORKER` (slower requests)
+3. Decrease `WORKER_COUNT` (fewer concurrent requests)
+
+**High failure rate:**
+
+1. Check network connectivity
+2. Verify WordPress credentials and permissions
+3. Review logs for specific error messages
+4. Increase retry settings if errors are transient
+
+## 10. Relation to Existing 003 (WXR) Tool
 
 - 003 (`Tistory WXR Generator`) try to produces a WXR XML file for import. But aborted. Cause there is a problem to handle media properly.
 - 005 (`Tistory → WordPress REST Migration`) pushes content directly into WordPress via REST.
