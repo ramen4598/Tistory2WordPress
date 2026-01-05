@@ -35,24 +35,49 @@ npm run build
 
 ## 5. Run a Single-Post Migration (Smoke Test)
 
-Use a known Tistory post URL to verify the pipeline end-to-end:
+This is the recommended first run: migrate a single known Tistory post URL end-to-end.
+
+### 5.1 Environment variables
+
+Create a `.env` file. See `.env.example` for reference.
+
+### 5.2 Run
 
 ```bash
-# Example: ts-node entry (exact command may vary once CLI is wired)
 npx ts-node src/cli.ts --post="https://your-blog.tistory.com/123"
-# Not using ts-node? Use built build output:
+# Or, if built:
 node dist/cli.js --post="https://your-blog.tistory.com/123"
 ```
 
-Expected results:
+### 5.3 What to expect
 
-- A new draft post appears in your WordPress admin with:
+- The command prints a summary at the end:
+  - `Migration Job Summary (jobId=...)`
+  - `- Completed: <N>`
+  - `- Failed: <M>`
+- A new draft post appears in WordPress admin with:
   - Correct title/content.
   - Categories/tags approximating the Tistory structure.
-  - Images stored in the WordPress media library and rendered correctly.
+  - Images uploaded to WordPress media library and rendered correctly.
   - Original publish date (and modified date if available).
-- SQLite DB (e.g. `migration.db`) updated with a `MigrationJob` + `MigrationJobItem` row for the processed URL.
-- `output/link_mapping.json` contains internal link records if the post had internal links (exported from DB).
+- SQLite DB at `MIGRATION_DB_PATH` is updated with:
+  - A `migration_jobs` row for the run
+  - A `migration_job_items` row for the post URL
+
+### 5.4 Rollback smoke check
+
+To confirm rollback behavior is working:
+
+- Intentionally trigger a failure (common ways):
+  - Use an invalid `WP_APP_PASSWORD`, or
+  - Temporarily point `WP_BASE_URL` to a non-WordPress server
+- Re-run the same `--post` command.
+
+Expected behavior:
+
+- The CLI exits with non-zero status when `Failed > 0`.
+- Any created WordPress resources during the failed attempt (post and/or media) are deleted.
+- `migration_job_items.status` is set to `Failed` with a stored failure reason.
 
 ## 6. Run Full-Blog Migration
 

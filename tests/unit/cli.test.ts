@@ -1,4 +1,4 @@
-import { MigrationJobType } from '../../src/enums/db.enum';
+import { MigrationJobStatus, MigrationJobType } from '../../src/enums/db.enum';
 
 describe('CLI --post', () => {
   beforeEach(() => {
@@ -7,14 +7,23 @@ describe('CLI --post', () => {
 
   it('runs single post migration with job + db bootstrap', async () => {
     const migratePostByUrl = jest.fn().mockResolvedValue(undefined);
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
     jest.doMock('../../src/utils/config', () => ({
       loadConfig: jest.fn().mockReturnValue({}),
     }));
 
+    const updateMigrationJob = jest.fn().mockResolvedValue(undefined);
+
     jest.doMock('../../src/db', () => ({
       getDb: jest.fn(),
       createMigrationJob: jest.fn().mockReturnValue({ id: 123 }),
+      getMigrationJobItemsByJobId: jest
+        .fn()
+        .mockReturnValue([
+          { id: 1, job_id: 123, tistory_url: 'https://example.com/post/1', status: 'completed' },
+        ]),
+      updateMigrationJob,
     }));
 
     jest.doMock('../../src/services/migrator', () => ({
@@ -30,8 +39,22 @@ describe('CLI --post', () => {
     const db = await import('../../src/db');
     expect(db.getDb).toHaveBeenCalledTimes(1);
     expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.SINGLE);
+    expect(db.getMigrationJobItemsByJobId).toHaveBeenCalledWith(123);
 
+    expect(db.updateMigrationJob).toHaveBeenCalledWith(
+      123,
+      expect.objectContaining({
+        status: MigrationJobStatus.COMPLETED,
+        error_message: null,
+      })
+    );
     expect(migratePostByUrl).toHaveBeenCalledWith('https://example.com/post/1', { jobId: 123 });
+
+    expect(logSpy).toHaveBeenCalledWith('Migration Job Summary (jobId=123)');
+    expect(logSpy).toHaveBeenCalledWith('- Completed: 1');
+    expect(logSpy).toHaveBeenCalledWith('- Failed: 0');
+
+    logSpy.mockRestore();
   });
 
   it('returns non-zero when --post is missing', async () => {
@@ -55,6 +78,7 @@ describe('CLI --post', () => {
     jest.doMock('../../src/db', () => ({
       getDb: jest.fn(),
       createMigrationJob: jest.fn().mockReturnValue({ id: 555 }),
+      updateMigrationJob: jest.fn(),
     }));
 
     jest.doMock('../../src/services/migrator', () => ({

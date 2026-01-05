@@ -124,18 +124,6 @@ export function createWpClient(): WpClient {
     fn: () => Promise<T>,
     context: { operation: string; url: string }
   ): Promise<T> {
-    // const wrapped = async () => {
-    //   try {
-    //     return await fn();
-    //   } catch (error) {
-    //     const axiosError = error as AxiosError;
-    //     if (!axiosError.isAxiosError || !isRetryableStatus(axiosError.response?.status)) {
-    //       throw error;
-    //     }
-    //     throw error;
-    //   }
-    // };
-
     return retryWithBackoff(fn, config, {
       onRetry: (error, attempt, delayMs) => {
         logger.warn(
