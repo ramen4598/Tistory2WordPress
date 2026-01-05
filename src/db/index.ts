@@ -142,6 +142,20 @@ export function getMigrationJobById(id: number): MigrationJob | undefined {
     | undefined;
 }
 
+/**
+ * Get the most recent running migration job of a given type.
+ * @param jobType MigrationJobType
+ * @return MigrationJob | undefined
+ */
+export function getLatestRunningJobByType(jobType: MigrationJobType): MigrationJob | undefined {
+  const db = getDb();
+  return db
+    .prepare(
+      'SELECT * FROM migration_jobs WHERE job_type = ? AND status = ? ORDER BY id DESC LIMIT 1'
+    )
+    .get(jobType, MigrationJobStatus.RUNNING) as MigrationJob | undefined;
+}
+
 // --- MigrationJobItem ---
 
 /**
@@ -235,6 +249,22 @@ export function getMigrationJobItemsByJobId(jobId: number): MigrationJobItem[] {
   return db
     .prepare('SELECT * FROM migration_job_items WHERE job_id = ? ORDER BY id')
     .all(jobId) as MigrationJobItem[];
+}
+
+/**
+ * Get migration job items by job ID and status.
+ * @param jobId number
+ * @param status MigrationJobItemStatus
+ * @return MigrationJobItem[]
+ */
+export function getMigrationJobItemsByJobIdAndStatus(
+  jobId: number,
+  status: MigrationJobItemStatus
+): MigrationJobItem[] {
+  const db = getDb();
+  return db
+    .prepare('SELECT * FROM migration_job_items WHERE job_id = ? AND status = ? ORDER BY id')
+    .all(jobId, status) as MigrationJobItem[];
 }
 
 // --- ImageAsset ---

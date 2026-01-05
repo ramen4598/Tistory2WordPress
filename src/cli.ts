@@ -1,6 +1,13 @@
 import { getLogger } from './utils/logger';
 import { loadConfig } from './utils/config';
-import { createMigrationJob, getDb, getMigrationJobItemsByJobId, updateMigrationJob } from './db';
+import {
+  createMigrationJob,
+  getDb,
+  getMigrationJobItemsByJobId,
+  getLatestRunningJobByType,
+  getMigrationJobItemsByJobIdAndStatus,
+  updateMigrationJob,
+} from './db';
 import { MigrationJobItemStatus, MigrationJobStatus, MigrationJobType } from './enums/db.enum';
 import { createMigrator } from './services/migrator';
 import { createCrawler } from './services/crawler';
@@ -69,7 +76,10 @@ export async function runCli(argv: string[]): Promise<number> {
     }
 
     if (allFlag) {
-      const job = createMigrationJob(MigrationJobType.FULL);
+      const job =
+        getLatestRunningJobByType(MigrationJobType.FULL) ??
+        createMigrationJob(MigrationJobType.FULL);
+
       const crawler = createCrawler({
         fetchFn: async (url: string) => {
           const res = await fetch(url);
@@ -77,11 +87,33 @@ export async function runCli(argv: string[]): Promise<number> {
         },
       });
 
-      const urls = await crawler.discoverPostUrls();
-      logger.info('Discovered URLs for full migration', { count: urls.length });
+      const allUrls = await crawler.discoverPostUrls();
+      logger.info('Discovered URLs for full migration', { count: allUrls.length });
+
+      const completedItems = getMigrationJobItemsByJobIdAndStatus(
+        job.id,
+        MigrationJobItemStatus.COMPLETED
+      );
+      const completedUrls = new Set(completedItems.map((item) => item.tistory_url));
+      const failedItems = getMigrationJobItemsByJobIdAndStatus(
+        job.id,
+        MigrationJobItemStatus.FAILED
+      );
+      const failedUrls = new Set(failedItems.map((item) => item.tistory_url));
+
+      const pendingUrls = allUrls.filter((url) => !completedUrls.has(url) && !failedUrls.has(url));
+      const skippedCount = allUrls.length - pendingUrls.length;
+
+      if (skippedCount > 0) {
+        logger.info(`Resuming job ${job.id}: skipping ${skippedCount} completed/failed items`, {
+          completedCount: completedUrls.size,
+          failedCount: failedUrls.size,
+          pendingCount: pendingUrls.length,
+        });
+      }
 
       const processor = createPostProcessor();
-      await processor.process(urls, job.id);
+      await processor.process(pendingUrls, job.id);
 
       return await finalizeJob(job.id);
     }
