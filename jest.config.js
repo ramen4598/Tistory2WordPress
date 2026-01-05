@@ -26,8 +26,8 @@ module.exports = {
     ],
   },
 
-  // Ensure ESM-only dependencies like marked are transformed
-  transformIgnorePatterns: ['/node_modules/(?!(marked)/)'],
+  // Ensure ESM-only dependencies like marked and p-queue (and its sub-deps) are transformed
+  transformIgnorePatterns: ['/node_modules/(?!(marked|p-queue|p-timeout|eventemitter3)/)'],
 
   // Module file extensions
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
