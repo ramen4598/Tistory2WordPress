@@ -50,9 +50,12 @@ describe('CLI --post', () => {
     );
     expect(migratePostByUrl).toHaveBeenCalledWith('https://example.com/post/1', { jobId: 123 });
 
-    expect(logSpy).toHaveBeenCalledWith('Migration Job Summary (jobId=123)');
+    expect(logSpy).toHaveBeenCalledWith('----------------------------------------');
+    expect(logSpy).toHaveBeenCalledWith('- Migration Job Summary (jobId=123)');
+    expect(logSpy).toHaveBeenCalledWith('----------------------------------------');
     expect(logSpy).toHaveBeenCalledWith('- Completed: 1');
     expect(logSpy).toHaveBeenCalledWith('- Failed: 0');
+    expect(logSpy).toHaveBeenCalledWith('----------------------------------------');
 
     logSpy.mockRestore();
   });

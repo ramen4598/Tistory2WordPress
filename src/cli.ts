@@ -108,9 +108,13 @@ async function finalizeJob(jobId: number): Promise<number> {
   };
   await updateMigrationJob(jobId, jobResult);
 
-  console.log(`Migration Job Summary (jobId=${jobId})`);
+  console.log('');
+  console.log('----------------------------------------');
+  console.log(`- Migration Job Summary (jobId=${jobId})`);
+  console.log('----------------------------------------');
   console.log(`- Completed: ${completed}`);
   console.log(`- Failed: ${failed}`);
+  console.log('----------------------------------------');
 
   return failed > 0 ? 1 : 0;
 }
