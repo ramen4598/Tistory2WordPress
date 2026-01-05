@@ -85,7 +85,7 @@
 
 ### Tests (write first)
 
-- [ ] T245 [P] [US3] Add unit tests for linkTracker DB writes + filtering.
+- [x] T245 [P] [US3] Add unit tests for linkTracker DB writes + filtering.
 - [ ] T246 [US3] Add integration test verifying `link_mapping.json` export content.
 
 ### Implementation

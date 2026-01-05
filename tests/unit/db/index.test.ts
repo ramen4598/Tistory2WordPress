@@ -266,4 +266,201 @@ describe('db repository methods', () => {
     const targets = links.map((l) => l.target_url).sort();
     expect(targets).toEqual(['https://example.tistory.com/5', 'https://example.tistory.com/6']);
   });
+
+  it('filters internal links by job item ID when mixed data exists', () => {
+    const job1 = createMigrationJob(MigrationJobType.SINGLE);
+    const item1 = createMigrationJobItem({
+      job_id: job1.id,
+      tistory_url: 'https://example.tistory.com/job1/1',
+    });
+
+    const job2 = createMigrationJob(MigrationJobType.SINGLE);
+    const item2 = createMigrationJobItem({
+      job_id: job2.id,
+      tistory_url: 'https://example.tistory.com/job2/1',
+    });
+
+    insertInternalLink({
+      job_item_id: item1.id,
+      source_url: 'https://example.tistory.com/job1/1',
+      target_url: 'https://example.tistory.com/target1',
+      link_text: 'link1',
+      context: 'context1',
+    });
+
+    insertInternalLink({
+      job_item_id: item1.id,
+      source_url: 'https://example.tistory.com/job1/1',
+      target_url: 'https://example.tistory.com/target2',
+      link_text: 'link2',
+      context: 'context2',
+    });
+
+    insertInternalLink({
+      job_item_id: item2.id,
+      source_url: 'https://example.tistory.com/job2/1',
+      target_url: 'https://example.tistory.com/target3',
+      link_text: 'link3',
+      context: 'context3',
+    });
+
+    const item1Links = getInternalLinksByJobItemId(item1.id);
+    const item2Links = getInternalLinksByJobItemId(item2.id);
+
+    expect(item1Links).toHaveLength(2);
+    expect(item2Links).toHaveLength(1);
+
+    item1Links.forEach((link) => {
+      expect(link.job_item_id).toBe(item1.id);
+    });
+
+    item2Links.forEach((link) => {
+      expect(link.job_item_id).toBe(item2.id);
+    });
+  });
+
+  it('returns empty array for non-existent job item ID', () => {
+    const links = getInternalLinksByJobItemId(999999);
+    expect(links).toEqual([]);
+  });
+
+  it('handles null link_text and context', () => {
+    const job = createMigrationJob(MigrationJobType.SINGLE);
+    const item = createMigrationJobItem({
+      job_id: job.id,
+      tistory_url: 'https://example.tistory.com/5',
+    });
+
+    const link = insertInternalLink({
+      job_item_id: item.id,
+      source_url: 'https://example.tistory.com/5',
+      target_url: 'https://example.tistory.com/6',
+      link_text: null,
+      context: null,
+    });
+
+    expect(link.link_text).toBeNull();
+    expect(link.context).toBeNull();
+
+    const links = getInternalLinksByJobItemId(item.id);
+    expect(links).toHaveLength(1);
+    expect(links[0].link_text).toBeNull();
+    expect(links[0].context).toBeNull();
+  });
+
+  it('persists internal links with special characters in link text and context', () => {
+    const job = createMigrationJob(MigrationJobType.SINGLE);
+    const item = createMigrationJobItem({
+      job_id: job.id,
+      tistory_url: 'https://example.tistory.com/6',
+    });
+
+    const specialText = 'Link with <special> & "characters" and \'quotes\' and émojis 🎉';
+    const specialContext = 'Context with <tag> & "quotes" and special chars: <>&"\' émojis ✨';
+
+    const link = insertInternalLink({
+      job_item_id: item.id,
+      source_url: 'https://example.tistory.com/6',
+      target_url: 'https://example.tistory.com/7',
+      link_text: specialText,
+      context: specialContext,
+    });
+
+    expect(link.link_text).toBe(specialText);
+    expect(link.context).toBe(specialContext);
+
+    const links = getInternalLinksByJobItemId(item.id);
+    expect(links).toHaveLength(1);
+    expect(links[0].link_text).toBe(specialText);
+    expect(links[0].context).toBe(specialContext);
+  });
+
+  it('handles multiple internal links with same source and target', () => {
+    const job = createMigrationJob(MigrationJobType.SINGLE);
+    const item = createMigrationJobItem({
+      job_id: job.id,
+      tistory_url: 'https://example.tistory.com/7',
+    });
+
+    insertInternalLink({
+      job_item_id: item.id,
+      source_url: 'https://example.tistory.com/7',
+      target_url: 'https://example.tistory.com/8',
+      link_text: 'link1',
+      context: 'context1',
+    });
+
+    insertInternalLink({
+      job_item_id: item.id,
+      source_url: 'https://example.tistory.com/7',
+      target_url: 'https://example.tistory.com/8',
+      link_text: 'link2',
+      context: 'context2',
+    });
+
+    const links = getInternalLinksByJobItemId(item.id);
+    expect(links.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('orders internal links by ID when retrieving', () => {
+    const job = createMigrationJob(MigrationJobType.SINGLE);
+    const item = createMigrationJobItem({
+      job_id: job.id,
+      tistory_url: 'https://example.tistory.com/8',
+    });
+
+    const link1 = insertInternalLink({
+      job_item_id: item.id,
+      source_url: 'https://example.tistory.com/8',
+      target_url: 'https://example.tistory.com/target1',
+      link_text: 'first',
+      context: 'first',
+    });
+
+    const link2 = insertInternalLink({
+      job_item_id: item.id,
+      source_url: 'https://example.tistory.com/8',
+      target_url: 'https://example.tistory.com/target2',
+      link_text: 'second',
+      context: 'second',
+    });
+
+    const link3 = insertInternalLink({
+      job_item_id: item.id,
+      source_url: 'https://example.tistory.com/8',
+      target_url: 'https://example.tistory.com/target3',
+      link_text: 'third',
+      context: 'third',
+    });
+
+    const links = getInternalLinksByJobItemId(item.id);
+    expect(links).toHaveLength(3);
+    expect(links[0].id).toBe(link1.id);
+    expect(links[1].id).toBe(link2.id);
+    expect(links[2].id).toBe(link3.id);
+  });
+
+  it('handles empty string for link_text and context', () => {
+    const job = createMigrationJob(MigrationJobType.SINGLE);
+    const item = createMigrationJobItem({
+      job_id: job.id,
+      tistory_url: 'https://example.tistory.com/9',
+    });
+
+    const link = insertInternalLink({
+      job_item_id: item.id,
+      source_url: 'https://example.tistory.com/9',
+      target_url: 'https://example.tistory.com/10',
+      link_text: '',
+      context: '',
+    });
+
+    expect(link.link_text).toBe('');
+    expect(link.context).toBe('');
+
+    const links = getInternalLinksByJobItemId(item.id);
+    expect(links).toHaveLength(1);
+    expect(links[0].link_text).toBe('');
+    expect(links[0].context).toBe('');
+  });
 });

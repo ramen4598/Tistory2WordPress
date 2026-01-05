@@ -3,10 +3,15 @@ import { createLinkTracker } from '../../../src/services/linkTracker';
 import { loadConfig } from '../../../src/utils/config';
 import { baseConfig } from '../helpers/baseConfig';
 
-jest.mock('../../../src/db');
 jest.mock('../../../src/utils/config');
 
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
+
+jest.mock('../../../src/db/index', () => ({
+  ...jest.requireActual('../../../src/db/index'),
+  insertInternalLink: jest.fn(),
+  getInternalLinksByJobItemId: jest.fn(),
+}));
 
 const mockedInsertInternalLink = insertInternalLink as jest.MockedFunction<
   typeof insertInternalLink
@@ -15,7 +20,7 @@ const mockedGetInternalLinksByJobItemId = getInternalLinksByJobItemId as jest.Mo
   typeof getInternalLinksByJobItemId
 >;
 
-describe('linkTracker', () => {
+describe('linkTracker (with mocked DB)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedLoadConfig.mockReturnValue(baseConfig);
@@ -99,5 +104,112 @@ describe('linkTracker', () => {
 
     expect(mockedGetInternalLinksByJobItemId).toHaveBeenCalledWith(jobItemId);
     expect(result).toEqual(internalLinks);
+  });
+
+  it('filters out external links from different domains', () => {
+    const html = `
+      <p>Internal: <a href="https://example.tistory.com/123">internal</a></p>
+      <p>External: <a href="https://other.com/456">external</a></p>
+    `;
+    const sourceUrl = 'https://example.tistory.com/1';
+
+    const linkTracker = createLinkTracker();
+
+    linkTracker.trackInternalLinks(sourceUrl, html, 1);
+
+    expect(mockedInsertInternalLink).toHaveBeenCalledTimes(1);
+    expect(mockedInsertInternalLink).toHaveBeenCalledWith({
+      job_item_id: 1,
+      source_url: sourceUrl,
+      target_url: 'https://example.tistory.com/123',
+      link_text: 'internal',
+      context: expect.any(String),
+    });
+  });
+
+  it('extracts context text around internal links', () => {
+    const html =
+      '<p>This is a longer paragraph with more text surrounding the <a href="https://example.tistory.com/123">link</a> element</p>';
+    const sourceUrl = 'https://example.tistory.com/1';
+
+    const linkTracker = createLinkTracker();
+
+    linkTracker.trackInternalLinks(sourceUrl, html, 1);
+
+    expect(mockedInsertInternalLink).toHaveBeenCalledTimes(1);
+    expect(mockedInsertInternalLink).toHaveBeenCalledWith({
+      job_item_id: 1,
+      source_url: sourceUrl,
+      target_url: 'https://example.tistory.com/123',
+      link_text: 'link',
+      context: expect.stringMatching(/.*surrounding the link element.*/),
+    });
+  });
+
+  it('handles links with no link text', () => {
+    const html = '<p>Test with <a href="https://example.tistory.com/123"></a> empty link</p>';
+    const sourceUrl = 'https://example.tistory.com/1';
+
+    const linkTracker = createLinkTracker();
+
+    linkTracker.trackInternalLinks(sourceUrl, html, 1);
+
+    expect(mockedInsertInternalLink).toHaveBeenCalledTimes(1);
+    expect(mockedInsertInternalLink).toHaveBeenCalledWith({
+      job_item_id: 1,
+      source_url: sourceUrl,
+      target_url: 'https://example.tistory.com/123',
+      link_text: '',
+      context: expect.any(String),
+    });
+  });
+
+  it('handles links with invalid URL schemes gracefully', () => {
+    const html =
+      '<p>Valid: <a href="https://example.tistory.com/123">valid</a></p><p>Invalid scheme: <a href="javascript:alert(\'xss\')">invalid</a></p>';
+    const sourceUrl = 'https://example.tistory.com/1';
+
+    const linkTracker = createLinkTracker();
+
+    linkTracker.trackInternalLinks(sourceUrl, html, 1);
+
+    expect(mockedInsertInternalLink).toHaveBeenCalledTimes(1);
+    expect(mockedInsertInternalLink).toHaveBeenCalledWith({
+      job_item_id: 1,
+      source_url: sourceUrl,
+      target_url: 'https://example.tistory.com/123',
+      link_text: 'valid',
+      context: expect.any(String),
+    });
+  });
+
+  it('returns empty array when no internal links exist for job item', () => {
+    const jobItemId = 999;
+    mockedGetInternalLinksByJobItemId.mockReturnValue([]);
+
+    const linkTracker = createLinkTracker();
+
+    const result = linkTracker.getInternalLinks(jobItemId);
+
+    expect(mockedGetInternalLinksByJobItemId).toHaveBeenCalledWith(jobItemId);
+    expect(result).toEqual([]);
+  });
+
+  it('extracts links with query parameters and fragments', () => {
+    const html =
+      '<p>Link with query: <a href="https://example.tistory.com/123?param=value#section">link</a></p>';
+    const sourceUrl = 'https://example.tistory.com/1';
+
+    const linkTracker = createLinkTracker();
+
+    linkTracker.trackInternalLinks(sourceUrl, html, 1);
+
+    expect(mockedInsertInternalLink).toHaveBeenCalledWith({
+      job_item_id: 1,
+      source_url: sourceUrl,
+      target_url: 'https://example.tistory.com/123?param=value#section',
+      link_text: 'link',
+      context: expect.any(String),
+    });
   });
 });
