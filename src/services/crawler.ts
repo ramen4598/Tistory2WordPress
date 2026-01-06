@@ -36,6 +36,13 @@ export interface Crawler {
    * Parse post metadata (title, dates, categories, tags) from HTML.
    */
   parsePostMetadata: (html: string, url: string) => ParsedPostMetadata;
+
+  /**
+   * Extract featured image from post HTML.
+   * @param html The HTML content of the post.
+   * @returns The featured image URL or null if not found.
+   */
+  extractFImgUrl: (html: string) => string | null;
 }
 
 /**
@@ -64,6 +71,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
     modifiedDate: config.postModifiedDateSelector,
     category: config.postCategorySelector,
     tag: config.postTagSelector,
+    featuredImage: config.postFeaturedImageSelector,
   };
 
   const resolveUrl = (path: string): string => {
@@ -192,6 +200,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
 
   const slugify = (name: string): string => {
     // TODO: 한국어 등 비영어권 문자 처리 개선
+    // TODO: slug를 만들 필요가 있는가?
     return name
       .trim()
       .toLowerCase()
@@ -304,9 +313,31 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
     return result;
   };
 
+  const extractFImgUrl = (html: string): string | null => {
+    logger.debug('Crawler.extractFeaturedImage: extracting featured image');
+
+    const $ = cheerio.load(html);
+    const featuredImageElement = $(metadataSelectors.featuredImage).first();
+    if (featuredImageElement.length < 1) return null;
+
+    const style = featuredImageElement.attr('style');
+    if (!style) return null;
+
+    const match = style.match(/background-image:\s*url\(["']?(.*?)["']?\)/);
+    if (!match || !match[1]) return null;
+
+    const imageUrl = resolveUrl(match[1]);
+    new URL(imageUrl);
+    logger.debug('Crawler.extractFImgUrl: extracted featured image URL', {
+      imageUrl,
+    });
+    return imageUrl;
+  };
+
   return {
     discoverPostUrls,
     fetchPostHtml,
     parsePostMetadata,
+    extractFImgUrl,
   };
 };

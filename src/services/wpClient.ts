@@ -10,7 +10,7 @@ export interface CreateDraftPostOptions {
   date: string;
   categories: number[];
   tags: number[];
-  featuredMediaId?: number; // Future use
+  featuredImageId: number | null;
 }
 
 export interface CreateDraftPostResult {
@@ -145,10 +145,10 @@ export function createWpClient(): WpClient {
       date: string;
       categories: number[];
       tags: number[];
-      featured_media?: number;
+      featured_image?: number;
     };
 
-    const { title, content, date, categories, tags, featuredMediaId } = options;
+    const { title, content, date, categories, tags, featuredImageId } = options;
     const payload: WpPostPayload = {
       title,
       content,
@@ -158,8 +158,8 @@ export function createWpClient(): WpClient {
       tags,
     };
 
-    if (featuredMediaId) {
-      payload.featured_media = featuredMediaId;
+    if (featuredImageId) {
+      payload.featured_image = featuredImageId;
     }
 
     const exec = async () => {

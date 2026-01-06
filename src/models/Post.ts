@@ -63,4 +63,9 @@ export interface Post {
    * One-to-many relationship
    */
   // attachments: Attachment[];
+
+  /**
+   * Featured image URL (optional)
+   */
+  featured_image: Image | null;
 }
