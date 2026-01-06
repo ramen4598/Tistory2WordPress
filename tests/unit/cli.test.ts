@@ -4,6 +4,94 @@ import {
   MigrationJobType,
 } from '../../src/enums/db.enum';
 
+describe('CLI --help', () => {
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
+  it('returns 0 and prints formatted help when --help is provided', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    const loadConfig = jest.fn().mockReturnValue({});
+    jest.doMock('../../src/utils/config', () => ({
+      loadConfig,
+    }));
+
+    const { runCli } = await import('../../src/cli');
+
+    const code = await runCli(['node', 'cli', '--help']);
+
+    expect(code).toBe(0);
+
+    // Config should not be loaded when help flag is present
+    expect(loadConfig).not.toHaveBeenCalled();
+
+    // ensure help output contains key sections
+    const logged = (logSpy.mock.calls as Array<[string]>).map(([msg]) => msg).join('\n');
+    expect(logged).toContain('Tistory2Wordpress - Migrate Tistory blog posts to WordPress');
+    expect(logged).toContain('Usage:');
+    expect(logged).toContain('[--post=<url> | --all] [--retry-failed] [--export-links]');
+    expect(logged).toContain('Options:');
+    expect(logged).toContain('-h, --help');
+    expect(logged).toContain('Environment Variables (in .env):');
+
+    logSpy.mockRestore();
+  });
+
+  it('returns 0 and prints usage when -h is provided', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    const loadConfig = jest.fn().mockReturnValue({});
+    jest.doMock('../../src/utils/config', () => ({
+      loadConfig,
+    }));
+
+    const { runCli } = await import('../../src/cli');
+
+    const code = await runCli(['node', 'cli', '-h']);
+
+    expect(code).toBe(0);
+    expect(loadConfig).not.toHaveBeenCalled();
+    expect(logSpy).toHaveBeenCalled();
+
+    logSpy.mockRestore();
+  });
+
+  it('prefers help over other flags', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    const loadConfig = jest.fn().mockReturnValue({});
+    jest.doMock('../../src/utils/config', () => ({
+      loadConfig,
+    }));
+
+    const getDb = jest.fn();
+    const createMigrationJob = jest.fn();
+    jest.doMock('../../src/db', () => ({
+      getDb,
+      createMigrationJob,
+      getMigrationJobItemsByJobId: jest.fn().mockReturnValue([]),
+      updateMigrationJob: jest.fn(),
+    }));
+
+    jest.doMock('../../src/services/migrator', () => ({
+      createMigrator: jest.fn().mockReturnValue({ migratePostByUrl: jest.fn() }),
+    }));
+
+    const { runCli } = await import('../../src/cli');
+
+    const code = await runCli(['node', 'cli', '--help', '--all']);
+
+    expect(code).toBe(0);
+    expect(loadConfig).not.toHaveBeenCalled();
+    expect(getDb).not.toHaveBeenCalled();
+    expect(createMigrationJob).not.toHaveBeenCalled();
+    expect(logSpy).toHaveBeenCalled();
+
+    logSpy.mockRestore();
+  });
+});
+
 describe('CLI --post', () => {
   beforeEach(() => {
     jest.resetModules();

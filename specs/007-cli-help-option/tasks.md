@@ -38,20 +38,20 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 **Acceptance Criteria**:
 
-- [ ] Help flag checked before config loading
-- [ ] Help message displayed when `--help` or `-h` present
-- [ ] Exit code 0 when help displayed
-- [ ] No migration performed when help displayed
-- [ ] Help message includes tool description, usage, and options
-- [ ] All existing CLI options listed in help message
+- [x] Help flag checked before config loading
+- [x] Help message displayed when `--help` or `-h` present
+- [x] Exit code 0 when help displayed
+- [x] No migration performed when help displayed
+- [x] Help message includes tool description, usage, and options
+- [x] All existing CLI options listed in help message
 
 **Tests**:
 
-- [ ] Unit test: `hasHelpFlag()` returns true for `--help` and `-h`
-- [ ] Unit test: `hasHelpFlag()` returns false for other flags
-- [ ] Integration test: CLI exits with code 0 when `--help` provided
-- [ ] Integration test: Help message contains expected content
-- [ ] Integration test: Config not loaded when help flag present
+- [x] Unit test: `hasHelpFlag()` returns true for `--help` and `-h`
+- [x] Unit test: `hasHelpFlag()` returns false for other flags
+- [x] Integration test: CLI exits with code 0 when `--help` provided
+- [x] Integration test: Help message contains expected content
+- [x] Integration test: Config not loaded when help flag present
 
 **Dependencies**: None
 
@@ -77,17 +77,17 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 **Acceptance Criteria**:
 
-- [ ] Tool description clear and concise
-- [ ] Usage syntax shows required vs optional arguments
-- [ ] Each option has short and long form (e.g., `-h, --help`)
-- [ ] Options grouped logically (basic, advanced, WordPress, etc.)
-- [ ] Environment variables include required fields and defaults
-- [ ] Help message <50 lines (concise)
+- [x] Tool description clear and concise
+- [x] Usage syntax shows required vs optional arguments
+- [x] Each option has short and long form (e.g., `-h, --help`)
+- [x] Options grouped logically (basic, advanced, WordPress, etc.)
+- [x] Environment variables include required fields and defaults
+- [x] Help message <50 lines (concise)
 
 **Tests**:
 
-- [ ] Manual test: Verify help message displays correctly
-- [ ] Integration test: Help output matches expected format
+- [x] Manual test: Verify help message displays correctly
+- [x] Integration test: Help output matches expected format
 
 **Dependencies**: [Task 1.1]
 
@@ -114,9 +114,9 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 **Acceptance Criteria**:
 
-- [ ] Test coverage >90% for help functionality
-- [ ] All tests pass
-- [ ] Edge cases covered (help with other flags)
+- [x] Test coverage >90% for help functionality
+- [x] All tests pass
+- [x] Edge cases covered (help with other flags)
 
 **Dependencies**: [Task 1.1]
 

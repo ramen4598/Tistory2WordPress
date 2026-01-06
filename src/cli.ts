@@ -39,14 +39,32 @@ function hasFlag(argv: string[], flag: string): boolean {
   return argv.includes(flag);
 }
 
+function hasHelpFlag(argv: string[]): boolean {
+  return argv.includes('--help') || argv.includes('-h');
+}
+
 function printUsage(): void {
-  // Keep it simple; tests shouldn't depend on output.
-  console.log(
-    'Usage: ts-node src/cli.ts [--post <tistory_post_url> | --all] [--retry-failed] [--export-links]'
-  );
+  console.log('Tistory2Wordpress - Migrate Tistory blog posts to WordPress');
+  console.log('');
+  console.log('Usage:');
+  console.log('[--post=<url> | --all] [--retry-failed] [--export-links]');
+  console.log('');
+  console.log('Options:');
+  console.log('  -h, --help           Show this help message');
+  console.log('  --post=<url>         Migrate a single post by URL');
+  console.log('  --all                Migrate all posts from the blog');
+  console.log('  --retry-failed       Retry failed migration items');
+  console.log('  --export-links       Export internal link mapping to JSON');
+  console.log('');
+  console.log('Environment Variables (in .env):');
 }
 
 export async function runCli(argv: string[]): Promise<number> {
+  if (hasHelpFlag(argv)) {
+    printUsage();
+    return 0;
+  }
+
   const logger = getLogger();
 
   try {
