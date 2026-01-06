@@ -55,7 +55,7 @@ describe('wpClient', () => {
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
-        featuredMediaId: 123,
+        featuredImageId: 123,
       });
 
       expect(axios.create).toHaveBeenCalledWith(
@@ -75,7 +75,7 @@ describe('wpClient', () => {
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
-        featured_media: 123,
+        featured_image: 123,
       });
 
       expect(result).toEqual(responseData);
@@ -137,10 +137,10 @@ describe('wpClient', () => {
       expect(axiosInstance.delete).toHaveBeenCalledWith('/posts/456?force=true');
     });
 
-    it('ensures category by searching then creating and caches the result', async () => {
+    it('ensures category by searching then creating and caches result', async () => {
       const client = createClient();
 
-      axiosInstance.get.mockResolvedValueOnce({ data: [] } as AxiosResponse); // no existing category
+      axiosInstance.get.mockResolvedValueOnce({ data: [] } as AxiosResponse);
 
       const createdCategory = { id: 10, name: 'Tech', parent: 0 };
       axiosInstance.post.mockResolvedValueOnce({ data: createdCategory } as unknown);
@@ -178,10 +178,10 @@ describe('wpClient', () => {
       expect(axiosInstance.post).not.toHaveBeenCalledWith('/categories', expect.anything());
     });
 
-    it('ensures tag by searching then creating and caches the result', async () => {
+    it('ensures tag by searching then creating and caches result', async () => {
       const client = createClient();
 
-      axiosInstance.get.mockResolvedValueOnce({ data: [] } as AxiosResponse); // no existing tag
+      axiosInstance.get.mockResolvedValueOnce({ data: [] } as AxiosResponse);
 
       const createdTag = { id: 7, name: 'javascript' };
       axiosInstance.post.mockResolvedValueOnce({ data: createdTag } as AxiosResponse);
@@ -216,6 +216,37 @@ describe('wpClient', () => {
 
       expect(axiosInstance.get).toHaveBeenCalledTimes(1);
       expect(axiosInstance.post).not.toHaveBeenCalledWith('/tags', expect.anything());
+    });
+
+    it('creates draft post without featured image when featuredImageId is null', async () => {
+      const client = createClient();
+
+      const responseData = {
+        id: 456,
+        status: 'draft',
+        link: 'https://example.wordpress.com/?p=456',
+      };
+      axiosInstance.post.mockResolvedValue({ data: responseData } as AxiosResponse);
+
+      const result = await client.createDraftPost({
+        title: 'Post Title',
+        content: '<p>content</p>',
+        date: '2026-01-01T12:00:00',
+        categories: [10],
+        tags: [20],
+        featuredImageId: null,
+      });
+
+      expect(axiosInstance.post).toHaveBeenCalledWith('/posts', {
+        title: 'Post Title',
+        content: '<p>content</p>',
+        status: 'draft',
+        date: '2026-01-01T12:00:00',
+        categories: [10],
+        tags: [20],
+      });
+
+      expect(result).toEqual(responseData);
     });
   });
 
@@ -272,6 +303,7 @@ describe('wpClient', () => {
         date: '2026-01-01T12:00:00',
         categories: [],
         tags: [],
+        featuredImageId: null,
       });
       await expect(result).rejects.toThrow();
       expect(axiosInstance.post).toHaveBeenCalledTimes(baseConfig.maxRetryAttempts);
@@ -301,6 +333,7 @@ describe('wpClient', () => {
         date: '2026-01-01T12:00:00',
         categories: [],
         tags: [],
+        featuredImageId: null,
       });
 
       expect(axiosInstance.post).toHaveBeenCalledTimes(2);

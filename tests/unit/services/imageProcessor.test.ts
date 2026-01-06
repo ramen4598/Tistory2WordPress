@@ -42,7 +42,7 @@ describe('imageProcessor', () => {
     categories: [],
     tags: [],
     images: [],
-    // attachments: [],
+    featured_image: null,
   });
 
   it('downloads images from HTML, uploads to WordPress, creates/updates ImageAsset DB records, rewrites URLs, and returns uploaded media IDs', async () => {
@@ -82,9 +82,9 @@ describe('imageProcessor', () => {
     };
     mockedCreateImageAsset.mockReturnValue(mockAsset);
 
-    const { processImagesForPost } = createImageProcessor();
+    const { processImgs } = createImageProcessor();
 
-    const result = await processImagesForPost(post, { jobItemId: 1 });
+    const result = await processImgs(post, 1);
 
     expect(mockedCreateImageAsset).toHaveBeenCalledWith({
       job_item_id: 1,
@@ -97,7 +97,7 @@ describe('imageProcessor', () => {
 
     expect(uploadMediaMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        fileName: 'test-post-image-1.jpg',
+        fileName: 'test-post-image.jpg',
         mimeType: 'image/jpeg',
         buffer: expect.any(Buffer),
         altText: 'one',
@@ -214,9 +214,9 @@ describe('imageProcessor', () => {
       .mockResolvedValueOnce(axiosResponses[1] as unknown as AxiosResponse)
       .mockResolvedValueOnce(axiosResponses[2] as unknown as AxiosResponse);
 
-    const { processImagesForPost } = createImageProcessor();
+    const { processImgs } = createImageProcessor();
 
-    const result = await processImagesForPost(post, { jobItemId: 1 });
+    const result = await processImgs(post, 1);
 
     expect(mockedCreateImageAsset).toHaveBeenCalledTimes(3);
     expect(uploadMediaMock).toHaveBeenCalledTimes(3);
@@ -224,7 +224,7 @@ describe('imageProcessor', () => {
     expect(uploadMediaMock).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        fileName: 'test-post-image-1.jpg',
+        fileName: 'test-post-image.jpg',
         mimeType: 'image/jpeg',
         buffer: expect.any(Buffer),
         altText: 'first',
@@ -233,7 +233,7 @@ describe('imageProcessor', () => {
     expect(uploadMediaMock).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
-        fileName: 'test-post-image-2.png',
+        fileName: 'test-post-image.png',
         mimeType: 'image/png',
         buffer: expect.any(Buffer),
         altText: 'second',
@@ -242,7 +242,7 @@ describe('imageProcessor', () => {
     expect(uploadMediaMock).toHaveBeenNthCalledWith(
       3,
       expect.objectContaining({
-        fileName: 'test-post-image-3.gif',
+        fileName: 'test-post-image.gif',
         mimeType: 'image/gif',
         buffer: expect.any(Buffer),
         altText: 'third',
@@ -288,9 +288,9 @@ describe('imageProcessor', () => {
 
     mockedCreateWpClient.mockReturnValue(wpClientMock as WpClient);
 
-    const { processImagesForPost } = createImageProcessor();
+    const { processImgs } = createImageProcessor();
 
-    const result = await processImagesForPost(post, { jobItemId: 1 });
+    const result = await processImgs(post, 1);
 
     expect(mockedCreateImageAsset).not.toHaveBeenCalled();
     expect(uploadMediaMock).not.toHaveBeenCalled();
@@ -332,13 +332,66 @@ describe('imageProcessor', () => {
     };
     mockedCreateImageAsset.mockReturnValue(mockAsset);
 
-    const { processImagesForPost } = createImageProcessor();
+    const { processImgs } = createImageProcessor();
 
-    await expect(processImagesForPost(post, { jobItemId: 1 })).rejects.toThrow('Download failed');
+    await expect(processImgs(post, 1)).rejects.toThrow('Download failed');
 
     expect(mockedUpdateImageAsset).toHaveBeenCalledWith(1, {
       status: ImageAssetStatus.FAILED,
       error_message: 'Download failed',
+    });
+  });
+
+  describe('processFImg', () => {
+    it('downloads and uploads featured image to WordPress', async () => {
+      const axiosResponse = {
+        status: 200,
+        data: Buffer.from('featured-image'),
+        headers: { 'content-type': 'image/jpeg' },
+      };
+      mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+      const uploadMediaMock = jest.fn().mockResolvedValue({
+        id: 200,
+        url: 'https://example.wordpress.com/wp-content/uploads/featured.jpg',
+        mediaType: 'image',
+        mimeType: 'image/jpeg',
+      });
+
+      const wpClientMock: Partial<WpClient> = {
+        uploadMedia: uploadMediaMock,
+      };
+      mockedCreateWpClient.mockReturnValue(wpClientMock as WpClient);
+
+      const mockAsset = {
+        id: 10,
+        job_item_id: 5,
+        tistory_image_url: 'https://img.tistory.com/featured.jpg',
+        wp_media_id: null,
+        wp_media_url: null,
+        status: ImageAssetStatus.PENDING,
+        error_message: null,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
+      };
+      mockedCreateImageAsset.mockReturnValue(mockAsset);
+
+      const { processFImg } = createImageProcessor();
+
+      const result = await processFImg(5, 'My Post', 'https://img.tistory.com/featured.jpg');
+
+      expect(result.wp_media_id).toBe(200);
+      expect(result.alt_text).toBe('Featured image for My Post');
+    });
+
+    it('handles featured image download failure', async () => {
+      mockedAxios.get.mockRejectedValue(new Error('Download failed'));
+
+      const { processFImg } = createImageProcessor();
+
+      await expect(
+        processFImg(5, 'My Post', 'https://img.tistory.com/featured.jpg')
+      ).rejects.toThrow('Download failed');
     });
   });
 });
