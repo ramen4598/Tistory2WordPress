@@ -17,6 +17,7 @@ const DEFAULT_CONFIG = {
   RETRY_INITIAL_DELAY_MS: 500,
   RETRY_MAX_DELAY_MS: 10000,
   RETRY_BACKOFF_MULTIPLIER: 2,
+  BOOKMARK_TEMPLATE_PATH: './src/templates/bookmark-template.html',
 };
 
 /**
@@ -109,6 +110,10 @@ export function loadConfig(): Config {
   const postFeaturedImageSelector: string | undefined =
     process.env['TISTORY_SELECTOR_FEATURED_IMAGE'];
 
+  const bookmarkSelector: string | undefined = process.env['TISTORY_BOOKMARK_SELECTOR'];
+  const bookmarkTemplatePath: string =
+    process.env['TISTORY_BOOKMARK_TEMPLATE_PATH'] ?? DEFAULT_CONFIG.BOOKMARK_TEMPLATE_PATH;
+
   let categoryHierarchyOrder: CategoryHierarchyOrder;
   const rawCategoryHierarchyOrder: string | undefined = process.env['CATEGORY_HIERARCHY_ORDER'];
   if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.FIRST_IS_PARENT) {
@@ -168,6 +173,12 @@ export function loadConfig(): Config {
   if (!postFeaturedImageSelector) {
     throw new ConfigurationError(
       'TISTORY_SELECTOR_FEATURED_IMAGE is required. Please set it in .env or environment variables.'
+    );
+  }
+
+  if (!bookmarkSelector || bookmarkSelector.length === 0 || bookmarkSelector.length > 200) {
+    throw new ConfigurationError(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
     );
   }
 
@@ -263,6 +274,8 @@ export function loadConfig(): Config {
     postContentSelector,
     categoryHierarchyOrder,
     postFeaturedImageSelector,
+    bookmarkSelector,
+    bookmarkTemplatePath,
   };
 
   cachedConfig = config;

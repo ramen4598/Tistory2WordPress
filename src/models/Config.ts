@@ -146,4 +146,16 @@ export interface Config {
    * @default CategoryHierarchyOrder.FIRST_IS_PARENT
    */
   categoryHierarchyOrder: CategoryHierarchyOrder;
+
+  /**
+   * CSS selector to detect bookmark elements in Tistory posts
+   * e.g. figure[data-ke-type="opengraph"]
+   */
+  bookmarkSelector: string;
+
+  /**
+   * Path to bookmark HTML template file
+   * @default "./src/templates/bookmark-template.html"
+   */
+  bookmarkTemplatePath: string;
 }

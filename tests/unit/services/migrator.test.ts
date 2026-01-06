@@ -6,6 +6,12 @@ import { LinkTracker } from '../../../src/services/linkTracker';
 import { ImageProcessor } from '../../../src/services/imageProcessor';
 import { WpClient } from '../../../src/services/wpClient';
 import { createMigrationJobItem, updateMigrationJobItem } from '../../../src/db';
+import { loadConfig } from '../../../src/utils/config';
+import { baseConfig } from '../helpers/baseConfig';
+
+jest.mock('../../../src/utils/config');
+
+const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
 jest.mock('../../../src/services/crawler', () => ({
   createCrawler: jest.fn(),
@@ -36,6 +42,7 @@ jest.mock('../../../src/db', () => ({
 describe('migrator (T221/T223)', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    mockedLoadConfig.mockReturnValue(baseConfig);
   });
 
   it('rolls back uploaded media when post creation fails', async () => {

@@ -17,6 +17,8 @@ export const baseConfig: Config = {
   postListLinkSelector: 'a.link_category',
   postFeaturedImageSelector:
     '#main > div > div > div.article_header.type_article_header_cover > div',
+  bookmarkSelector: 'figure[data-ke-type="opengraph"]',
+  bookmarkTemplatePath: './src/templates/bookmark-template.html',
 
   categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
 

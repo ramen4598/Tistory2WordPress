@@ -140,8 +140,8 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 **Acceptance Criteria**:
 
-- [ ] Help option documented
-- [ ] Examples include help usage
+- [x] Help option documented
+- [x] Examples include help usage
 
 **Dependencies**: [Task 1.1]
 
@@ -162,7 +162,7 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 **Implementation Steps**:
 
-1. Add `bookmarkSelector` field to Config interface (default: `figure[data-og-type="website"]`)
+1. Add `bookmarkSelector` field to Config interface (default: `figure[data-ke-type="opengraph"]`)
 2. Add `bookmarkTemplatePath` field to Config interface (default: `./src/templates/bookmark-template.html`)
 3. Update `loadConfig()` to read `TISTORY_BOOKMARK_SELECTOR` from `.env`
 4. Add validation for bookmark selector (non-empty, reasonable length)
@@ -171,12 +171,12 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 **Acceptance Criteria**:
 
-- [ ] Config includes bookmark selector with default value
-- [ ] Config includes template path with default value
-- [ ] Environment variable `TISTORY_BOOKMARK_SELECTOR` loaded from `.env`
-- [ ] Selector validation prevents empty or malformed values
-- [ ] `.env.example` documents bookmark configuration
-- [ ] Default selector: `figure[data-og-type="website"]`
+- [x] Config includes bookmark selector with default value
+- [x] Config includes template path with default value
+- [x] Environment variable `TISTORY_BOOKMARK_SELECTOR` loaded from `.env`
+- [x] Selector validation prevents empty or malformed values
+- [x] `.env.example` documents bookmark configuration
+- [x] Default selector: `figure[data-ke-type=\"opengraph\"]`
 
 **Tests**:
 

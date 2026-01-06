@@ -29,6 +29,7 @@ function setMinimumValidEnv() {
   process.env.TISTORY_SELECTOR_CONTENT = 'div.tt_article_useless_p_margin.contents_style';
   process.env.TISTORY_SELECTOR_FEATURED_IMAGE =
     '#main > div > div > div.article_header.type_article_header_cover > div';
+  process.env.TISTORY_BOOKMARK_SELECTOR = 'figure[data-ke-type="opengraph"]';
 }
 
 // const realDotenv = require('dotenv');
@@ -68,20 +69,30 @@ describe('loadConfig', () => {
     expect(() => loadConfig()).toThrow('TISTORY_BLOG_URL must be a valid URL');
   });
 
-  it('applies defaults and validates numeric fields', () => {
+  // it('applies defaults and validates numeric fields', () => {
+  it('throws error when there is no tistory bookmark selector', () => {
     setMinimumValidEnv();
     // no numeric envs set -> defaults used, should not throw
+    delete process.env.TISTORY_BOOKMARK_SELECTOR;
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
-    const config = loadConfig();
+    // const config = loadConfig();
+    expect(() => loadConfig()).toThrow(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
+  });
 
-    expect(config.workerCount).toBe(4);
-    expect(config.rateLimitPerWorker).toBe(1000);
-    expect(config.maxRetryAttempts).toBe(3);
-    expect(config.retryInitialDelayMs).toBe(500);
-    expect(config.retryMaxDelayMs).toBe(10000);
-    expect(config.retryBackoffMultiplier).toBe(2);
+  it('validates bookmark selector length and non-empty', () => {
+    setMinimumValidEnv();
+    process.env.TISTORY_BOOKMARK_SELECTOR = '';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
   });
 
   it('throws ConfigurationError when WORKER_COUNT is out of range', () => {

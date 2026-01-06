@@ -1,5 +1,11 @@
 import { retryWithBackoff } from '../../../src/utils/retry';
 import { Config } from '../../../src/models/Config';
+import { loadConfig } from '../../../src/utils/config';
+import { baseConfig } from '../helpers/baseConfig';
+
+jest.mock('../../../src/utils/config');
+
+const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
 const retryConfig: Pick<
   Config,
@@ -12,6 +18,11 @@ const retryConfig: Pick<
 };
 
 describe('retryWithBackoff', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+    mockedLoadConfig.mockReturnValue(baseConfig);
+  });
+
   it('resolves on first attempt', async () => {
     let calls = 0;
 
