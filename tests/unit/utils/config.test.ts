@@ -83,9 +83,33 @@ describe('loadConfig', () => {
     );
   });
 
+  it('throws error when bookmark selector is missing', () => {
+    setMinimumValidEnv();
+    delete process.env.TISTORY_BOOKMARK_SELECTOR;
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
+  });
+
   it('validates bookmark selector length and non-empty', () => {
     setMinimumValidEnv();
     process.env.TISTORY_BOOKMARK_SELECTOR = '';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
+  });
+
+  it('rejects overly long bookmark selector', () => {
+    setMinimumValidEnv();
+    process.env.TISTORY_BOOKMARK_SELECTOR = 'a'.repeat(201);
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');

@@ -100,41 +100,36 @@ Add bookmark configuration to your `.env` file:
 TISTORY_BOOKMARK_SELECTOR=figure[data-ke-type="opengraph"]
 ```
 
-**Optional**: Customize bookmark HTML template by editing `src/templates/bookmark-template.html`:
+**Optional**: Customize bookmark HTML by updating the TypeScript template in `src/templates/bookmarkTemplate.ts`.
 
-```html
-<div
-  class="bookmark-card"
-  style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin: 16px 0;"
->
-  {{#if featuredImage}}
-  <div class="bookmark-featured-image" style="height: 200px; overflow: hidden;">
-    <img
-      src="{{featuredImage}}"
-      alt="{{title}}"
-      style="width: 100%; height: 100%; object-fit: cover;"
-    />
-  </div>
-  {{/if}}
-  <div class="bookmark-content" style="padding: 16px;">
-    <h3 class="bookmark-title" style="margin: 0 0 8px 0;">
-      <a href="{{url}}" target="_blank" rel="noopener noreferrer">{{title}}</a>
-    </h3>
-    {{#if description}}
-    <p class="bookmark-description" style="margin: 0; color: #666; line-height: 1.5;">
-      {{description}}
-    </p>
-    {{/if}}
-  </div>
-</div>
+The helper function `renderBookmarkHTML` takes bookmark metadata and returns a styled `<figure>` element:
+
+```ts
+renderBookmarkHTML({
+  title: 'Example Title',
+  url: 'https://example.com',
+  description: 'Short description',
+  featuredImage: 'https://example.com/image.jpg',
+});
 ```
 
-**Template Variables**:
+This renders HTML similar to:
 
-- `{{title}}` - Bookmark title
-- `{{description}}` - Bookmark description
-- `{{featuredImage}}` - Featured image URL
-- `{{url}}` - Bookmark URL
+```html
+<figure class="bookmark-card">
+  <div class="bookmark-featured-image">
+    <img src="https://example.com/image.jpg" alt="Example Title" />
+  </div>
+  <div class="bookmark-content">
+    <h3 class="bookmark-title">
+      <a href="https://example.com" target="_blank" rel="noopener noreferrer">Example Title</a>
+    </h3>
+    <p class="bookmark-description">Short description</p>
+  </div>
+</figure>
+```
+
+You can adjust styles inside `bookmarkTemplate.ts` (card layout, colors, spacing) to match your site.
 
 ### Usage
 

@@ -180,10 +180,10 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 **Tests**:
 
-- [ ] Unit test: Config loads bookmark selector from `.env`
-- [ ] Unit test: Config uses default selector when not in `.env`
-- [ ] Unit test: Config validation rejects empty selector
-- [ ] Unit test: Config validation rejects overly long selector
+- [x] Unit test: Config loads bookmark selector from `.env`
+- [x] Unit test: Config uses default selector when not in `.env`
+- [x] Unit test: Config validation rejects empty selector
+- [x] Unit test: Config validation rejects overly long selector
 
 **Dependencies**: None (can be done in parallel with 2.2)
 
@@ -193,34 +193,36 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 ### Task 2.2: Create Bookmark HTML Template
 
-**Description**: Create customizable HTML template file for bookmark cards with placeholder variables for title, description, featured image, and URL.
+**Description**: Create customizable bookmark card template (implemented as a TypeScript renderer) for title, description, featured image, and URL.
 
 **Files**:
 
-- `src/templates/bookmark-template.html` (NEW)
+- `src/templates/bookmarkTemplate.ts`
+- `tests/unit/templates/bookmarkTemplate.test.ts`
 
 **Implementation Steps**:
 
-1. Create `src/templates/` directory if not exists
-2. Create `bookmark-template.html` with card component structure
-3. Add `{{title}}`, `{{description}}`, `{{featuredImage}}`, `{{url}}` placeholders
-4. Include conditional `{{#if}}` blocks for optional fields
-5. Add inline styles or CSS classes for bookmark card
-6. Include target="\_blank" and rel="noopener noreferrer" for security
+1. Implement `renderBookmarkHTML(data: BookmarkTemplateData): string` that returns a `<figure class="bookmark-card">` bookmark card
+2. Ensure the entire card is clickable by wrapping image and content inside a single `<a>` with `target="_blank"` and `rel="noopener noreferrer"`
+3. Use grid layout on the anchor (`grid-template-columns: 30% 70%`) to position image/content
+4. Include optional featured image and description blocks that render only when data is provided
+5. Escape user-provided values (title, description, url, featuredImage) for XSS safety
+6. Keep all styles inline within `bookmarkTemplate.ts` for easy customization
 
 **Acceptance Criteria**:
 
-- [ ] Template file exists at specified path
-- [ ] Template uses `{{variable}}` placeholder syntax
-- [ ] Template includes title, description, featured image, URL placeholders
-- [ ] Template has conditional blocks for optional fields
-- [ ] Template includes security attributes on links
-- [ ] Template renders valid HTML structure
+- [x] Bookmark template implemented in `bookmarkTemplate.ts` with `renderBookmarkHTML`
+- [x] Top-level element is `<figure class="bookmark-card">`
+- [x] Entire card is clickable via a single outer `<a>`
+- [x] Layout uses grid to place image and content side-by-side
+- [x] Optional description and featured image handled gracefully when missing
+- [x] User-provided content is HTML-escaped
 
 **Tests**:
 
-- [ ] Manual test: Template renders as valid HTML
-- [ ] Manual test: Placeholders are clearly visible
+- [x] Unit test: Renders figure with title and link
+- [x] Unit test: Includes image section when `featuredImage` is provided
+- [x] Unit test: Includes description paragraph when `description` is provided
 
 **Dependencies**: None (can be done in parallel with 2.1)
 
@@ -231,6 +233,7 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 ### Task 2.3: Implement Bookmark Metadata Fetcher
 
 **Description**: Create service to fetch OpenGraph metadata from bookmark URLs with 10s timeout, redirect following, and fallback logic.
+Use retryWithBackoff.
 
 **Files**:
 
@@ -241,10 +244,10 @@ This document contains actionable, dependency-ordered tasks for implementing CLI
 
 1. Create `BookmarkMetadata` interface with fields: title, description, featuredImage, url, fetchedAt, success, error
 2. Create `bookmarkProcessor.ts` service with `fetchMetadata()` function
-3. Implement HTTP GET with axios, 10s timeout, 5 max redirects
+3. Implement HTTP GET with axios, 10s timeout, 5 max redirects with retryWithBackoff
 4. Parse HTML response with cheerio to extract OpenGraph meta tags
 5. Implement fallbacks: og:title → <title>, og:description → empty, og:image → empty
-6. Handle errors gracefully: timeout, 4xx/5xx, network errors
+6. Handle errors gracefully: timeout, 4xx/5xx, network errors -> 북마크와 관련된 에러 전파하지 말것. 실패해도 해당 post migration 계속 진행해야 함.
 7. Log success and failure cases appropriately
 
 **Acceptance Criteria**:
