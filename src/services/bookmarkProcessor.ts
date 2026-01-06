@@ -1,0 +1,117 @@
+import axios from 'axios';
+import * as cheerio from 'cheerio';
+import { BookmarkMetadata } from '../models/BookmarkMetadata';
+import { loadConfig } from '../utils/config';
+import { getLogger } from '../utils/logger';
+import { retryWithBackoff } from '../utils/retry';
+
+export interface BookmarkProcessorOptions {
+  config?: {
+    timeout?: number;
+    maxRedirects?: number;
+    userAgent?: string;
+  };
+}
+
+/**
+ * BookmarkProcessor 인스턴스를 생성합니다.
+ * @param options BookmarkProcessorOptions
+ * @return BookmarkProcessor
+ */
+export const createBookmarkProcessor = (
+  options: BookmarkProcessorOptions = {}
+): BookmarkProcessor => {
+  const config = loadConfig();
+  const logger = getLogger();
+
+  const {
+    timeout = 10000, // 10 seconds
+    maxRedirects = 5,
+    userAgent = 'Mozilla/5.0 (compatible; Tistory2Wordpress/1.0)',
+  } = options.config || {};
+
+  const fetchMetadata = async (url: string): Promise<BookmarkMetadata> => {
+    const startTime = Date.now();
+    const fetchedAt = new Date().toISOString();
+
+    try {
+      logger.info('Fetching bookmark metadata', { url });
+
+      const response = await retryWithBackoff(async () => {
+        return await axios.get(url, {
+          timeout,
+          maxRedirects,
+          headers: {
+            'User-Agent': userAgent,
+            Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            // 'Accept-Language': 'en-US,en;q=0.9',
+          },
+        });
+      }, config);
+
+      const $ = cheerio.load(response.data);
+
+      const title = $('meta[property="og:title"]').attr('content') || $('title').text() || url;
+
+      const description = $('meta[property="og:description"]').attr('content') || '';
+
+      // 파비콘 추출 (우선순위 순서)
+      const favicon =
+        $('link[rel="icon"]').attr('href') ||
+        $('link[rel="shortcut icon"]').attr('href') ||
+        $('link[rel="apple-touch-icon"]').attr('href') ||
+        undefined;
+
+      // 없으면 파비콘 시비
+      const featuredImage = $('meta[property="og:image"]').attr('content') || favicon || '';
+
+      const canonicalUrl = $('meta[property="og:url"]').attr('content') || url;
+
+      const elapsedTime = Date.now() - startTime;
+      logger.info('Bookmark metadata fetched successfully', {
+        url,
+        title,
+        hasDescription: description.length > 0,
+        hasFeaturedImage: featuredImage.length > 0,
+        fetchTimeMs: elapsedTime,
+      });
+
+      return {
+        title,
+        description,
+        featuredImage,
+        url: canonicalUrl,
+        fetchedAt,
+        success: true,
+      };
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      const elapsedTime = Date.now() - startTime;
+
+      logger.warn('Failed to fetch bookmark metadata', {
+        url,
+        errorType: err.name,
+        message: err.message,
+        fetchTimeMs: elapsedTime,
+      });
+
+      return {
+        title: url,
+        description: '',
+        featuredImage: '',
+        url,
+        fetchedAt,
+        success: false,
+        error: err.message,
+      };
+    }
+  };
+
+  return {
+    fetchMetadata,
+  };
+};
+
+export interface BookmarkProcessor {
+  fetchMetadata(url: string): Promise<BookmarkMetadata>;
+}

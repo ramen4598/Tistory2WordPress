@@ -252,24 +252,24 @@ Use retryWithBackoff.
 
 **Acceptance Criteria**:
 
-- [ ] BookmarkMetadata interface defined
-- [ ] fetchMetadata() function extracts og:title, og:description, og:image, og:url
-- [ ] Timeout set to 10 seconds
-- [ ] Max redirects set to 5
-- [ ] Fallbacks implemented (title from <title>, empty for missing fields)
-- [ ] Errors handled with success=false and error message
-- [ ] Logging for success and failure cases
-- [ ] User-Agent header set to reduce blocking
+- [x] BookmarkMetadata interface defined
+- [x] fetchMetadata() function extracts og:title, og:description, og:image, og:url
+- [x] Timeout set to 10 seconds
+- [x] Max redirects set to 5
+- [x] Fallbacks implemented (title from <title>, empty for missing fields)
+- [x] Errors handled with success=false and error message
+- [x] Logging for success and failure cases
+- [x] User-Agent header set to reduce blocking
 
 **Tests**:
 
-- [ ] Unit test: Successfully fetch metadata from URL with all OpenGraph tags
-- [ ] Unit test: Use fallbacks when og:title, og:description, og:image missing
-- [ ] Unit test: Handle timeout after 10s
-- [ ] Unit test: Handle 404, 403, 500 HTTP errors
-- [ ] Unit test: Handle network errors (connection refused)
-- [ ] Unit test: Follow redirects (1-5 hops)
-- [ ] Unit test: Parse HTML with UTF-8 encoding
+- [x] Unit test: Successfully fetch metadata from URL with all OpenGraph tags
+- [x] Unit test: Use fallbacks when og:title, og:description, og:image missing
+- [x] Unit test: Handle timeout after 10s
+- [x] Unit test: Handle 404, 403, 500 HTTP errors
+- [x] Unit test: Handle network errors (connection refused)
+- [x] Unit test: Follow redirects (1-5 hops)
+- [x] Unit test: Parse HTML with UTF-8 encoding
 
 **Dependencies**: None (can be done in parallel with 2.1, 2.2)
 
