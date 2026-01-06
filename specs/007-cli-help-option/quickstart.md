@@ -21,9 +21,9 @@ This guide provides quick setup and usage instructions for the CLI help option a
 Display help message:
 
 ```bash
-npm start -- --help
+node dist/cli.js --help
 # or
-npm start -- -h
+node dist/cli.js -h
 # or
 ts-node src/cli.ts --help
 ```
@@ -59,7 +59,7 @@ Environment Variables (in .env):
   LOG_FILE             Log file path (optional)
 
   Bookmark Configuration:
-  TISTORY_BOOKMARK_SELECTOR  CSS selector to detect bookmarks (default: figure[data-og-type="website"])
+  TISTORY_BOOKMARK_SELECTOR  CSS selector to detect bookmarks (default: figure[data-ke-type="opengraph"])
 ```
 
 ### Behavior
@@ -73,15 +73,15 @@ Environment Variables (in .env):
 
 ```bash
 # Test help option
-npm start -- --help
+node dist/cli.js --help
 # Should display help and exit
 
 # Test short form
-npm start -- -h
+node dist/cli.js -h
 # Should display same help
 
 # Test help with other flags (help takes precedence)
-npm start -- --help --all
+node dist/cli.js --help --all
 # Should display help and exit, ignoring --all
 ```
 
@@ -96,8 +96,8 @@ Add bookmark configuration to your `.env` file:
 ```bash
 # Bookmark Configuration
 # CSS selector to detect bookmark elements in Tistory posts
-# Default: figure[data-og-type="website"]
-TISTORY_BOOKMARK_SELECTOR=figure[data-og-type="website"]
+# Default: figure[data-ke-type="opengraph"]
+TISTORY_BOOKMARK_SELECTOR=figure[data-ke-type="opengraph"]
 ```
 
 **Optional**: Customize bookmark HTML template by editing `src/templates/bookmark-template.html`:
@@ -208,7 +208,7 @@ npm start -- --post https://yourblog.tistory.com/123
 **Scenario 3: Invalid CSS Selector**
 
 - Log: `Warning: Invalid bookmark selector "{selector}", using default`
-- Action: Falls back to default selector `figure[data-og-type="website"]`
+- Action: Falls back to default selector `figure[data-ke-type="opengraph"]`
 
 ### Performance Impact
 
@@ -232,7 +232,7 @@ LOG_LEVEL=debug
 [DEBUG] BookmarkProcessor: Fetching metadata from https://example.com/article1
 [DEBUG] BookmarkProcessor: Metadata fetched successfully (title: "Example Title", hasFeaturedImage: true)
 [DEBUG] BookmarkProcessor: Replaced bookmark #0 with custom HTML
-[DEBUG] ImageProcessor: Skipping bookmark featured image (parent: figure[data-og-type="website"])
+[DEBUG] ImageProcessor: Skipping bookmark featured image (parent: figure[data-ke-type="opengraph"])
 ```
 
 ---
@@ -243,11 +243,11 @@ LOG_LEVEL=debug
 
 ```bash
 # Test help display
-npm start -- --help
+node dist/cli.js --help
 # Verify: Help message displayed, exit code 0
 
 # Test short form
-npm start -- -h
+node dist/cli.js -h
 # Verify: Same output as --help
 ```
 
@@ -289,7 +289,7 @@ npm start -- -h
 2. **Run Migration**:
 
    ```bash
-   npm start -- --all
+   node dist/cli.js --all
    ```
 
 3. **Verify Behavior**:
@@ -317,7 +317,7 @@ npm start -- -h
 
 **Solutions**:
 
-1. Check CSS selector in `.env`: `TISTORY_BOOKMARK_SELECTOR=figure[data-og-type="website"]`
+1. Check CSS selector in `.env`: `TISTORY_BOOKMARK_SELECTOR=figure[data-ke-type="opengraph"]`
 2. Verify bookmark HTML matches selector in your Tistory post
 3. Enable debug logging: `LOG_LEVEL=debug`
 4. Check logs for: `BookmarkProcessor: Detected X bookmarks`
@@ -339,7 +339,7 @@ npm start -- -h
 
 **Solutions**:
 
-1. Verify CSS selector includes parent: `figure[data-og-type="website"]`
+1. Verify CSS selector includes parent: `figure[data-ke-type="opengraph"]`
 2. Check ImageProcessor logs for: `Skipping bookmark featured image`
 3. Ensure bookmark HTML has correct `data-og-type` attribute
 

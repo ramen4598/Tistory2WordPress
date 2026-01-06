@@ -177,7 +177,7 @@ function printHelp(): void {
 const processImgs = async (post: Post, jobItemId: number): Promise<Post> => {
   const $ = cheerio.load(post.content);
   const imgElements = $('img');
-  const bookmarkSelector = loadConfig().bookmarkSelector; // e.g., 'figure[data-og-type="website"]'
+  const bookmarkSelector = loadConfig().bookmarkSelector; // e.g., 'figure[data-ke-type="opengraph"]'
 
   const uploadedImages: Image[] = [];
 
@@ -219,8 +219,8 @@ const processImgs = async (post: Post, jobItemId: number): Promise<Post> => {
 **Recommendations**:
 
 - Add `TISTORY_BOOKMARK_SELECTOR` to `.env.example`
-- Default value: `figure[data-og-type="website"] a` (extract URL)
-- For bookmark detection, use parent: `figure[data-og-type="website"]`
+- Default value: `figure[data-ke-type="opengraph"] a` (extract URL)
+- For bookmark detection, use parent: `figure[data-ke-type="opengraph"]`
 - Add simple validation: check if selector is non-empty
 - Log warning if selector looks suspicious (e.g., too short)
 
@@ -229,8 +229,8 @@ const processImgs = async (post: Post, jobItemId: number): Promise<Post> => {
 ```bash
 # Bookmark configuration
 # CSS selector to detect bookmark elements in Tistory posts
-# Default: figure[data-og-type="website"]
-TISTORY_BOOKMARK_SELECTOR=figure[data-og-type="website"]
+# Default: figure[data-ke-type="opengraph"]
+TISTORY_BOOKMARK_SELECTOR=figure[data-ke-type="opengraph"]
 ```
 
 ---

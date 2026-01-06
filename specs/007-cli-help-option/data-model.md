@@ -132,7 +132,7 @@ interface Config {
 
 **Default Values**:
 
-- `bookmarkSelector`: `figure[data-og-type="website"]`
+- `bookmarkSelector`: `figure[data-ke-type="opengraph"]`
 - `bookmarkTemplatePath`: `./src/templates/bookmark-template.html`
 
 ---

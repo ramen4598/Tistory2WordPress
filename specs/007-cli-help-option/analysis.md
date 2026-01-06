@@ -43,12 +43,12 @@ This report documents cross-artifact consistency and quality analysis across spe
 | Language/Version | Implied | TypeScript 5.x, Node.js 18+ | ✅ Consistent |
 | Dependencies | None listed | cheerio, axios, etc. | ✅ Plan provides detail |
 | Performance goals | SC-007 <20% overhead | Explicitly stated | ✅ Consistent |
-| CSS selector | FR-010: `figure[data-og-type="website"] a` | Default: `figure[data-og-type="website"]` | ℹ️ Note 1 |
+| CSS selector | FR-010: `figure[data-ke-type="opengraph"] a` | Default: `figure[data-ke-type="opengraph"]` | ℹ️ Note 1 |
 
 **Note 1 - CSS Selector Discrepancy**:
 
-- Spec FR-010: `figure[data-og-type="website"] a` (anchor tag)
-- Plan: `figure[data-og-type="website"]` (figure element)
+- Spec FR-010: `figure[data-ke-type="opengraph"] a` (anchor tag)
+- Plan: `figure[data-ke-type="opengraph"]` (figure element)
 - **Analysis**: Spec mentions "anchor tag" in selector, but this is for URL extraction. For bookmark detection, the figure element is the target. This is intentional - anchor tag is used to extract URL, figure element is used for detection.
 - **Severity**: LOW - Not an inconsistency, just different contexts (detection vs. extraction)
 
@@ -260,9 +260,9 @@ This report documents cross-artifact consistency and quality analysis across spe
 
 **Locations**:
 
-- spec.md FR-010: `figure[data-og-type="website"] a`
-- .env.example: `figure[data-og-type="website"]`
-- plan.md: `figure[data-og-type="website"]`
+- spec.md FR-010: `figure[data-ke-type="opengraph"] a`
+- .env.example: `figure[data-ke-type="opengraph"]`
+- plan.md: `figure[data-ke-type="opengraph"]`
 
 **Analysis**:
 
@@ -424,8 +424,8 @@ This report documents cross-artifact consistency and quality analysis across spe
 
 **Recommendation**: Consider updating FR-010 to clarify:
 
-- Current: "System MUST use default CSS selector `figure[data-og-type="website"] a` if not configured in `.env`"
-- Suggested: "System MUST use default CSS selector `figure[data-og-type="website"]` for bookmark detection if not configured in `.env`. URLs are extracted from anchor tags within matched elements."
+- Current: "System MUST use default CSS selector `figure[data-ke-type="opengraph"] a` if not configured in `.env`"
+- Suggested: "System MUST use default CSS selector `figure[data-ke-type="opengraph"]` for bookmark detection if not configured in `.env`. URLs are extracted from anchor tags within matched elements."
 
 **Impact**: Improves clarity without changing technical approach
 

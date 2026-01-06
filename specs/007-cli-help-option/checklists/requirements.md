@@ -37,7 +37,7 @@ This checklist verifies that all requirements from `requirements.md` are capture
 - [ ] **R-008**: Extract bookmarks from Tistory posts
   - Corresponds to FR-009, FR-011
 
-- [ ] **R-009**: Use the CSS Selector (ex. `figure[data-og-type="website"] a`) to identify bookmarks
+- [ ] **R-009**: Use the CSS Selector (ex. `figure[data-ke-type="opengraph"] a`) to identify bookmarks
   - Corresponds to FR-009, FR-010
 
 - [ ] **R-010**: CSS Selector should be configurable via `.env` file

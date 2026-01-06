@@ -45,7 +45,7 @@ Users want Tistory bookmarks (website previews/og:type=website) to be properly c
 
 **Acceptance Scenarios**:
 
-1. **Given** a Tistory post contains a bookmark element with CSS selector `figure[data-og-type="website"] a`, **When** the post is processed, **Then** the URL is extracted, metadata is fetched, and the element is replaced with custom HTML structure containing the metadata
+1. **Given** a Tistory post contains a bookmark element with CSS selector `figure[data-ke-type="opengraph"] a`, **When** the post is processed, **Then** the URL is extracted, metadata is fetched, and the element is replaced with custom HTML structure containing the metadata
 2. **Given** the CSS selector is configured in `.env` file, **When** processing begins, **Then** the tool uses the configured selector from `.env` to detect bookmarks
 3. **Given** a bookmark URL returns metadata, **When** the metadata is fetched, **Then** the custom HTML includes title, description, and featured image URL
 4. **Given** a bookmark element contains a featured image, **When** the image processor runs, **Then** the featured image is ignored (not downloaded/processed) because its parent is a figure element
@@ -57,7 +57,7 @@ Users want Tistory bookmarks (website previews/og:type=website) to be properly c
 ### Edge Cases
 
 - What happens when the bookmark CSS selector in `.env` is malformed or invalid?
-  - System should use default selector `figure[data-og-type="website"] a`
+  - System should use default selector `figure[data-ke-type="opengraph"] a`
 - How does system handle bookmark URLs that are HTTP (not HTTPS)?
   - System should still attempt to fetch metadata, log warning about insecure HTTP
 - How does system handle bookmark metadata fetch timeouts or network errors?
@@ -93,7 +93,7 @@ Users want Tistory bookmarks (website previews/og:type=website) to be properly c
 #### Tistory Bookmark Handling Requirements
 
 - **FR-009**: System MUST detect bookmark elements using configurable CSS selector from `.env` file
-- **FR-010**: System MUST use default CSS selector `figure[data-og-type="website"] a` if not configured in `.env`
+- **FR-010**: System MUST use default CSS selector `figure[data-ke-type="opengraph"] a` if not configured in `.env`
 - **FR-011**: System MUST extract URL from bookmark anchor tag
 - **FR-012**: System MUST fetch metadata from bookmark URL (title, description, featured image URL)
 - **FR-013**: System MUST replace original bookmark HTML with custom HTML structure
