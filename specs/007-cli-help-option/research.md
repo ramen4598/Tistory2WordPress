@@ -30,7 +30,7 @@ This document documents research findings for implementing CLI help option and T
 - Use cheerio to parse HTML and extract meta tags
 - Implement fallback logic for missing metadata
 - Add User-Agent header to reduce blocking risk
-- Graceful degradation: if fetch fails, preserve original bookmark HTML
+- Graceful degradation: if fetch fails, render bookmark using URL only with fallback structure
 
 **Example Implementation**:
 

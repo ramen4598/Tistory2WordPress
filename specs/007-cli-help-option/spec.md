@@ -49,7 +49,7 @@ Users want Tistory bookmarks (website previews/og:type=website) to be properly c
 2. **Given** the CSS selector is configured in `.env` file, **When** processing begins, **Then** the tool uses the configured selector from `.env` to detect bookmarks
 3. **Given** a bookmark URL returns metadata, **When** the metadata is fetched, **Then** the custom HTML includes title, description, and featured image URL
 4. **Given** a bookmark element contains a featured image, **When** the image processor runs, **Then** the featured image is ignored (not downloaded/processed) because its parent is a figure element
-5. **Given** a bookmark URL is unreachable or returns no metadata, **When** the metadata fetch fails, **Then** the bookmark is either preserved with original structure or replaced with a fallback (graceful degradation)
+5. **Given** a bookmark URL is unreachable or returns no metadata, **When** the metadata fetch fails, **Then** the bookmark is rendered using URL only with fallback structure (graceful degradation)
 6. **Given** bookmark handling is disabled or no bookmarks are found, **When** the post is processed, **Then** the conversion proceeds normally without bookmark-related changes
 
 ---
@@ -100,7 +100,7 @@ Users want Tistory bookmarks (website previews/og:type=website) to be properly c
 - **FR-014**: Custom HTML structure MUST include fetched metadata (title, description, featured image)
 - **FR-015**: System MUST ignore images inside bookmark figure elements during image processing
 - **FR-016**: System MUST handle metadata fetch failures gracefully with robust exception handling
-- **FR-017**: System MUST preserve bookmark functionality even when partial metadata is missing or metadata fetch fails completely
+- **FR-017**: System MUST render bookmark using URL only when metadata fetch fails completely (graceful degradation)
 - **FR-018**: System MUST apply bookmark handling during HTML to Markdown conversion phase
 - **FR-019**: Custom HTML structure MUST be a card component with title, description, and featured image
 - **FR-020**: Custom HTML template MUST be managed in a separate file for easy modification

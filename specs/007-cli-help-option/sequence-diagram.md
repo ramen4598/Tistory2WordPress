@@ -82,19 +82,21 @@ sequenceDiagram
     participant BookmarkProcessor
     participant External URL
     participant Logger
+    participant Cleaner
 
+    Cleaner->>BookmarkProcessor: Process bookmarks
     BookmarkProcessor->>External URL: Fetch metadata (GET /)
     External URL-->>BookmarkProcessor: Timeout or Error (4xx/5xx)
     BookmarkProcessor->>Logger: Log error with details
     Note right of Logger: "Failed to fetch metadata from {url}: {error}"
-    BookmarkProcessor->>BookmarkProcessor: Preserve original bookmark HTML
-    BookmarkProcessor-->>Migrator: Continue with next bookmark
+    BookmarkProcessor->>BookmarkProcessor: Render bookmark using URL only.
+    BookmarkProcessor-->>Cleaner: Return rendered bookmark HTML
 ```
 
 **Key Interactions**:
 
 - Error is logged but doesn't stop migration
-- Original bookmark HTML is preserved when metadata fetch fails
+- Bookmark is rendered using URL only when metadata fetch fails
 - Multiple bookmarks can fail independently
 - Migration continues to next bookmark or next processing step
 

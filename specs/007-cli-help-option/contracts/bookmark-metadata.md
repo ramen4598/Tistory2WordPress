@@ -102,14 +102,14 @@ Accept-Language: en-US,en;q=0.9
 
 ### Failure Conditions
 
-| Condition               | Handling                            | Error Type      |
-| ----------------------- | ----------------------------------- | --------------- |
-| HTTP 4xx (client error) | Log error, preserve original HTML   | ClientError     |
-| HTTP 5xx (server error) | Log error, preserve original HTML   | ServerError     |
-| Timeout (>10s)          | Log error, preserve original HTML   | TimeoutError    |
-| Network error           | Log error, preserve original HTML   | NetworkError    |
-| Invalid HTML            | Log error, preserve original HTML   | ParseError      |
-| No metadata found       | Log warning, preserve original HTML | MetadataMissing |
+| Condition               | Handling                           | Error Type      |
+| ----------------------- | ---------------------------------- | --------------- |
+| HTTP 4xx (client error) | Log error, render using URL only   | ClientError     |
+| HTTP 5xx (server error) | Log error, render using URL only   | ServerError     |
+| Timeout (>10s)          | Log error, render using URL only   | TimeoutError    |
+| Network error           | Log error, render using URL only   | NetworkError    |
+| Invalid HTML            | Log error, render using URL only   | ParseError      |
+| No metadata found       | Log warning, render using URL only | MetadataMissing |
 
 ### Retry Policy
 

@@ -247,7 +247,7 @@ Use retryWithBackoff.
 3. Implement HTTP GET with axios, 10s timeout, 5 max redirects with retryWithBackoff
 4. Parse HTML response with cheerio to extract OpenGraph meta tags
 5. Implement fallbacks: og:title → <title>, og:description → empty, og:image → empty
-6. Handle errors gracefully: timeout, 4xx/5xx, network errors -> 북마크와 관련된 에러 전파하지 말것. 실패해도 해당 post migration 계속 진행해야 함.
+6. Handle errors gracefully: timeout, 4xx/5xx, network errors -> 북마크와 관련된 에러 전파하지 말것. 실패해도 해당 post migration 계속 진행해야 함. 실패 시 URL만 사용하여 렌더링
 7. Log success and failure cases appropriately
 
 **Acceptance Criteria**:
@@ -387,7 +387,7 @@ Use retryWithBackoff.
 - [ ] Metadata fetched for each bookmark
 - [ ] Bookmarks replaced with custom HTML
 - [ ] Original workflow (HTML → MD → HTML) maintained
-- [ ] Failure handling: original bookmark preserved if metadata fetch fails
+- [ ] Failure handling: bookmark rendered using URL only if metadata fetch fails
 
 **Tests**:
 
@@ -486,7 +486,7 @@ Use retryWithBackoff.
 3. Verify bookmarks are replaced with custom HTML
 4. Add test case for HTML without bookmarks (no changes)
 5. Add test case for bookmark metadata fetch failure
-6. Verify original HTML preserved on failure
+6. Verify bookmark rendered using URL only on failure
 
 **Acceptance Criteria**:
 

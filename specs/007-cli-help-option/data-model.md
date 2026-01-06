@@ -190,7 +190,7 @@ Bookmark URL
     ↓ YES
 [Log Error]
     ↓
-[Preserve Original HTML]
+[Render bookmark using URL only]
     ↓
 Continue to next bookmark
 ```
@@ -305,7 +305,7 @@ function validateCssSelector(selector: string): boolean {
 
 - Log error with details
 - Set `success: false` in BookmarkMetadata
-- Preserve original bookmark HTML
+- Render bookmark using URL only with fallback structure
 - Continue migration (don't stop)
 
 ### Missing Metadata Fields

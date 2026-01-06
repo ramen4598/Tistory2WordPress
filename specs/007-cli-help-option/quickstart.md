@@ -149,7 +149,7 @@ npm start -- --post https://yourblog.tistory.com/123
 2. **Metadata Fetch**: For each bookmark, metadata is fetched from URL (10s timeout)
 3. **HTML Replacement**: Original bookmark HTML is replaced with custom card template
 4. **Image Processing**: Bookmark featured images are ignored during image upload
-5. **Error Handling**: If metadata fetch fails, original bookmark HTML is preserved
+5. **Error Handling**: If metadata fetch fails, bookmark is rendered using URL only with fallback structure
 
 ### What Gets Processed
 
@@ -193,7 +193,7 @@ npm start -- --post https://yourblog.tistory.com/123
 **Scenario 1: Metadata Fetch Fails**
 
 - Log: `Failed to fetch bookmark metadata from {url}: {error}`
-- Action: Original bookmark HTML preserved, migration continues
+- Action: Bookmark rendered using URL only, migration continues
 
 **Scenario 2: Missing Metadata Fields**
 
@@ -289,7 +289,7 @@ node dist/cli.js -h
 
 3. **Verify Behavior**:
    - Log shows warning about failed metadata fetch
-   - Original bookmark HTML preserved
+   - Bookmark rendered using URL only
    - Migration continues to next bookmark/post
 
 ---

@@ -68,7 +68,7 @@ The following requirements were added during spec creation for completeness:
 - [ ] **R-017**: Handle metadata fetch failures gracefully with robust exception handling
   - Corresponds to FR-016
 
-- [ ] **R-018**: Preserve bookmark functionality even when partial metadata is missing or metadata fetch fails completely
+- [ ] **R-018**: Render bookmark using URL only when metadata fetch fails completely
   - Corresponds to FR-017
 
 - [ ] **R-019**: Custom HTML structure MUST be a card component with title, description, and featured image
