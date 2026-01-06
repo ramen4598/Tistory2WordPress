@@ -145,7 +145,7 @@ export function createWpClient(): WpClient {
       date: string;
       categories: number[];
       tags: number[];
-      featured_image?: number;
+      featured_media?: number;
     };
 
     const { title, content, date, categories, tags, featuredImageId } = options;
@@ -159,8 +159,16 @@ export function createWpClient(): WpClient {
     };
 
     if (featuredImageId) {
-      payload.featured_image = featuredImageId;
+      payload.featured_media = featuredImageId;
     }
+
+    logger.debug('Creating WordPress draft post', {
+      title,
+      date,
+      categories,
+      tags,
+      featuredImageId,
+    });
 
     const exec = async () => {
       const response = await client.post('/posts', payload);

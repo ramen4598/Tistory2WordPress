@@ -75,7 +75,7 @@ describe('wpClient', () => {
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
-        featured_image: 123,
+        featured_media: 123,
       });
 
       expect(result).toEqual(responseData);
