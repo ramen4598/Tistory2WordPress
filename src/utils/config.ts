@@ -106,6 +106,9 @@ export function loadConfig(): Config {
   const postTagSelector: string | undefined = process.env['TISTORY_SELECTOR_TAG'];
   const postListLinkSelector: string | undefined = process.env['TISTORY_SELECTOR_POST_LINK'];
   const postContentSelector: string | undefined = process.env['TISTORY_SELECTOR_CONTENT'];
+  const postFeaturedImageSelector: string | undefined =
+    process.env['TISTORY_SELECTOR_FEATURED_IMAGE'];
+
   let categoryHierarchyOrder: CategoryHierarchyOrder;
   const rawCategoryHierarchyOrder: string | undefined = process.env['CATEGORY_HIERARCHY_ORDER'];
   if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.FIRST_IS_PARENT) {
@@ -159,6 +162,12 @@ export function loadConfig(): Config {
   if (!postContentSelector) {
     throw new ConfigurationError(
       'TISTORY_SELECTOR_CONTENT is required. Please set it in .env or environment variables.'
+    );
+  }
+
+  if (!postFeaturedImageSelector) {
+    throw new ConfigurationError(
+      'TISTORY_SELECTOR_FEATURED_IMAGE is required. Please set it in .env or environment variables.'
     );
   }
 
@@ -253,6 +262,7 @@ export function loadConfig(): Config {
     postListLinkSelector,
     postContentSelector,
     categoryHierarchyOrder,
+    postFeaturedImageSelector,
   };
 
   cachedConfig = config;

@@ -27,6 +27,8 @@ function setMinimumValidEnv() {
   process.env.TISTORY_SELECTOR_TAG = 'div.area_tag a[rel="tag"]';
   process.env.TISTORY_SELECTOR_POST_LINK = 'a.link_category';
   process.env.TISTORY_SELECTOR_CONTENT = 'div.tt_article_useless_p_margin.contents_style';
+  process.env.TISTORY_SELECTOR_FEATURED_IMAGE =
+    '#main > div > div > div.article_header.type_article_header_cover > div';
 }
 
 // const realDotenv = require('dotenv');

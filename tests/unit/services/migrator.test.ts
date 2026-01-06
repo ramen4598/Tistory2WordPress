@@ -58,6 +58,7 @@ describe('migrator (T221/T223)', () => {
         categories: [],
         tags: [],
       }),
+      extractFImgUrl: jest.fn().mockReturnValue(null),
     };
 
     const cleaner = {
@@ -69,7 +70,7 @@ describe('migrator (T221/T223)', () => {
     };
 
     const imageProcessor = {
-      processImagesForPost: jest.fn().mockResolvedValue({
+      processImgs: jest.fn().mockResolvedValue({
         url,
         title: 'Hello',
         content: '<p>cleaned</p>',
@@ -79,12 +80,14 @@ describe('migrator (T221/T223)', () => {
         tags: [],
         images: [
           {
-            id: 1,
+            url: 'https://img.tistory.com/image1.jpg',
+            alt_text: 'one',
             wp_media_id: 1,
             wp_media_url: 'https://example.wordpress.com/wp-content/uploads/image1.jpg',
           },
           {
-            id: 2,
+            url: 'https://img.tistory.com/image2.jpg',
+            alt_text: 'two',
             wp_media_id: 2,
             wp_media_url: 'https://example.wordpress.com/wp-content/uploads/image2.jpg',
           },

@@ -15,6 +15,8 @@ export const baseConfig: Config = {
   postTagSelector: 'div.area_tag a[rel="tag"]',
   postContentSelector: 'div.tt_article_useless_p_margin.contents_style',
   postListLinkSelector: 'a.link_category',
+  postFeaturedImageSelector:
+    '#main > div > div > div.article_header.type_article_header_cover > div',
 
   categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
 

@@ -133,6 +133,12 @@ export interface Config {
   postListLinkSelector: string;
 
   /**
+   * CSS selector for featured image element
+   * e.g. #main > div > div > div.article_header.type_article_header_cover > div
+   */
+  postFeaturedImageSelector: string;
+
+  /**
    * Category hierarchy order when two categories are present.
    * - "first-is-parent": first crawled category is parent
    * - "last-is-parent": last crawled category is parent

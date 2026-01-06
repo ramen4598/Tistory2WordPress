@@ -10,7 +10,7 @@ export interface CreateDraftPostOptions {
   date: string;
   categories: number[];
   tags: number[];
-  featuredMediaId?: number; // Future use
+  featuredImageId: number | null;
 }
 
 export interface CreateDraftPostResult {
@@ -148,7 +148,7 @@ export function createWpClient(): WpClient {
       featured_media?: number;
     };
 
-    const { title, content, date, categories, tags, featuredMediaId } = options;
+    const { title, content, date, categories, tags, featuredImageId } = options;
     const payload: WpPostPayload = {
       title,
       content,
@@ -158,9 +158,17 @@ export function createWpClient(): WpClient {
       tags,
     };
 
-    if (featuredMediaId) {
-      payload.featured_media = featuredMediaId;
+    if (featuredImageId) {
+      payload.featured_media = featuredImageId;
     }
+
+    logger.debug('Creating WordPress draft post', {
+      title,
+      date,
+      categories,
+      tags,
+      featuredImageId,
+    });
 
     const exec = async () => {
       const response = await client.post('/posts', payload);

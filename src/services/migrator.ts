@@ -48,7 +48,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
     try {
       const html = await crawler.fetchPostHtml(url);
       const metadata = crawler.parsePostMetadata(html, url);
-
+      const featuredImageUrl: string | null = crawler.extractFImgUrl(html);
       const cleanedHtml = cleaner.cleanHtml(html);
 
       post = {
@@ -60,16 +60,16 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         categories: metadata.categories,
         tags: metadata.tags,
         images: [],
+        featured_image: null,
         // attachments: [], // needed?
       };
 
       linkTracker.trackInternalLinks(url, post.content, jobItem.id);
 
-      const imagesResult: Post = await imageProcessor.processImagesForPost(post, {
-        jobItemId: jobItem.id,
-      });
-      post.content = imagesResult.content;
-      post.images = imagesResult.images;
+      post.featured_image = featuredImageUrl
+        ? await imageProcessor.processFImg(jobItem.id, post.title, featuredImageUrl)
+        : null;
+      post = await imageProcessor.processImgs(post, jobItem.id);
 
       const categoryIds = await Promise.all(
         post.categories.map(async (category) => {
@@ -88,6 +88,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         date: post.publish_date.toISOString(),
         categories: categoryIds,
         tags: tagIds,
+        featuredImageId: post.featured_image?.wp_media_id ?? null,
       });
 
       wpPostId = wpPost.id;
@@ -118,6 +119,18 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
       });
 
       // --- rollback (best effort) ---
+      if (post?.featured_image?.wp_media_id != null) {
+        try {
+          await wpClient.deleteMedia(post.featured_image.wp_media_id);
+        } catch (rollbackError) {
+          logger.error('Rollback: failed to delete featured image', {
+            url,
+            wpMediaId: post.featured_image.wp_media_id,
+            error: (rollbackError as Error)?.message ?? String(rollbackError),
+          });
+        }
+      }
+
       for (const image of post?.images ?? []) {
         if (image.wp_media_id == null) continue;
         try {

@@ -369,4 +369,57 @@ describe('Crawler service', () => {
     expect(cat2.parent).toBeNull();
     expect(cat1.parent).toBe(cat2);
   });
+
+  describe('extractFImgUrl', () => {
+    it('extracts featured image URL from style attribute with double quotes', () => {
+      const html = `
+        <div id="main"><div><div><div class="article_header type_article_header_cover"><div style="background-image: url(&quot;https://img.tistory.com/featured.jpg&quot;);"></div></div></div></div></div>
+      `;
+      const crawler = createCrawler({ fetchFn: jest.fn() as any });
+      const url = crawler.extractFImgUrl(html);
+      expect(url).toBe('https://img.tistory.com/featured.jpg');
+    });
+
+    it('extracts featured image URL from style attribute with single quotes', () => {
+      const html = `
+        <div id="main"><div><div><div class="article_header type_article_header_cover"><div style="background-image: url('https://img.tistory.com/featured.jpg');"></div></div></div></div></div>
+      `;
+      const crawler = createCrawler({ fetchFn: jest.fn() as any });
+      const url = crawler.extractFImgUrl(html);
+      expect(url).toBe('https://img.tistory.com/featured.jpg');
+    });
+
+    it('extracts featured image URL from style attribute without quotes', () => {
+      const html = `
+        <div id="main"><div><div><div class="article_header type_article_header_cover"><div style="background-image: url(https://img.tistory.com/featured.jpg);"></div></div></div></div></div>
+      `;
+      const crawler = createCrawler({ fetchFn: jest.fn() as any });
+      const url = crawler.extractFImgUrl(html);
+      expect(url).toBe('https://img.tistory.com/featured.jpg');
+    });
+
+    it('returns null when no featured image element found', () => {
+      const html = '<p>No featured image here</p>';
+      const crawler = createCrawler({ fetchFn: jest.fn() as any });
+      const url = crawler.extractFImgUrl(html);
+      expect(url).toBeNull();
+    });
+
+    it('returns null when style attribute does not contain background-image', () => {
+      const html =
+        '<div id="main"><div><div><div class="article_header type_article_header_cover"><div style="color: red; margin: 10px;"></div></div></div></div></div>';
+      const crawler = createCrawler({ fetchFn: jest.fn() as any });
+      const url = crawler.extractFImgUrl(html);
+      expect(url).toBeNull();
+    });
+
+    it('converts relative URLs to absolute URLs', () => {
+      const html = `
+        <div id="main"><div><div><div class="article_header type_article_header_cover"><div style="background-image: url(/images/featured.jpg);"></div></div></div></div></div>
+      `;
+      const crawler = createCrawler({ fetchFn: jest.fn() as any });
+      const url = crawler.extractFImgUrl(html);
+      expect(url).toBe('https://example.tistory.com/images/featured.jpg');
+    });
+  });
 });
