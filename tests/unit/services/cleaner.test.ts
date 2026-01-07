@@ -149,6 +149,42 @@ describe('Cleaner service', () => {
     expect(cleanedHtml).toContain('<sub>subscript</sub>');
   });
 
+  it('should preserve bookmark-card figure structure during cleaning', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <figure class="bookmark-card">
+        <div class="bookmark-card-inner">
+          <a class="bookmark-card-link" href="https://example.com" target="_blank" rel="noopener noreferrer">
+            <div class="bookmark-card-content">
+              <div class="bookmark-card-text">
+                <div class="bookmark-card-title">Example Title</div>
+                <div class="bookmark-card-description">Example description</div>
+                <div class="bookmark-card-url">https://example.com</div>
+              </div>
+              <div class="bookmark-card-thumbnail">
+                <img src="https://example.com/image.jpg" alt="Example Title" />
+              </div>
+            </div>
+          </a>
+        </div>
+      </figure>
+    `;
+
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    expect(cleanedHtml).toContain('<figure class="bookmark-card">');
+    expect(cleanedHtml).toContain('<a class="bookmark-card-link" href="https://example.com"');
+    expect(cleanedHtml).toContain('<div class="bookmark-card-title">Example Title</div>');
+    expect(cleanedHtml).toContain(
+      '<div class="bookmark-card-description">Example description</div>'
+    );
+    expect(cleanedHtml).toContain('<div class="bookmark-card-url">https://example.com</div>');
+    expect(cleanedHtml).toContain('<img src="https://example.com/image.jpg" alt="Example Title">');
+  });
+
   it('should preserve blockquotes during cleaning', () => {
     const cleaner = createCleaner();
     const content = `

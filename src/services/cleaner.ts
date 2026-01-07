@@ -58,6 +58,7 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
     turndownService.use([gfm.strikethrough, gfm.taskListItems]);
     registerGenericTableRule(turndownService);
     registerCleanIframeRule(turndownService);
+    registerKeepBookmarkCardRule(turndownService);
 
     return turndownService.turndown(html);
   };
@@ -143,6 +144,26 @@ const registerCleanIframeRule = (turndownService: TurndownService): void => {
       const attrString = attrs.join(' ');
 
       return `\n\n<iframe ${attrString}></iframe>\n\n`;
+    },
+  });
+};
+
+/**
+ * Turndown 규칙을 추가하여 bookmark-card를 유지합니다.
+ * HTML -> Markdown -> HTML 변환 과정에서 bookmark-card가 손상되지 않도록 합니다.
+ * @param turndownService TurndownService 인스턴스
+ * @return void
+ */
+const registerKeepBookmarkCardRule = (turndownService: TurndownService): void => {
+  turndownService.addRule('keepBookmarkCard', {
+    filter: (node: HTMLElement) => {
+      if (node.nodeName.toLowerCase() !== 'figure') return false;
+      const cls = (node.getAttribute('class') ?? '').trim().split(/\s+/).filter(Boolean);
+      return cls.includes('bookmark-card');
+    },
+    replacement: (_content, node) => {
+      const element = node;
+      return `\n\n${element.outerHTML}\n\n`;
     },
   });
 };

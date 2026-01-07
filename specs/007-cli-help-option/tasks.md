@@ -387,13 +387,13 @@ Use retryWithBackoff.
 - [x] Bookmarks detected and processed with standard HTML structure
 - [x] Metadata fetched for each bookmark
 - [x] Bookmarks replaced with figure.bookmark-card HTML structure
-- [ ] Original turndown workflow (HTML → MD → HTML) preserves bookmark-card
+- [x] Original turndown workflow (HTML → MD → HTML) preserves bookmark-card
 - [x] Failure handling: bookmark rendered using URL only if metadata fetch fails
 
 **Tests**:
 
 - [x] Integration test: Migrator processes bookmarks before cleaner
-- [ ] Integration test: Bookmark HTML structure survives turndown roundtrip
+- [x] Integration test: Bookmark HTML structure survives turndown roundtrip
 - [ ] Integration test: Migrator handles bookmark metadata fetch failures
 - [x] Integration test: Migration continues after bookmark processing
 
