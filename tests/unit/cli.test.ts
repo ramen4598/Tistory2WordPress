@@ -116,6 +116,7 @@ describe('CLI --post', () => {
           { id: 1, job_id: 123, tistory_url: 'https://example.com/post/1', status: 'completed' },
         ]),
       updateMigrationJob,
+      closeDb: jest.fn(),
     }));
 
     jest.doMock('../../src/services/migrator', () => ({
@@ -189,6 +190,7 @@ describe('CLI --post', () => {
       }),
       getMigrationJobItemsByJobId: jest.fn().mockReturnValue([]),
       updateMigrationJob: jest.fn(),
+      closeDb: jest.fn(),
     }));
 
     jest.doMock('../../src/services/migrator', () => ({
@@ -215,6 +217,7 @@ describe('CLI --post', () => {
         { id: 2, job_id: 123, tistory_url: 'https://example.com/post/2', status: 'failed' },
       ]),
       updateMigrationJob: jest.fn(),
+      closeDb: jest.fn(),
     }));
 
     const { runCli } = await import('../../src/cli');
@@ -252,6 +255,7 @@ describe('CLI --all', () => {
         { id: 2, job_id: 999, tistory_url: 'https://example.com/post/2', status: 'completed' },
       ]),
       updateMigrationJob: jest.fn(),
+      closeDb: jest.fn(),
     }));
 
     jest.doMock('../../src/services/crawler', () => ({
@@ -316,6 +320,7 @@ describe('CLI --all', () => {
       ]),
       getMigrationJobItemsByJobId: jest.fn().mockReturnValue([]),
       updateMigrationJob: jest.fn(),
+      closeDb: jest.fn(),
     }));
 
     jest.doMock('../../src/services/crawler', () => ({
@@ -401,6 +406,7 @@ describe('CLI --all', () => {
         failed_count: 0,
       }),
       updateMigrationJob: jest.fn(),
+      closeDb: jest.fn(),
     }));
 
     jest.doMock('../../src/services/crawler', () => ({

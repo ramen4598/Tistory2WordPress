@@ -1,4 +1,4 @@
-import { getLogger } from './utils/logger';
+import { getLogger, Logger } from './utils/logger';
 import { loadConfig } from './utils/config';
 import {
   createMigrationJob,
@@ -7,6 +7,7 @@ import {
   getLatestRunningJobByType,
   getMigrationJobItemsByJobIdAndStatus,
   updateMigrationJob,
+  closeDb,
 } from './db';
 import { MigrationJobItemStatus, MigrationJobStatus, MigrationJobType } from './enums/db.enum';
 import { createMigrator } from './services/migrator';
@@ -59,21 +60,24 @@ function printUsage(): void {
   console.log('Environment Variables (in .env):');
 }
 
+function close(): void {
+  const logger: Logger = getLogger();
+  logger.info('Shutting down gracefully');
+  logger.close();
+  closeDb();
+}
+
 export async function runCli(argv: string[]): Promise<number> {
   if (hasHelpFlag(argv)) {
     printUsage();
     return 0;
   }
 
-  const logger = getLogger();
-
   try {
     // Load config early to validate and provide clear error messages
     loadConfig();
   } catch (error) {
-    logger.error('Configuration error', {
-      error: (error as Error)?.message ?? String(error),
-    });
+    console.error('Error loading configuration:', (error as Error).message);
     return 1;
   }
 
@@ -87,9 +91,21 @@ export async function runCli(argv: string[]): Promise<number> {
     return 1;
   }
 
+  const logger = getLogger();
+  getDb(); // Initialize DB connection
+
+  process.on('SIGINT', async () => {
+    close();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    close();
+    process.exit(0);
+  });
+
   try {
     // Ensure DB is initialized and schema applied.
-    getDb();
     const migrator = createMigrator();
 
     if (postUrl) {
@@ -151,12 +167,12 @@ export async function runCli(argv: string[]): Promise<number> {
         exportLinks: exportLinksFlag,
       });
     }
-
     return 0;
   } catch (error) {
     logger.error('CLI failed', {
       error: (error as Error)?.message ?? String(error),
     });
+    close();
     return 1;
   }
 }
@@ -203,6 +219,7 @@ async function finalizeJob(
 
   console.log('----------------------------------------');
 
+  close();
   return failed > 0 ? 1 : 0;
 }
 
