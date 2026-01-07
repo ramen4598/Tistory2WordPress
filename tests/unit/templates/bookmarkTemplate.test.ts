@@ -10,9 +10,14 @@ describe('renderBookmarkHTML', () => {
     expect(html).toContain('<figure');
     expect(html).toContain('class="bookmark-card"');
     expect(html).toContain('Example Title');
-    expect(html).toContain('<a href="https://example.com"');
+    expect(html).toContain('<a class="bookmark-overlay-link" href="https://example.com"');
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).toContain('aria-label="Example Title"');
+    expect(html).toContain('class="bookmark-row"');
+    expect(html).toContain('display: flex');
+    expect(html).toContain('flex: 0 0 30%');
+    expect(html).toContain('flex: 1');
   });
 
   it('includes image section when featuredImage is provided', () => {

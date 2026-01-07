@@ -42,6 +42,7 @@ function getImageContainerStyles(): Record<string, string> {
     position: 'relative',
     backgroundColor: '#f3f4f6',
     overflow: 'hidden',
+    flex: '0 0 30%',
   };
 }
 
@@ -60,6 +61,7 @@ function getContentContainerStyles(): Record<string, string> {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    flex: '1',
   };
 }
 
@@ -70,17 +72,33 @@ function getTitleStyles(): Record<string, string> {
     fontWeight: '500',
     color: '#111827',
     lineHeight: '1.3',
+    overflowWrap: 'anywhere',
   };
 }
 
-function getCardLinkStyles(): Record<string, string> {
+function getRowContainerStyles(): Record<string, string> {
   return {
-    display: 'grid',
-    gridTemplateColumns: '30% 70%',
+    display: 'flex',
     gap: '14px',
     alignItems: 'stretch',
+    position: 'relative',
+    zIndex: '1',
+  };
+}
+
+function getCardPositioningStyles(): Record<string, string> {
+  return {
+    position: 'relative',
+  };
+}
+
+function getOverlayLinkStyles(): Record<string, string> {
+  return {
+    position: 'absolute',
+    inset: '0',
+    display: 'block',
+    zIndex: '3',
     textDecoration: 'none',
-    color: '#111827',
   };
 }
 
@@ -95,22 +113,24 @@ function getDescriptionStyles(): Record<string, string> {
   };
 }
 
-function cardStylesForImage(): string {
-  return styleToString(getImageContainerStyles());
-}
-
 export function renderBookmarkHTML(data: BookmarkTemplateData): string {
-  const cardStyles = styleToString(getCardStyles());
+  const cardStyles = styleToString({ ...getCardStyles(), ...getCardPositioningStyles() });
 
   const displayTitle = data.title && data.title.trim().length > 0 ? data.title : data.url;
 
+  const overlayLinkHtml = `<a class="bookmark-overlay-link" href="${escapeHtml(
+    data.url
+  )}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(
+    displayTitle
+  )}" style="${styleToString(getOverlayLinkStyles())}"></a>`;
+
   const imageHtml = data.featuredImage
-    ? `<div class="bookmark-featured-image" style="${cardStylesForImage()}">
+    ? `<div class="bookmark-featured-image" style="${styleToString(getImageContainerStyles())}">
         <img src="${escapeHtml(data.featuredImage)}" alt="${escapeHtml(
           displayTitle
         )}" style="${styleToString(getImageStyles())}" />
       </div>`
-    : '';
+    : `<div class="bookmark-featured-image" style="${styleToString(getImageContainerStyles())}"></div>`;
 
   const descriptionHtml = data.description
     ? `<p class="bookmark-description" style="${styleToString(
@@ -118,18 +138,20 @@ export function renderBookmarkHTML(data: BookmarkTemplateData): string {
       )}">${escapeHtml(data.description)}</p>`
     : '';
 
-  const contentHtml = `${imageHtml}<div class="bookmark-content" style="${styleToString(
-    getContentContainerStyles()
-  )}">
-      <h3 class="bookmark-title" style="${styleToString(getTitleStyles())}">
+  const contentHtml = `<div class="bookmark-content" style="${styleToString(getContentContainerStyles())}">
+      <p class="bookmark-title" style="${styleToString(getTitleStyles())}">
         ${escapeHtml(displayTitle)}
-      </h3>
+      </p>
       ${descriptionHtml}
     </div>`;
 
+  const rowHtml = `<div class="bookmark-row" style="${styleToString(getRowContainerStyles())}">
+    ${imageHtml}
+    ${contentHtml}
+  </div>`;
+
   return `<figure class="bookmark-card" style="${cardStyles}">
-    <a href="${escapeHtml(data.url)}" target="_blank" rel="noopener noreferrer" style="${styleToString(
-      getCardLinkStyles()
-    )}">${contentHtml}</a>
+    ${overlayLinkHtml}
+    ${rowHtml}
   </figure>`;
 }

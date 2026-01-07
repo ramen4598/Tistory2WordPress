@@ -32,6 +32,15 @@ export const createBookmarkProcessor = (
     userAgent = 'Mozilla/5.0 (compatible; Tistory2Wordpress/1.0)',
   } = options.config || {};
 
+  const resolveUrl = (siteUrl: string, path: string): string => {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    const site = new URL(siteUrl);
+    // return `${siteUrl.replace(/\/$/, '')}${path.startsWith('/') ? '' : '/'}${path}`;
+    return site.origin + (path.startsWith('/') ? path : '/' + path);
+  };
+
   const detectBookmarks = (html: string): Bookmark[] => {
     const $ = cheerio.load(html);
     const { bookmarkSelector } = config;
@@ -93,7 +102,8 @@ export const createBookmarkProcessor = (
         undefined;
 
       // 없으면 파비콘 시비
-      const featuredImage = $('meta[property="og:image"]').attr('content') || favicon || '';
+      const featuredImage =
+        $('meta[property="og:image"]').attr('content') || (favicon ? resolveUrl(url, favicon) : '');
 
       const canonicalUrl = $('meta[property="og:url"]').attr('content') || url;
 
