@@ -55,7 +55,6 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://example.com/article');
 
-      expect(result.success).toBe(true);
       expect(result.title).toBe('Example Title');
       expect(result.description).toBe('Example Description');
       expect(result.featuredImage).toBe('https://example.com/image.jpg');
@@ -85,10 +84,9 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://example.com/article');
 
-      expect(result.success).toBe(true);
       expect(result.title).toBe('Fallback Title');
-      expect(result.description).toBe('');
-      expect(result.featuredImage).toBe('');
+      expect(result.description).toBeUndefined();
+      expect(result.featuredImage).toBeUndefined();
       expect(result.url).toBe('https://example.com/article');
     });
 
@@ -114,7 +112,6 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://example.com/article');
 
-      expect(result.success).toBe(true);
       expect(result.featuredImage).toBe('https://example.com/favicon.png');
     });
 
@@ -155,10 +152,9 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://slow-server.com/article');
 
-      expect(result.success).toBe(false);
       expect(result.title).toBe('https://slow-server.com/article');
-      expect(result.description).toBe('');
-      expect(result.featuredImage).toBe('');
+      expect(result.description).toBeUndefined();
+      expect(result.featuredImage).toBeUndefined();
       expect(result.url).toBe('https://slow-server.com/article');
       expect(result.error).toBe('Request timeout after 10000ms');
     });
@@ -172,7 +168,6 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://example.com/not-found');
 
-      expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.title).toBe('https://example.com/not-found');
     });
@@ -186,7 +181,6 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://example.com/forbidden');
 
-      expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.title).toBe('https://example.com/forbidden');
     });
@@ -200,7 +194,6 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://example.com/server-error');
 
-      expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.title).toBe('https://example.com/server-error');
     });
@@ -211,7 +204,6 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://unreachable.com/article');
 
-      expect(result.success).toBe(false);
       expect(result.error).toBe('ECONNREFUSED: Connection refused');
       expect(result.title).toBe('https://unreachable.com/article');
     });
@@ -238,7 +230,6 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://short.link/abc');
 
-      expect(result.success).toBe(true);
       expect(result.title).toBe('Redirected Article');
       expect(result.url).toBe('https://final.com/article');
     });
@@ -265,7 +256,6 @@ describe('BookmarkProcessor service', () => {
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://example.com/article');
 
-      expect(result.success).toBe(true);
       expect(result.title).toBe('안녕하세요 你好');
       expect(result.description).toBe('こんにちは مرحبا');
     });

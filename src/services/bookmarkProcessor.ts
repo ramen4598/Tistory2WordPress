@@ -92,7 +92,8 @@ export const createBookmarkProcessor = (
 
       const title = $('meta[property="og:title"]').attr('content') || $('title').text() || url;
 
-      const description = $('meta[property="og:description"]').attr('content') || '';
+      const description: string | undefined =
+        $('meta[property="og:description"]').attr('content') || undefined;
 
       // 파비콘 추출 (우선순위 순서)
       const favicon =
@@ -103,7 +104,8 @@ export const createBookmarkProcessor = (
 
       // 없으면 파비콘 시비
       const featuredImage =
-        $('meta[property="og:image"]').attr('content') || (favicon ? resolveUrl(url, favicon) : '');
+        $('meta[property="og:image"]').attr('content') ||
+        (favicon ? resolveUrl(url, favicon) : undefined);
 
       const canonicalUrl = $('meta[property="og:url"]').attr('content') || url;
 
@@ -111,8 +113,8 @@ export const createBookmarkProcessor = (
       logger.info('Bookmark metadata fetched successfully', {
         url,
         title,
-        hasDescription: description.length > 0,
-        hasFeaturedImage: featuredImage.length > 0,
+        hasDescription: description ? description.length > 0 : false,
+        hasFeaturedImage: featuredImage ? featuredImage.length > 0 : false,
         fetchTimeMs: elapsedTime,
       });
 
@@ -122,7 +124,6 @@ export const createBookmarkProcessor = (
         featuredImage,
         url: canonicalUrl,
         fetchedAt,
-        success: true,
       };
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
@@ -137,11 +138,10 @@ export const createBookmarkProcessor = (
 
       return {
         title: url,
-        description: '',
-        featuredImage: '',
+        description: undefined,
+        featuredImage: undefined,
         url,
         fetchedAt,
-        success: false,
         error: err.message,
       };
     }
@@ -167,16 +167,15 @@ export const createBookmarkProcessor = (
       const metadata = await fetchMetadata(url);
       const cardHtml = renderBookmarkHTML({
         url: metadata.url || url,
-        title: metadata.success ? metadata.title : undefined,
-        description: metadata.success ? metadata.description : undefined,
-        featuredImage: metadata.success ? metadata.featuredImage : undefined,
+        title: metadata.title,
+        description: metadata.description,
+        featuredImage: metadata.featuredImage,
       });
 
       logger.info('Replacing bookmark with bookmark-card HTML', {
         url,
         selector: config.bookmarkSelector,
         index: i,
-        metadataSuccess: metadata.success,
       });
 
       bookmarkEl.replaceWith(cardHtml);
