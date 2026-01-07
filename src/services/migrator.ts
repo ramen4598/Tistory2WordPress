@@ -1,5 +1,6 @@
 import { createCrawler, type Crawler } from './crawler';
 import { createCleaner, type Cleaner } from './cleaner';
+import { createBookmarkProcessor, type BookmarkProcessor } from './bookmarkProcessor';
 import { type ImageProcessor, createImageProcessor } from './imageProcessor';
 import { createLinkTracker, type LinkTracker } from './linkTracker';
 import { createWpClient, type WpClient } from './wpClient';
@@ -24,6 +25,7 @@ export interface Migrator {
 export interface CreateMigratorOptions {
   crawler?: Crawler;
   cleaner?: Cleaner;
+  bookmarkProcessor?: BookmarkProcessor;
   linkTracker?: LinkTracker;
   imageProcessor?: ImageProcessor;
   wpClient?: WpClient;
@@ -34,6 +36,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
 
   const crawler = options.crawler ?? createCrawler({ fetchFn: fetch });
   const cleaner = options.cleaner ?? createCleaner();
+  const bookmarkProcessor = options.bookmarkProcessor ?? createBookmarkProcessor();
   const linkTracker = options.linkTracker ?? createLinkTracker();
   const wpClient = options.wpClient ?? createWpClient();
   const imageProcessor = options.imageProcessor ?? createImageProcessor(wpClient);
@@ -49,7 +52,8 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
       const html = await crawler.fetchPostHtml(url);
       const metadata = crawler.parsePostMetadata(html, url);
       const featuredImageUrl: string | null = crawler.extractFImgUrl(html);
-      const cleanedHtml = cleaner.cleanHtml(html);
+      const bookmarkProcessedHtml = await bookmarkProcessor.replaceBookmarks(html);
+      const cleanedHtml = cleaner.cleanHtml(bookmarkProcessedHtml);
 
       post = {
         url,

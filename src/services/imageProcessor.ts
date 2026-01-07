@@ -157,15 +157,22 @@ export function createImageProcessor(wpc?: WpClient): ImageProcessor {
 
   const processImgs = async (post: Post, jobItemId: number): Promise<Post> => {
     const $ = cheerio.load(post.content);
+    // const imgElements = $('img');
     const imgElements = $('img');
-    if (imgElements.length === 0) {
+
+    const filtered = imgElements.filter((_, el) => {
+      // Filter out images that are inside figure.bookmark-card
+      return $(el).closest('figure.bookmark-card').length === 0;
+    });
+
+    if (filtered.length === 0) {
       return post;
     }
 
     const uploadedImages: Image[] = [];
 
-    for (let i = 0; i < imgElements.length; i++) {
-      const img = imgElements.eq(i);
+    for (let i = 0; i < filtered.length; i++) {
+      const img = filtered.eq(i);
       const originalUrl = img.attr('src');
       const altText = img.attr('alt') ?? null;
 

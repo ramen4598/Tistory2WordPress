@@ -383,19 +383,19 @@ Use retryWithBackoff.
 
 **Acceptance Criteria**:
 
-- [ ] Bookmark processor called before cleaner in migrator workflow
-- [ ] Bookmarks detected and processed with standard HTML structure
-- [ ] Metadata fetched for each bookmark
-- [ ] Bookmarks replaced with figure.bookmark-card HTML structure
+- [x] Bookmark processor called before cleaner in migrator workflow
+- [x] Bookmarks detected and processed with standard HTML structure
+- [x] Metadata fetched for each bookmark
+- [x] Bookmarks replaced with figure.bookmark-card HTML structure
 - [ ] Original turndown workflow (HTML → MD → HTML) preserves bookmark-card
-- [ ] Failure handling: bookmark rendered using URL only if metadata fetch fails
+- [x] Failure handling: bookmark rendered using URL only if metadata fetch fails
 
 **Tests**:
 
-- [ ] Integration test: Migrator processes bookmarks before cleaner
+- [x] Integration test: Migrator processes bookmarks before cleaner
 - [ ] Integration test: Bookmark HTML structure survives turndown roundtrip
 - [ ] Integration test: Migrator handles bookmark metadata fetch failures
-- [ ] Integration test: Migration continues after bookmark processing
+- [x] Integration test: Migration continues after bookmark processing
 
 **Dependencies**: [Task 2.5]
 
@@ -422,17 +422,17 @@ Use retryWithBackoff.
 
 **Acceptance Criteria**:
 
-- [ ] Image processor checks parent element for each image
-- [ ] Bookmark featured images detected using configured selector
-- [ ] Bookmark featured images skipped (not downloaded/uploaded)
-- [ ] Non-bookmark images processed normally
-- [ ] Skip logged with appropriate message
+- [x] Image processor checks parent element for each image
+- [x] Bookmark featured images detected using `figure.bookmark-card`
+- [x] Bookmark featured images skipped (not downloaded/uploaded)
+- [x] Non-bookmark images processed normally
+- [x] Skip logged with appropriate message
 
 **Tests**:
 
-- [ ] Unit test: Skip image when parent matches bookmark selector
-- [ ] Unit test: Process image when parent doesn't match
-- [ ] Unit test: Handle multiple images (mix of bookmark and non-bookmark)
+- [x] Unit test: Skip image when parent matches `figure.bookmark-card`
+- [x] Unit test: Process image when parent doesn't match
+- [x] Unit test: Handle multiple images (mix of bookmark and non-bookmark)
 - [ ] Integration test: Bookmark featured images not uploaded to WordPress
 
 **Dependencies**: [Task 2.1] (needs bookmark selector in config)
