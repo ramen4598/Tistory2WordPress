@@ -34,7 +34,7 @@ interface Bookmark {
 **Notes**:
 
 - Not persisted to database - transient entity during post processing
-- Exists only in memory during HTML cleaning phase
+- Exists only in memory during bookmark processing phase (before HTML cleaning)
 - Used to coordinate metadata fetching and HTML replacement
 
 ---
@@ -152,9 +152,11 @@ Raw HTML (from Tistory)
     ↓
 [Load Template] → BookmarkTemplate
     ↓
-[Replace HTML] → Template + Metadata = Custom HTML
+[Replace HTML] → Template + Metadata = Custom HTML (figure.bookmark-card)
     ↓
-[Image Processing] → Skip bookmark featured images
+[Cleaning / Turndown Roundtrip] → HTML → MD → HTML (preserves bookmark-card)
+    ↓
+[Image Processing] → Skip bookmark featured images (inside figure.bookmark-card)
     ↓
 Final HTML (with bookmarks)
 ```

@@ -13,7 +13,7 @@ This plan implements two features for the Tistory2Wordpress migration tool:
 Technical approach:
 
 - CLI Help: Early flag detection in `cli.ts` before config loading, displaying formatted help text
-- Bookmark Handling: New `bookmarkProcessor.ts` service with HTML parsing, metadata fetching (10s timeout, no caching), and template-based HTML generation using configurable CSS selector from `.env`
+- Bookmark Handling: New `bookmarkProcessor.ts` service with HTML parsing, metadata fetching (10s timeout, no caching), and template-based HTML generation using configurable CSS selector from `.env`. Bookmark processing occurs BEFORE Cleaner to ensure standard HTML structure survives turndown roundtrip
 
 ## Technical Context
 
@@ -25,7 +25,7 @@ Technical approach:
 **Project Type**: Single project (monorepo with src/ and tests/)
 **Performance Goals**: Bookmark metadata fetch <10s per URL, <20% overall migration overhead, 95%+ bookmark detection accuracy, 95%+ featured image fetch success
 **Constraints**: No metadata caching, per-post error handling (fail gracefully, don't stop entire migration), configurable CSS selector via `.env`
-**Scale/Scope**: 2 new files (bookmarkProcessor.ts, bookmark-template.html with featuredImage variable), modifications to cli.ts, imageProcessor.ts, cleaner.ts, and .env.example
+**Scale/Scope**: 2 new files (bookmarkProcessor.ts, bookmarkTemplate.ts), modifications to cli.ts, imageProcessor.ts, cleaner.ts, migrator.ts, and .env.example
 
 ## Constitution Check
 
@@ -64,19 +64,21 @@ src/
 ├── services/
 │   ├── bookmarkProcessor.ts      # NEW: Bookmark detection & replacement
 │   ├── imageProcessor.ts        # MODIFIED: Ignore bookmark featured images
-│   └── cleaner.ts               # MODIFIED: Integrate bookmark handling
+│   ├── cleaner.ts               # MODIFIED: Preserves bookmark-card structure
+│   └── migrator.ts             # MODIFIED: Call BookmarkProcessor before Cleaner
 ├── utils/
 │   └── config.ts                # MODIFIED: Add bookmark selector config
 ├── cli.ts                       # MODIFIED: Add --help flag
 └── templates/
-    └── bookmark-template.html   # NEW: Custom bookmark HTML template
+    └── bookmarkTemplate.ts      # NEW: Custom bookmark HTML template renderer
 
 tests/
 ├── unit/
 │   ├── services/
 │   │   ├── bookmarkProcessor.test.ts  # NEW
 │   │   ├── imageProcessor.test.ts      # MODIFIED
-│   │   └── cleaner.test.ts             # MODIFIED
+│   │   ├── cleaner.test.ts             # MODIFIED
+│   │   └── migrator.test.ts           # MODIFIED
 │   └── cli.test.ts                     # MODIFIED
 
 .env.example                  # MODIFIED: Add bookmark configuration
@@ -85,8 +87,9 @@ tests/
 **Structure Decision**: Single project structure maintained. Follows existing patterns:
 
 - New `bookmarkProcessor.ts` service similar to existing `imageProcessor.ts`
+- Bookmark processing executed BEFORE Cleaner to preserve HTML structure through turndown
 - Models in `src/models/` for data entities
-- Templates in `src/templates/` for easy customization
+- Templates in `src/templates/` for easy customization (TypeScript renderer)
 - Unit tests in `tests/unit/` following Jest patterns
 
 ## Complexity Tracking

@@ -298,20 +298,20 @@ Use retryWithBackoff.
 
 **Acceptance Criteria**:
 
-- [ ] Bookmark interface defined
-- [ ] detectBookmarks() uses configured CSS selector
-- [ ] URLs extracted from anchor tags within matched elements
-- [ ] Each bookmark assigned correct index (0-based)
-- [ ] Returns empty array if no bookmarks found
-- [ ] Logs number of bookmarks detected
+- [x] Bookmark interface defined
+- [x] detectBookmarks() uses configured CSS selector
+- [x] URLs extracted from anchor tags within matched elements
+- [x] Each bookmark assigned correct index (0-based)
+- [x] Returns empty array if no bookmarks found
+- [x] Logs number of bookmarks detected
 
 **Tests**:
 
-- [ ] Unit test: Detect bookmarks with correct CSS selector
-- [ ] Unit test: Extract URL from anchor tag
-- [ ] Unit test: Assign correct index to each bookmark
-- [ ] Unit test: Return empty array for HTML without bookmarks
-- [ ] Unit test: Handle multiple bookmarks in same HTML
+- [x] Unit test: Detect bookmarks with correct CSS selector
+- [x] Unit test: Extract URL from anchor tag
+- [x] Unit test: Assign correct index to each bookmark
+- [x] Unit test: Return empty array for HTML without bookmarks
+- [x] Unit test: Handle multiple bookmarks in same HTML
 
 **Dependencies**: [Task 2.1] (needs config)
 
@@ -361,39 +361,41 @@ Use retryWithBackoff.
 
 ---
 
-### Task 2.6: Integrate Bookmark Processor into Cleaner
+### Task 2.6: Integrate Bookmark Processor before Cleaner
 
-**Description**: Modify Cleaner service to call BookmarkProcessor during HTML cleaning phase, detecting and replacing bookmarks before markdown conversion.
+**Description**: Modify Migrator service to call BookmarkProcessor before Cleaner, ensuring bookmarks are processed with standard HTML structure that survives the turndown roundtrip.
 
 **Files**:
 
-- `src/services/cleaner.ts`
+- `src/services/migrator.ts`
 
 **Implementation Steps**:
 
 1. Import createBookmarkProcessor from bookmarkProcessor
-2. Create bookmarkProcessor instance in createCleaner()
-3. In cleanHtml(), after extracting content root HTML
+2. Create bookmarkProcessor instance in createMigrator()
+3. In migratePost(), before calling cleaner.clean()
 4. Call bookmarkProcessor.detectBookmarks() on content
 5. For each bookmark, call fetchMetadata()
 6. Call bookmarkProcessor.renderBookmark() for each successful fetch
-7. Replace original bookmark HTML with rendered bookmark
-8. Continue with existing markdown conversion logic
+7. Replace original bookmark HTML with rendered bookmark (figure.bookmark-card)
+8. Pass bookmark-processed HTML to cleaner.clean()
+9. Continue with existing markdown conversion logic (HTML → MD → HTML)
 
 **Acceptance Criteria**:
 
-- [ ] Bookmark processor integrated into cleaner workflow
-- [ ] Bookmarks detected and processed before markdown conversion
+- [ ] Bookmark processor called before cleaner in migrator workflow
+- [ ] Bookmarks detected and processed with standard HTML structure
 - [ ] Metadata fetched for each bookmark
-- [ ] Bookmarks replaced with custom HTML
-- [ ] Original workflow (HTML → MD → HTML) maintained
+- [ ] Bookmarks replaced with figure.bookmark-card HTML structure
+- [ ] Original turndown workflow (HTML → MD → HTML) preserves bookmark-card
 - [ ] Failure handling: bookmark rendered using URL only if metadata fetch fails
 
 **Tests**:
 
-- [ ] Integration test: Cleaner processes bookmarks correctly
-- [ ] Integration test: Cleaner handles bookmark metadata fetch failures
-- [ ] Integration test: Cleaner continues after bookmark processing
+- [ ] Integration test: Migrator processes bookmarks before cleaner
+- [ ] Integration test: Bookmark HTML structure survives turndown roundtrip
+- [ ] Integration test: Migrator handles bookmark metadata fetch failures
+- [ ] Integration test: Migration continues after bookmark processing
 
 **Dependencies**: [Task 2.5]
 
@@ -546,15 +548,17 @@ Use retryWithBackoff.
 1. Create integration test file
 2. Test help option: run CLI with --help, verify output and exit code
 3. Test migration with bookmarks: run CLI with post containing bookmarks
-4. Verify bookmarks detected, metadata fetched, and HTML replaced
-5. Verify bookmark featured images not uploaded
-6. Test migration without bookmarks: verify normal processing
-7. Test help with other flags: verify help takes precedence
+4. Verify bookmarks processed before cleaner, metadata fetched, and HTML replaced with figure.bookmark-card
+5. Verify bookmark-card structure survives turndown roundtrip
+6. Verify bookmark featured images not uploaded
+7. Test migration without bookmarks: verify normal processing
+8. Test help with other flags: verify help takes precedence
 
 **Acceptance Criteria**:
 
 - [ ] Help option integration test passes
 - [ ] Bookmark handling integration test passes
+- [ ] Bookmark HTML structure preserved through cleaning
 - [ ] Combined workflow test passes
 - [ ] All edge cases covered
 
@@ -688,13 +692,14 @@ Use retryWithBackoff.
 - [DEPENDS: 1.1] Task 1.2 (Help message format)
 - [DEPENDS: 1.1] Task 1.3 (Help tests)
 - [DEPENDS: 2.1, 2.2, 2.3, 2.4] Task 2.5 (Bookmark replacement)
+- [DEPENDS: 2.1, 2.2, 2.3, 2.4] Task 2.6 (Migrator integration)
 - [DEPENDS: 2.1] Task 2.7 (Image processor filter)
 
 **Phase 3: Testing**
 
-- [DEPENDS: 2.5] Task 2.6 (Cleaner integration)
+- [DEPENDS: 2.5] Task 2.6 (Migrator integration)
 - [DEPENDS: 2.5] Task 2.8 (Bookmark tests)
-- [DEPENDS: 2.6] Task 2.9 (Cleaner tests)
+- [DEPENDS: 2.6] Task 2.9 (Migrator tests)
 - [DEPENDS: 2.7] Task 2.10 (Image processor tests)
 
 **Phase 4: Finalization**

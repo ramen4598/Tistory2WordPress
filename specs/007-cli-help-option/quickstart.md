@@ -147,9 +147,10 @@ npm start -- --post https://yourblog.tistory.com/123
 
 1. **Detection**: Bookmarks are identified using the CSS selector configured in `.env`
 2. **Metadata Fetch**: For each bookmark, metadata is fetched from URL (10s timeout)
-3. **HTML Replacement**: Original bookmark HTML is replaced with custom card template
-4. **Image Processing**: Bookmark featured images are ignored during image upload
-5. **Error Handling**: If metadata fetch fails, bookmark is rendered using URL only with fallback structure
+3. **HTML Replacement**: Original bookmark HTML is replaced with standard card template (`<figure class="bookmark-card">`)
+4. **Cleaning/Turndown**: The bookmark-card HTML structure is preserved through the turndown roundtrip (HTML → Markdown → HTML)
+5. **Image Processing**: Bookmark featured images are ignored during image upload (images inside `figure.bookmark-card`)
+6. **Error Handling**: If metadata fetch fails, bookmark is rendered using URL only with fallback structure
 
 ### What Gets Processed
 

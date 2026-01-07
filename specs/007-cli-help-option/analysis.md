@@ -133,13 +133,14 @@ This report documents cross-artifact consistency and quality analysis across spe
 
 **Location**: spec.md FR-018, data-model.md, sequence-diagram.md
 
-**Issue**: Not explicitly stated whether bookmarks are processed before or after image processing in the overall migration flow.
+**Issue**: Not explicitly stated whether bookmarks are processed before or after cleaning in the overall migration flow.
 
 **Analysis**:
 
-- Spec FR-018: "during HTML to Markdown conversion phase"
-- Sequence diagram shows: Cleaner → BookmarkProcessor → ImageProcessor
+- Spec FR-018: "before HTML to Markdown conversion phase"
+- Sequence diagram shows: BookmarkProcessor → Cleaner → ImageProcessor
 - Tasks 2.6 and 2.7 confirm this order
+- Key intent: Standard bookmark HTML structure must survive turndown roundtrip
 
 **Status**: ✅ **RESOLVED** - Clear in sequence diagram and tasks
 
@@ -288,7 +289,7 @@ This report documents cross-artifact consistency and quality analysis across spe
 
 **Critical Path**:
 
-1. 2.1 (Config) → 2.4 (Detection) → 2.5 (Replacement) → 2.6 (Cleaner integration)
+1. 2.1 (Config) → 2.4 (Detection) → 2.5 (Replacement) → 2.6 (Migrator integration)
 2. 2.1 (Config) → 2.7 (Image filter)
 3. 1.1 (Help flag) → 1.2 (Help format)
 

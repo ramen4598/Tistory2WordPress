@@ -31,7 +31,7 @@ This checklist verifies that all requirements from `requirements.md` are capture
 
 ## Handle Bookmark of Tistory Requirements
 
-- [ ] **R-007**: While coverting raw HTML to Markdown, handle Tistory bookmarks
+- [ ] **R-007**: Before converting raw HTML to Markdown, handle Tistory bookmarks
   - Corresponds to FR-018
 
 - [ ] **R-008**: Extract bookmarks from Tistory posts
