@@ -1,6 +1,8 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { Bookmark } from '../models/Bookmark';
 import { BookmarkMetadata } from '../models/BookmarkMetadata';
+import { renderBookmarkHTML } from '../templates/bookmarkTemplate';
 import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
 import { retryWithBackoff } from '../utils/retry';
@@ -29,6 +31,34 @@ export const createBookmarkProcessor = (
     maxRedirects = 5,
     userAgent = 'Mozilla/5.0 (compatible; Tistory2Wordpress/1.0)',
   } = options.config || {};
+
+  const detectBookmarks = (html: string): Bookmark[] => {
+    const $ = cheerio.load(html);
+    const { bookmarkSelector } = config;
+
+    const bookmarkElements = $(bookmarkSelector);
+    const bookmarks: Bookmark[] = [];
+
+    bookmarkElements.each((index, element) => {
+      const $element = $(element);
+
+      const anchor = $element.find('a').first();
+      const url = anchor.attr('href');
+
+      if (url) {
+        bookmarks.push({
+          originalElement: $element,
+          url,
+          selector: bookmarkSelector,
+          index,
+        });
+      }
+    });
+
+    logger.info(`Detected ${bookmarks.length} bookmark(s)`);
+
+    return bookmarks;
+  };
 
   const fetchMetadata = async (url: string): Promise<BookmarkMetadata> => {
     const startTime = Date.now();
@@ -107,11 +137,53 @@ export const createBookmarkProcessor = (
     }
   };
 
+  const replaceBookmarks = async (html: string): Promise<string> => {
+    const bookmarks = detectBookmarks(html);
+    if (bookmarks.length === 0) return html;
+
+    const $ = cheerio.load(html);
+
+    const bookmarkEls = $(config.bookmarkSelector);
+
+    for (let i = 0; i < bookmarkEls.length; i++) {
+      const bookmarkEl = bookmarkEls.eq(i);
+      const anchor = bookmarkEl.find('a').first();
+      const url = anchor.attr('href');
+
+      if (!url) {
+        continue;
+      }
+
+      const metadata = await fetchMetadata(url);
+      const cardHtml = renderBookmarkHTML({
+        url: metadata.url || url,
+        title: metadata.success ? metadata.title : undefined,
+        description: metadata.success ? metadata.description : undefined,
+        featuredImage: metadata.success ? metadata.featuredImage : undefined,
+      });
+
+      logger.info('Replacing bookmark with bookmark-card HTML', {
+        url,
+        selector: config.bookmarkSelector,
+        index: i,
+        metadataSuccess: metadata.success,
+      });
+
+      bookmarkEl.replaceWith(cardHtml);
+    }
+
+    return $.html();
+  };
+
   return {
+    detectBookmarks,
     fetchMetadata,
+    replaceBookmarks,
   };
 };
 
 export interface BookmarkProcessor {
+  detectBookmarks(html: string): Bookmark[];
   fetchMetadata(url: string): Promise<BookmarkMetadata>;
+  replaceBookmarks(html: string): Promise<string>;
 }
