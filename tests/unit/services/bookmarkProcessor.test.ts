@@ -92,6 +92,63 @@ describe('BookmarkProcessor service', () => {
       expect(result.url).toBe('https://example.com/article');
     });
 
+    it('Uses favicon when og:image missing', async () => {
+      const html = `
+        <html>
+          <head>
+            <meta property="og:title" content="Title" />
+            <link rel="icon" href="https://example.com/favicon.png" />
+          </head>
+          <body></body>
+        </html>
+      `;
+
+      mockedAxios.get.mockResolvedValue({
+        data: html,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {},
+      } as any);
+
+      const processor = createBookmarkProcessor();
+      const result = await processor.fetchMetadata('https://example.com/article');
+
+      expect(result.success).toBe(true);
+      expect(result.featuredImage).toBe('https://example.com/favicon.png');
+    });
+
+    it('Passes timeout/maxRedirects/user-agent to axios', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: '<html><head><title>ok</title></head><body></body></html>',
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {},
+      } as any);
+
+      const processor = createBookmarkProcessor({
+        config: {
+          timeout: 1234,
+          maxRedirects: 4,
+          userAgent: 'TestAgent/1.0',
+        },
+      });
+
+      await processor.fetchMetadata('https://example.com/article');
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        'https://example.com/article',
+        expect.objectContaining({
+          timeout: 1234,
+          maxRedirects: 4,
+          headers: expect.objectContaining({
+            'User-Agent': 'TestAgent/1.0',
+          }),
+        })
+      );
+    });
+
     it('Handle timeout after 10s', async () => {
       mockedAxios.get.mockRejectedValue(new Error('Request timeout after 10000ms'));
 
@@ -255,6 +312,60 @@ describe('BookmarkProcessor service', () => {
 
       // Original Tistory opengraph figure should be gone
       expect(replaced).not.toContain('data-ke-type="opengraph"');
+    });
+
+    it('Escapes malicious metadata to prevent XSS', async () => {
+      const html = `
+        <div class="content">
+          <figure data-ke-type="opengraph">
+            <a href="https://example.com/article1">Article 1</a>
+          </figure>
+        </div>
+      `;
+
+      mockedAxios.get.mockResolvedValue({
+        data: `
+          <html>
+            <head>
+              <meta property="og:title" content="<img src=x onerror=alert(1)>" />
+              <meta property="og:description" content="<script>alert(1)</script>" />
+              <meta property="og:image" content="https://example.com/image.jpg" />
+              <meta property="og:url" content="https://example.com/article1" />
+            </head>
+            <body></body>
+          </html>
+        `,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {},
+      } as any);
+
+      const processor = createBookmarkProcessor();
+      const replaced = await processor.replaceBookmarks(html);
+
+      expect(replaced).toContain('class="bookmark-card"');
+      expect(replaced).not.toContain('<script>');
+      // Ensure the title is escaped in visible HTML
+      expect(replaced).toContain('&lt;img');
+      // Ensure potentially executable tags are escaped in rendered text
+      expect(replaced).not.toContain('<script>');
+    });
+
+    it('Leaves bookmark element unchanged when it has no anchor href', async () => {
+      const html = `
+        <div class="content">
+          <figure data-ke-type="opengraph">
+            <a>missing href</a>
+          </figure>
+        </div>
+      `;
+
+      const processor = createBookmarkProcessor();
+      const replaced = await processor.replaceBookmarks(html);
+
+      expect(replaced).toContain('data-ke-type="opengraph"');
+      expect(mockedAxios.get).not.toHaveBeenCalled();
     });
 
     it('Fall back to URL-only card when metadata fetch fails', async () => {

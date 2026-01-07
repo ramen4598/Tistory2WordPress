@@ -117,15 +117,9 @@ This renders HTML similar to:
 
 ```html
 <figure class="bookmark-card">
-  <div class="bookmark-featured-image">
-    <img src="https://example.com/image.jpg" alt="Example Title" />
-  </div>
-  <div class="bookmark-content">
-    <h3 class="bookmark-title">
-      <a href="https://example.com" target="_blank" rel="noopener noreferrer">Example Title</a>
-    </h3>
-    <p class="bookmark-description">Short description</p>
-  </div>
+  <a href="https://example.com" target="_blank" rel="noopener noreferrer">
+    <!-- image + content wrapped by single <a> -->
+  </a>
 </figure>
 ```
 
@@ -168,25 +162,11 @@ npm start -- --post https://yourblog.tistory.com/123
 **After Processing** (custom card):
 
 ```html
-<div
-  class="bookmark-card"
-  style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin: 16px 0;"
->
-  <div class="bookmark-featured-image" style="height: 200px; overflow: hidden;">
-    <img src="https://example.com/thumbnail.jpg" />
-    alt="Article Title" style="width: 100%; height: 100%; object-fit: cover;" />
-  </div>
-  <div class="bookmark-content" style="padding: 16px;">
-    <h3 class="bookmark-title" style="margin: 0 0 8px 0;">
-      <a href="https://example.com/article" target="_blank" rel="noopener noreferrer"
-        >Article Title</a
-      >
-    </h3>
-    <p class="bookmark-description" style="margin: 0; color: #666; line-height: 1.5;">
-      Article description goes here...
-    </p>
-  </div>
-</div>
+<figure class="bookmark-card">
+  <a href="https://example.com/article" target="_blank" rel="noopener noreferrer">
+    <!-- optional image + content -->
+  </a>
+</figure>
 ```
 
 ### Error Scenarios
@@ -228,7 +208,7 @@ LOG_LEVEL=debug
 [DEBUG] BookmarkProcessor: Fetching metadata from https://example.com/article1
 [DEBUG] BookmarkProcessor: Metadata fetched successfully (title: "Example Title", hasFeaturedImage: true)
 [DEBUG] BookmarkProcessor: Replaced bookmark #0 with custom HTML
-[DEBUG] ImageProcessor: Skipping bookmark featured image (parent: figure[data-ke-type="opengraph"])
+[DEBUG] ImageProcessor: Skipping bookmark featured image (parent: figure.bookmark-card)
 ```
 
 ---
@@ -335,20 +315,18 @@ node dist/cli.js -h
 
 **Solutions**:
 
-1. Verify CSS selector includes parent: `figure[data-ke-type="opengraph"]`
-2. Check ImageProcessor logs for: `Skipping bookmark featured image`
-3. Ensure bookmark HTML has correct `data-og-type` attribute
+1. Ensure migrated HTML contains `figure.bookmark-card`
+2. Check ImageProcessor logs for: `Skipping bookmark featured image (parent: figure.bookmark-card)`
 
 ### Custom Template Not Working
 
-**Problem**: Custom bookmark template not rendering
+**Problem**: Bookmark card HTML doesn't look right
 
 **Solutions**:
 
-1. Verify template file exists: `src/templates/bookmark-template.html`
-2. Check template syntax: `{{title}}`, `{{description}}`, etc.
-3. Ensure file is valid HTML
-4. Check logs for template loading errors
+1. Edit `src/templates/bookmarkTemplate.ts`
+2. Verify `renderBookmarkHTML()` outputs `<figure class="bookmark-card">` with a single outer `<a>`
+3. Re-run migration for a post that contains bookmarks
 
 ---
 

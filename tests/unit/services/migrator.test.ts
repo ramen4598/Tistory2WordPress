@@ -2,14 +2,16 @@ import { createMigrator } from '../../../src/services/migrator';
 import { MigrationJobItemStatus } from '../../../src/enums/db.enum';
 import { Crawler } from '../../../src/services/crawler';
 import { Cleaner } from '../../../src/services/cleaner';
-import { BookmarkProcessor } from '../../../src/services/bookmarkProcessor';
 import { LinkTracker } from '../../../src/services/linkTracker';
 import { ImageProcessor } from '../../../src/services/imageProcessor';
 import { WpClient } from '../../../src/services/wpClient';
 import { createMigrationJobItem, updateMigrationJobItem } from '../../../src/db';
 import { loadConfig } from '../../../src/utils/config';
 import { baseConfig } from '../helpers/baseConfig';
-import { createBookmarkProcessor } from '../../../src/services/bookmarkProcessor';
+import {
+  createBookmarkProcessor,
+  BookmarkProcessor,
+} from '../../../src/services/bookmarkProcessor';
 
 jest.mock('../../../src/utils/config');
 

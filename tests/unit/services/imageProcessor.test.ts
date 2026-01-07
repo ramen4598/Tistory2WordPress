@@ -361,9 +361,13 @@ describe('imageProcessor', () => {
   it('updates ImageAsset to FAILED when download/upload fails', async () => {
     const post = createPost();
 
-    const axiosError: any = new Error('Download failed');
+    const axiosError = new Error('Download failed') as unknown as {
+      isAxiosError: boolean;
+      response: { status: number; statusText: string };
+    };
     axiosError.isAxiosError = true;
     axiosError.response = { status: 404, statusText: 'Not Found' };
+
     mockedAxios.get.mockRejectedValue(axiosError);
 
     const uploadMediaMock = jest.fn().mockResolvedValue({
