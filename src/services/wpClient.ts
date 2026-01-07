@@ -114,7 +114,7 @@ export function createWpClient(): WpClient {
     headers: {
       Authorization: `Basic ${auth}`,
     },
-    timeout: 3000,
+    timeout: 600000, // 10 minutes
   });
 
   const categoryCache = new Map<string, number>(); // key: name value: categoryId
