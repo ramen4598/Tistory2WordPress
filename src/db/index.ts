@@ -77,8 +77,11 @@ export function closeDb(): void {
  */
 export function createMigrationJob(jobType: MigrationJobType): MigrationJob {
   const db = getDb();
-  const stmt = db.prepare('INSERT INTO migration_jobs (job_type, status) VALUES (?, ?)');
-  const info = stmt.run(jobType, MigrationJobStatus.RUNNING);
+  const config = loadConfig();
+  const stmt = db.prepare(
+    'INSERT INTO migration_jobs (blog_url, job_type, status) VALUES (?, ?, ?)'
+  );
+  const info = stmt.run(config.blogUrl, jobType, MigrationJobStatus.RUNNING);
   const id = Number(info.lastInsertRowid);
 
   const row = db.prepare('SELECT * FROM migration_jobs WHERE id = ?').get(id) as
@@ -135,13 +138,16 @@ export function updateMigrationJob(
  * @param jobType MigrationJobType
  * @return MigrationJob | undefined
  */
-export function getLatestRunningJobByType(jobType: MigrationJobType): MigrationJob | undefined {
+export function getLatestRunningJobByTypeAndUrl(
+  jobType: MigrationJobType,
+  blogUrl: string
+): MigrationJob | undefined {
   const db = getDb();
   return db
     .prepare(
-      'SELECT * FROM migration_jobs WHERE job_type = ? AND status = ? ORDER BY id DESC LIMIT 1'
+      'SELECT * FROM migration_jobs WHERE job_type = ? AND status = ? AND blog_url = ? ORDER BY id DESC LIMIT 1'
     )
-    .get(jobType, MigrationJobStatus.RUNNING) as MigrationJob | undefined;
+    .get(jobType, MigrationJobStatus.RUNNING, blogUrl) as MigrationJob | undefined;
 }
 
 // --- MigrationJobItem ---
@@ -253,6 +259,22 @@ export function getMigrationJobItemsByJobIdAndStatus(
   return db
     .prepare('SELECT * FROM migration_job_items WHERE job_id = ? AND status = ? ORDER BY id')
     .all(jobId, status) as MigrationJobItem[];
+}
+
+/**
+ * Get all FAILED migration job items for a given blog URL.
+ */
+export function getFailedMigrationJobItemsByBlogUrl(blogUrl: string): MigrationJobItem[] {
+  const db = getDb();
+  return db
+    .prepare(
+      `SELECT mji.*
+       FROM migration_job_items mji
+       JOIN migration_jobs mj ON mji.job_id = mj.id
+       WHERE mj.blog_url = ? AND mji.status = ?
+       ORDER BY mji.id`
+    )
+    .all(blogUrl, MigrationJobItemStatus.FAILED) as MigrationJobItem[];
 }
 
 // --- ImageAsset ---

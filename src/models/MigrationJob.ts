@@ -6,6 +6,7 @@ import { MigrationJobStatus, MigrationJobType } from '../enums/db.enum';
  */
 export interface MigrationJob {
   id: number;
+  blog_url: string;
   job_type: MigrationJobType;
   status: MigrationJobStatus;
   created_at: string;
