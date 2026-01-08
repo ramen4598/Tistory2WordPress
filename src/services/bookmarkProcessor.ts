@@ -107,8 +107,6 @@ export const createBookmarkProcessor = (
         $('meta[property="og:image"]').attr('content') ||
         (favicon ? resolveUrl(url, favicon) : undefined);
 
-      const canonicalUrl = $('meta[property="og:url"]').attr('content') || url;
-
       const elapsedTime = Date.now() - startTime;
       logger.info('BookmarkProcessor.fetchMetadata - bookmark metadata fetched successfully', {
         url,
@@ -122,7 +120,7 @@ export const createBookmarkProcessor = (
         title,
         description,
         featuredImage,
-        url: canonicalUrl,
+        url,
         fetchedAt,
       };
     } catch (error) {

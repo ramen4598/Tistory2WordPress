@@ -41,7 +41,6 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
   const wpClient = options.wpClient ?? createWpClient();
   const imageProcessor = options.imageProcessor ?? createImageProcessor(wpClient);
 
-  // TODO: 예외 처리 강화 (전반적인 예외 처리 강화가 필요)
   const migratePostByUrl = async (url: string, context: MigratorContext): Promise<void> => {
     const jobItem = createMigrationJobItem({ job_id: context.jobId, tistory_url: url });
 

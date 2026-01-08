@@ -202,32 +202,6 @@ describe('BookmarkProcessor service', () => {
       expect(result.title).toBe('https://unreachable.com/article');
     });
 
-    it('Follow redirects (1-5 hops)', async () => {
-      const finalHtml = `
-        <html>
-          <head>
-            <meta property="og:title" content="Redirected Article" />
-            <meta property="og:url" content="https://final.com/article" />
-          </head>
-          <body></body>
-        </html>
-      `;
-
-      mockedAxios.get.mockResolvedValue({
-        data: finalHtml,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {},
-      } as any);
-
-      const processor = createBookmarkProcessor();
-      const result = await processor.fetchMetadata('https://short.link/abc');
-
-      expect(result.title).toBe('Redirected Article');
-      expect(result.url).toBe('https://final.com/article');
-    });
-
     it('Parse HTML with UTF-8 encoding', async () => {
       const html = `
         <html>

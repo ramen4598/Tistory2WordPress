@@ -26,6 +26,8 @@ export function exportFailedPostsByBlogUrl(outputPath: string, blogUrl: string):
 
   const failedItems = getFailedMigrationJobItemsByBlogUrl(blogUrl);
 
+  // TODO: 성공한 적이 있는 항목은 제외하는 로직 추가
+
   const errorMessagesByUrl = new Map<string, Set<string>>();
   for (const item of failedItems) {
     const set = errorMessagesByUrl.get(item.tistory_url) ?? new Set<string>();
