@@ -24,15 +24,11 @@ export const createPostProcessor = (): PostProcessor => {
   const logger = getLogger();
   const config = loadConfig();
 
-  // Calculate rate limiting parameters
-  // If rateLimitPerWorker is 1000ms, allow 1 request per 1000ms
-  const intervalMs = config.rateLimitPerWorker;
-  const intervalCap = 1; // 1 request per interval
-
   const queue = new PQueue({
-    concurrency: config.workerCount,
-    intervalCap: intervalCap,
-    interval: intervalMs,
+    // maximum throughput per minute: rateLimitCap / (rateLimitInterval / 60000)
+    concurrency: config.workerCount, // Number of concurrent workers
+    intervalCap: config.rateLimitCap, // Max requests per interval
+    interval: config.rateLimitInterval, // Interval duration in ms
   });
 
   const migrator = createMigrator();
@@ -41,7 +37,8 @@ export const createPostProcessor = (): PostProcessor => {
     logger.info('PostProcessor: starting processing', {
       count: urls.length,
       concurrency: config.workerCount,
-      rateLimitPerWorker: config.rateLimitPerWorker,
+      rateLimitInterval: config.rateLimitInterval,
+      rateLimitCap: config.rateLimitCap,
     });
 
     const tasks = urls.map((url) => {

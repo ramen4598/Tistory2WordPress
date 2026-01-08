@@ -4,7 +4,7 @@ function resetEnv() {
       key.startsWith('TISTORY_') ||
       key.startsWith('WP_') ||
       key === 'WORKER_COUNT' ||
-      key === 'RATE_LIMIT_PER_WORKER' ||
+      key.startsWith('RATE_LIMIT_') ||
       key.startsWith('RETRY_') ||
       key === 'MIGRATION_DB_PATH' ||
       key === 'LOG_LEVEL' ||
@@ -178,16 +178,28 @@ describe('loadConfig', () => {
     expect(config.workerCount).toBe(8);
   });
 
-  it('loads rate limit config from environment variable', () => {
+  it('loads rate limit interval config from environment variable', () => {
     setMinimumValidEnv();
-    process.env.RATE_LIMIT_PER_WORKER = '500';
+    process.env.RATE_LIMIT_INTERVAL = '999';
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
     const config = loadConfig();
 
-    expect(config.rateLimitPerWorker).toBe(500);
+    expect(config.rateLimitInterval).toBe(999);
+  });
+
+  it('loads rate limit cap config from environment variable', () => {
+    setMinimumValidEnv();
+    process.env.RATE_LIMIT_CAP = '9';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.rateLimitCap).toBe(9);
   });
 
   it('validates WORKER_COUNT upper bound', () => {
@@ -200,20 +212,30 @@ describe('loadConfig', () => {
     expect(() => loadConfig()).toThrow('WORKER_COUNT must be a number between 1 and 16');
   });
 
-  it('validates RATE_LIMIT_PER_WORKER is positive', () => {
+  it('validates RATE_LIMIT_INTERVAL is positive', () => {
     setMinimumValidEnv();
-    process.env.RATE_LIMIT_PER_WORKER = '0';
+    process.env.RATE_LIMIT_INTERVAL = '0';
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
-    expect(() => loadConfig()).toThrow('RATE_LIMIT_PER_WORKER must be a positive number');
+    expect(() => loadConfig()).toThrow('RATE_LIMIT_INTERVAL must be a positive number. Got: 0');
+  });
+
+  it('validates RATE_LIMIT_CAP is positive', () => {
+    setMinimumValidEnv();
+    process.env.RATE_LIMIT_CAP = '0';
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow('RATE_LIMIT_CAP must be a positive number. Got: 0');
   });
 
   it('handles string values for numeric config', () => {
     setMinimumValidEnv();
     process.env.WORKER_COUNT = '4';
-    process.env.RATE_LIMIT_PER_WORKER = '2000';
+    process.env.RATE_LIMIT_INTERVAL = '2000';
+    process.env.RATE_LIMIT_CAP = '4';
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
@@ -221,6 +243,7 @@ describe('loadConfig', () => {
     const config = loadConfig();
 
     expect(config.workerCount).toBe(4);
-    expect(config.rateLimitPerWorker).toBe(2000);
+    expect(config.rateLimitInterval).toBe(2000);
+    expect(config.rateLimitCap).toBe(4);
   });
 });

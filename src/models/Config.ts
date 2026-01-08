@@ -59,17 +59,23 @@ export interface Config {
 
   /**
    * Number of concurrent workers for parallel processing
-   * @default 4
+   * @default 1
    * @min 1
    * @max 16
    */
   workerCount: number;
 
   /**
-   * Rate limit per worker in milliseconds
-   * @default 1000
+   * Rate limit interval
+   * @default 60000 (1 minute)
    */
-  rateLimitPerWorker: number;
+  rateLimitInterval: number;
+
+  /**
+   * Rate limit cap (number of requests per interval)
+   * @default 1 (1 request per interval)
+   */
+  rateLimitCap: number;
 
   /**
    * Output directory path for generated files

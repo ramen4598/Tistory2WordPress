@@ -3,8 +3,9 @@ import { CategoryHierarchyOrder, LogLevel } from '../../../src/enums/config.enum
 
 export const baseConfig: Config = {
   blogUrl: 'https://example.tistory.com',
-  workerCount: 4,
-  rateLimitPerWorker: 1000,
+  workerCount: 1,
+  rateLimitInterval: 60000,
+  rateLimitCap: 1,
   outputDir: './output',
   logLevel: LogLevel.INFO,
 

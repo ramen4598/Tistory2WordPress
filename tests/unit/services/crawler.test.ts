@@ -2,6 +2,8 @@
 import { loadConfig } from '../../../src/utils/config';
 import { createCrawler } from '../../../src/services/crawler';
 import { baseConfig } from '../helpers/baseConfig';
+import { Config } from '../../../src/models/Config';
+import { CategoryHierarchyOrder } from '../../../src/enums/config.enum';
 
 jest.mock('../../../src/utils/config');
 
@@ -337,20 +339,9 @@ describe('Crawler service', () => {
     `;
 
     mockedLoadConfig.mockReturnValue({
-      blogUrl,
-      workerCount: 4,
-      rateLimitPerWorker: 1000,
-      outputDir: './output',
-      downloadsDir: './output/downloads',
-      logLevel: 'info',
-      postTitleSelector: 'meta[name="title"]',
-      postPublishDateSelector: 'meta[property="article:published_time"]',
-      postModifiedDateSelector: 'meta[property="article:modified_time"]',
-      postCategorySelector: 'div.another_category h4 a',
-      postTagSelector: 'div.area_tag a[rel="tag"]',
-      postListLinkSelector: 'a.link_category',
-      categoryHierarchyOrder: 'last-is-parent',
-    } as any);
+      ...baseConfig,
+      categoryHierarchyOrder: CategoryHierarchyOrder.LAST_IS_PARENT,
+    } as Config);
 
     const crawler = createCrawler({
       fetchFn: jest.fn() as any,

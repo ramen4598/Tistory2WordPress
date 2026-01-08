@@ -27,7 +27,7 @@ export const createBookmarkProcessor = (
   const logger = getLogger();
 
   const {
-    timeout = 10000, // 10 seconds
+    timeout = 60000, // 1 minutes
     maxRedirects = 5,
     userAgent = 'Mozilla/5.0 (compatible; Tistory2Wordpress/1.0)',
   } = options.config || {};

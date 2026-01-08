@@ -7,8 +7,9 @@ import { CategoryHierarchyOrder, LogLevel } from '../enums/config.enum';
  * Change Config interface JSDoc defaults when modifying these
  */
 const DEFAULT_CONFIG = {
-  WORKER_COUNT: 4,
-  RATE_LIMIT_PER_WORKER: 1000,
+  WORKER_COUNT: 1,
+  RATE_LIMIT_INTERVAL: 60000, // 1 minute
+  RATE_LIMIT_CAP: 1, // 1 request per interval
   OUTPUT_DIR: './output',
   LOG_LEVEL: LogLevel.INFO,
   CATEGORY_HIERARCHY_ORDER: CategoryHierarchyOrder.FIRST_IS_PARENT,
@@ -67,9 +68,14 @@ export function loadConfig(): Config {
     ? parseInt(process.env['WORKER_COUNT'], 10)
     : DEFAULT_CONFIG.WORKER_COUNT;
 
-  const rateLimitPerWorker: number = process.env['RATE_LIMIT_PER_WORKER']
-    ? parseInt(process.env['RATE_LIMIT_PER_WORKER'], 10)
-    : DEFAULT_CONFIG.RATE_LIMIT_PER_WORKER;
+  const rateLimitInterval: number = process.env['RATE_LIMIT_INTERVAL']
+    ? parseInt(process.env['RATE_LIMIT_INTERVAL'], 10)
+    : DEFAULT_CONFIG.RATE_LIMIT_INTERVAL;
+
+  const rateLimitCap: number = process.env['RATE_LIMIT_CAP']
+    ? parseInt(process.env['RATE_LIMIT_CAP'], 10)
+    : DEFAULT_CONFIG.RATE_LIMIT_CAP;
+
   const outputDir: string = process.env['OUTPUT_DIR'] || DEFAULT_CONFIG.OUTPUT_DIR;
 
   const logLevel: LogLevel = (process.env['LOG_LEVEL'] as LogLevel) || DEFAULT_CONFIG.LOG_LEVEL;
@@ -190,9 +196,15 @@ export function loadConfig(): Config {
     );
   }
 
-  if (isNaN(rateLimitPerWorker) || rateLimitPerWorker <= 0) {
+  if (isNaN(rateLimitInterval) || rateLimitInterval <= 0) {
     throw new ConfigurationError(
-      `RATE_LIMIT_PER_WORKER must be a positive number. Got: ${process.env['RATE_LIMIT_PER_WORKER']}`
+      `RATE_LIMIT_INTERVAL must be a positive number. Got: ${process.env['RATE_LIMIT_INTERVAL']}`
+    );
+  }
+
+  if (isNaN(rateLimitCap) || rateLimitCap <= 0) {
+    throw new ConfigurationError(
+      `RATE_LIMIT_CAP must be a positive number. Got: ${process.env['RATE_LIMIT_CAP']}`
     );
   }
 
@@ -250,7 +262,8 @@ export function loadConfig(): Config {
   const config: Config = {
     blogUrl,
     workerCount,
-    rateLimitPerWorker,
+    rateLimitInterval,
+    rateLimitCap,
     outputDir,
     logLevel,
     logFile,

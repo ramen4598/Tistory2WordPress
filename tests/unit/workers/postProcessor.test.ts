@@ -10,14 +10,6 @@ jest.mock('../../../src/services/migrator');
 const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
 describe('PostProcessor', () => {
-  beforeEach(() => {
-    mockedLoadConfig.mockReturnValue(baseConfig);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   let mockMigrator: jest.Mocked<Migrator>;
   beforeEach(() => {
     mockMigrator = {
@@ -26,7 +18,19 @@ describe('PostProcessor', () => {
     (createMigrator as jest.Mock).mockReturnValue(mockMigrator);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('processes posts with specified concurrency', async () => {
+    const testConfig: Config = {
+      ...baseConfig,
+      workerCount: 10,
+      rateLimitInterval: 1000,
+      rateLimitCap: 10,
+    };
+    mockedLoadConfig.mockReturnValue(testConfig);
+
     const urls = ['https://example.com/1', 'https://example.com/2', 'https://example.com/3'];
 
     const processor = createPostProcessor();
@@ -45,6 +49,14 @@ describe('PostProcessor', () => {
   });
 
   it('continues processing even if some posts fail', async () => {
+    const testConfig: Config = {
+      ...baseConfig,
+      workerCount: 10,
+      rateLimitInterval: 1000,
+      rateLimitCap: 10,
+    };
+    mockedLoadConfig.mockReturnValue(testConfig);
+
     const urls = ['https://example.com/fail', 'https://example.com/pass'];
     mockMigrator.migratePostByUrl
       .mockRejectedValueOnce(new Error('Migration failed'))
@@ -59,7 +71,8 @@ describe('PostProcessor', () => {
     const testConfig: Config = {
       ...baseConfig,
       workerCount: 2,
-      rateLimitPerWorker: 500, // 500ms = 2 requests per second
+      rateLimitInterval: 500,
+      rateLimitCap: 2,
     };
     mockedLoadConfig.mockReturnValue(testConfig);
 
@@ -75,6 +88,6 @@ describe('PostProcessor', () => {
     expect(mockMigrator.migratePostByUrl).toHaveBeenCalledTimes(3);
     // With rate limiting of 500ms per request and 2 concurrent workers,
     // we should see some minimum duration for processing
-    expect(duration).toBeGreaterThan(250); // Allow some tolerance for test execution time
+    expect(duration).toBeGreaterThan(500); // Allow some tolerance for test execution time
   });
 });

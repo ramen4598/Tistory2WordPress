@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'fs';
 import * as path from 'path';
+import { Config } from '../../../src/models/Config';
 import { loadConfig } from '../../../src/utils/config';
 import { createCleaner } from '../../../src/services/cleaner';
+import { baseConfig } from '../helpers/baseConfig';
 
 jest.mock('../../../src/utils/config');
 
@@ -23,7 +24,6 @@ const dummyPost384Html = fs.readFileSync(
 );
 
 describe('Cleaner service', () => {
-  const blogUrl = 'https://ramen4598.tistory.com';
   const metaTags = `
     <meta name="title" content="Test Post Title">
     <meta property="article:published_time" content="2024-01-15T10:00:00+09:00">
@@ -45,20 +45,9 @@ describe('Cleaner service', () => {
 
   beforeEach(() => {
     mockedLoadConfig.mockReturnValue({
-      blogUrl,
-      workerCount: 4,
-      rateLimitPerWorker: 1000,
-      outputDir: './output',
-      downloadsDir: './output/downloads',
-      logLevel: 'info',
-      postTitleSelector: 'meta[name="title"]',
-      postPublishDateSelector: 'meta[property="article:published_time"]',
-      postModifiedDateSelector: 'meta[property="article:modified_time"]',
-      postCategorySelector: 'div.another_category h4 a',
-      postTagSelector: 'div.area_tag a[rel="tag"]',
-      postListLinkSelector: 'a.link_category',
-      postContentSelector: 'div.tt_article_useless_p_margin.contents_style',
-    } as any);
+      ...baseConfig,
+      blogUrl: 'https://ramen4598.tistory.com',
+    } as Config);
   });
 
   afterEach(() => {

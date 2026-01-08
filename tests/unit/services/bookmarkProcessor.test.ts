@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { loadConfig } from '../../../src/utils/config';
 import { createBookmarkProcessor } from '../../../src/services/bookmarkProcessor';
+import { baseConfig } from '../helpers/baseConfig';
 
 jest.mock('axios');
 jest.mock('../../../src/utils/config');
@@ -11,22 +12,15 @@ const mockedLoadConfig = loadConfig as jest.MockedFunction<typeof loadConfig>;
 
 describe('BookmarkProcessor service', () => {
   const config = {
-    blogUrl: 'https://test.tistory.com',
-    workerCount: 4,
-    rateLimitPerWorker: 1000,
-    outputDir: './output',
-    downloadsDir: './output/downloads',
-    logLevel: 'info',
+    ...baseConfig,
     maxRetryAttempts: 3,
-    retryInitialDelayMs: 1000,
+    retryInitialDelayMs: 100,
     retryMaxDelayMs: 10000,
     retryBackoffMultiplier: 2,
-    bookmarkSelector: 'figure[data-ke-type="opengraph"]',
-    bookmarkTemplatePath: './src/templates/bookmarkTemplate.ts',
-  };
+  }
 
   beforeEach(() => {
-    mockedLoadConfig.mockReturnValue(config as any);
+    mockedLoadConfig.mockReturnValue(config);
     jest.clearAllMocks();
   });
 
@@ -146,8 +140,8 @@ describe('BookmarkProcessor service', () => {
       );
     });
 
-    it('Handle timeout after 10s', async () => {
-      mockedAxios.get.mockRejectedValue(new Error('Request timeout after 10000ms'));
+    it('Handle timeout after 1m', async () => {
+      mockedAxios.get.mockRejectedValue(new Error('Request timeout after 60000ms'));
 
       const processor = createBookmarkProcessor();
       const result = await processor.fetchMetadata('https://slow-server.com/article');
@@ -156,7 +150,7 @@ describe('BookmarkProcessor service', () => {
       expect(result.description).toBeUndefined();
       expect(result.featuredImage).toBeUndefined();
       expect(result.url).toBe('https://slow-server.com/article');
-      expect(result.error).toBe('Request timeout after 10000ms');
+      expect(result.error).toBe('Request timeout after 60000ms');
     });
 
     it('Handle 404 HTTP error', async () => {
