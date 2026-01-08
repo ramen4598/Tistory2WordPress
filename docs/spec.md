@@ -143,7 +143,6 @@ node dist/cli.js -h
 **특이사항**:
 
 - 네트워크가 느리거나 이미지 업로드가 오래 걸리는 경우를 고려해, 워드프레스 API 요청 timeout은 비교적 길게 설정됩니다(10분).
-- 장시간 실행 시 연결 안정성을 위해 WordPress REST 요청은 keep-alive `https.Agent`를 사용합니다.
 
 **기능**:
 

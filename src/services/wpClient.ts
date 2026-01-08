@@ -5,8 +5,6 @@ import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
 import { retryWithBackoff } from '../utils/retry';
 
-const WP_REQUEST_TIMEOUT_MS = 600000; // 10 minutes
-
 export interface CreateDraftPostOptions {
   title: string;
   content: string;
@@ -114,7 +112,6 @@ export function createWpClient(): WpClient {
 
   const httpsAgent = new https.Agent({
     keepAlive: true,
-    keepAliveMsecs: 60000, // 1 minute
     // 최대 유휴 연결 수. worker 수만큼은 항상 유지.
     maxFreeSockets: config.workerCount,
     rejectUnauthorized: true,
@@ -125,6 +122,7 @@ export function createWpClient(): WpClient {
     headers: {
       Authorization: `Basic ${auth}`,
     },
+    timeout: 600000, // 10 minutes
     httpsAgent,
   });
 
@@ -182,7 +180,7 @@ export function createWpClient(): WpClient {
     });
 
     const exec = async () => {
-      const response = await client.post('/posts', payload, { timeout: WP_REQUEST_TIMEOUT_MS });
+      const response = await client.post('/posts', payload);
       return response.data as { id: number; status: string; link: string };
     };
 
@@ -238,7 +236,6 @@ export function createWpClient(): WpClient {
     const exec = async () => {
       const response = await client.post<WpMediaResponse>('/media', form, {
         headers: form.getHeaders(),
-        timeout: WP_REQUEST_TIMEOUT_MS,
       });
       return response.data;
     };
@@ -276,7 +273,7 @@ export function createWpClient(): WpClient {
 
   const deleteMedia = async (mediaId: number): Promise<void> => {
     try {
-      await client.delete(`/media/${mediaId}?force=true`, { timeout: WP_REQUEST_TIMEOUT_MS });
+      await client.delete(`/media/${mediaId}?force=true`);
     } catch (error) {
       const axiosError = error as AxiosError;
       const status = axiosError.response?.status;
@@ -299,7 +296,7 @@ export function createWpClient(): WpClient {
 
   const deletePost = async (postId: number): Promise<void> => {
     try {
-      await client.delete(`/posts/${postId}?force=true`, { timeout: WP_REQUEST_TIMEOUT_MS });
+      await client.delete(`/posts/${postId}?force=true`);
     } catch (error) {
       const axiosError = error as AxiosError;
       const status = axiosError.response?.status;
@@ -340,7 +337,6 @@ export function createWpClient(): WpClient {
       do {
         const response = await client.get<WpCategory[]>(`/categories`, {
           params: { per_page: 100, page, search: name },
-          timeout: WP_REQUEST_TIMEOUT_MS,
         });
 
         if (!response?.data || response?.data.length === 0) break;
@@ -369,14 +365,10 @@ export function createWpClient(): WpClient {
 
     // --- if not found, create it ---
     const createExec = async () => {
-      const response = await client.post<WpCategory>(
-        '/categories',
-        {
-          name,
-          parent,
-        },
-        { timeout: WP_REQUEST_TIMEOUT_MS }
-      );
+      const response = await client.post<WpCategory>('/categories', {
+        name,
+        parent,
+      });
       return response.data;
     };
 
@@ -407,7 +399,6 @@ export function createWpClient(): WpClient {
       do {
         const response = await client.get<WpTag[]>(`/tags`, {
           params: { per_page: 100, page, search: name },
-          timeout: WP_REQUEST_TIMEOUT_MS,
         });
 
         if (!response?.data || response?.data.length === 0) break;
@@ -436,11 +427,7 @@ export function createWpClient(): WpClient {
 
     // --- if not found, create it ---
     const createExec = async () => {
-      const response = await client.post<WpTag>(
-        '/tags',
-        { name },
-        { timeout: WP_REQUEST_TIMEOUT_MS }
-      );
+      const response = await client.post<WpTag>('/tags', { name });
       return response.data;
     };
 
