@@ -264,7 +264,7 @@ LOG_FILE=./output/migration.log
 | 변수   | `RETRY_MAX_DELAY_MS`          |
 | ------ | ----------------------------- |
 | 용도   | 재시도 시 최대 대기 시간 (ms) |
-| 기본값 | `600000` (10분)                |
+| 기본값 | `600000` (10분)               |
 | 설명   | 재시도 대기 시간의 상한입니다 |
 
 | 변수   | `RETRY_BACKOFF_MULTIPLIER`                                                 |
@@ -317,7 +317,8 @@ node dist/cli.js --post=https://yourblog.tistory.com/123
 
 ### 전체 블로그 이관
 
-모든 포스트를 이관하려면 `--all` 옵션을 사용하세요:
+`--all`은 블로그의 전체 URL을 발견한 뒤, **역대 한 번도 시도되지 않은 URL**만 이관합니다.
+("시도"는 `migration_job_items`에 한 번이라도 기록된 경우를 의미합니다.)
 
 ```bash
 node dist/cli.js --all
@@ -335,10 +336,10 @@ node dist/cli.js --all --export-links
 
 ### 실패 항목 재시도
 
-이관 중 실패한 항목만 다시 시도하려면 `--retry-failed` 옵션을 사용하세요:
+`--retry-failed`는 **역대 실패 이력은 있으나 성공(COMPLETED) 이력이 단 한 번도 없는 URL**만 재시도합니다.
 
 ```bash
-node dist/cli.js --all --retry-failed
+node dist/cli.js --retry-failed
 ```
 
 ### CLI 옵션
@@ -347,8 +348,8 @@ node dist/cli.js --all --retry-failed
 | ---------------- | ---------------------------------- |
 | `-h, --help`     | 도움말 메시지 표시 후 종료         |
 | `--post=<url>`   | 단일 포스트 URL로 이관             |
-| `--all`          | 블로그의 모든 포스트 이관          |
-| `--retry-failed` | 실패한 이관 항목 재시도            |
+| `--all`          | 역대 미시도 URL만 이관             |
+| `--retry-failed` | 역대 실패(미성공) URL만 재시도     |
 | `--export-links` | 내부 링크 매핑을 JSON으로 내보내기 |
 
 ## 북마크 처리
@@ -445,10 +446,10 @@ HTML을 마크다운으로 변환한 후, 다시 HTML로 변환하여 워드프�
 
 ### 이관 작업 관리
 
-- `--all` 옵션으로 이관을 시작하면 이관 작업이 생성됩니다.
+- `--all` 옵션으로 이관을 시작하면 FULL 이관 작업이 생성됩니다.
 - 이관 작업 ID는 로그에 표시됩니다.
-- 이관 중단 후 `--all`을 다시 실행하면 마지막 작업이 재개됩니다.
-- `--retry-failed` 옵션으로 실패 항목만 재시도할 수 있습니다.
+- `--all`은 실행할 때마다 "역대 미시도" URL만 골라서 진행합니다.
+- `--retry-failed`은 실행할 때마다 "역대 실패만 한" URL만 골라서 진행합니다.
 
 ## 문제 해결
 

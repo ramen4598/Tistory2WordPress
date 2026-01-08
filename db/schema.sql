@@ -9,7 +9,7 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS migration_jobs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   blog_url TEXT NOT NULL,
-  job_type TEXT NOT NULL CHECK(job_type IN ('full', 'single')),
+  job_type TEXT NOT NULL CHECK(job_type IN ('full', 'single', 'retry')),
   status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed')),
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   completed_at TEXT,

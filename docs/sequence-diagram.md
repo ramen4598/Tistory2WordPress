@@ -43,7 +43,7 @@ sequenceDiagram
             Note right of Migrator: Single post migration (see detailed diagram)
             Migrator-->>CLI: Done
         else --all
-            CLI->>DB: Get latest FULL job or create new
+            CLI->>DB: Create MigrationJob (type=FULL, status=Running)
             DB-->>CLI: jobId
 
             CLI->>Crawler: discoverPostUrls()
@@ -54,12 +54,31 @@ sequenceDiagram
             end
             Crawler-->>CLI: All post URLs
 
-            CLI->>DB: Query MigrationJobItems (Completed/Failed)
-            DB-->>CLI: existing job items
-            CLI->>CLI: Filter remaining URLs (skip completed, optionally retry failed)
+            CLI->>DB: Query attempted URLs (history)
+            DB-->>CLI: attemptedUrls
+            CLI->>CLI: Filter never-attempted URLs
 
             CLI->>WorkerPool: Initialize workers (WORKER_COUNT, rate limiters)
             CLI->>WorkerPool: process(pendingUrls, jobId)
+
+            par Worker 1..N
+                loop Each assigned post
+                    WorkerPool->>Migrator: migratePostByUrl(url, {jobId})
+                    Note right of Migrator: See Single Post Migration diagram
+                    Migrator-->>WorkerPool: Done or Error
+                end
+            end
+
+            WorkerPool-->>CLI: All posts processed
+        else --retry-failed
+            CLI->>DB: Create MigrationJob (type=RETRY, status=Running)
+            DB-->>CLI: jobId
+
+            CLI->>DB: Query retry URLs (history)
+            DB-->>CLI: retryUrls
+
+            CLI->>WorkerPool: Initialize workers (WORKER_COUNT, rate limiters)
+            CLI->>WorkerPool: process(retryUrls, jobId)
 
             par Worker 1..N
                 loop Each assigned post

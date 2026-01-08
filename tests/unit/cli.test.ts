@@ -31,7 +31,7 @@ describe('CLI --help', () => {
     expect(logged).toContain('Tistory2Wordpress - Migrate Tistory blog posts to WordPress');
     expect(logged).toContain('Usage:');
     expect(logged).toContain(
-      '[--post=<url> | --all] [--retry-failed] [--export-links] [--export-failed]'
+      '[--post=<url> | --all | --retry-failed] [--export-links] [--export-failed]'
     );
     expect(logged).toContain('Options:');
     expect(logged).toContain('-h, --help');
@@ -253,84 +253,10 @@ describe('CLI --all', () => {
 
     jest.doMock('../../src/db', () => ({
       getDb: jest.fn(),
-      getLatestRunningJobByTypeAndUrl: jest.fn().mockReturnValue(null),
       createMigrationJob: jest.fn().mockReturnValue({ id: 999 }),
-      getMigrationJobItemsByJobIdAndStatus: jest.fn().mockReturnValue([]),
-      getMigrationJobItemsByJobId: jest.fn().mockReturnValue([
-        { id: 1, job_id: 999, tistory_url: 'https://example.com/post/1', status: 'completed' },
-        { id: 2, job_id: 999, tistory_url: 'https://example.com/post/2', status: 'completed' },
-      ]),
-      updateMigrationJob: jest.fn(),
-      closeDb: jest.fn(),
-    }));
-
-    jest.doMock('../../src/services/crawler', () => ({
-      createCrawler: jest.fn().mockReturnValue({ discoverPostUrls }),
-    }));
-
-    jest.doMock('../../src/services/migrator', () => ({
-      createMigrator: jest.fn().mockReturnValue({}),
-    }));
-
-    jest.doMock('../../src/workers/postProcessor', () => ({
-      createPostProcessor: jest.fn().mockReturnValue({ process }),
-    }));
-
-    const { runCli } = await import('../../src/cli');
-
-    const code = await runCli(['node', 'cli', '--all']);
-
-    expect(code).toBe(0);
-
-    const db = await import('../../src/db');
-    const postProcessor = await import('../../src/workers/postProcessor');
-    expect(db.getLatestRunningJobByTypeAndUrl).toHaveBeenCalledWith(
-      MigrationJobType.FULL,
-      'https://example.com'
-    );
-    expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.FULL);
-    expect(discoverPostUrls).toHaveBeenCalled();
-    expect(db.getMigrationJobItemsByJobIdAndStatus).toHaveBeenCalledWith(
-      999,
-      MigrationJobItemStatus.COMPLETED
-    );
-    expect(postProcessor.createPostProcessor).toHaveBeenCalledWith();
-    expect(process).toHaveBeenCalledWith(
-      ['https://example.com/post/1', 'https://example.com/post/2'],
-      999
-    );
-    expect(db.getMigrationJobItemsByJobId).toHaveBeenCalledWith(999);
-
-    logSpy.mockRestore();
-  });
-
-  it('resumes migration when running job exists with completed items', async () => {
-    const discoverPostUrls = jest
-      .fn()
-      .mockResolvedValue([
-        'https://example.com/post/1',
-        'https://example.com/post/2',
-        'https://example.com/post/3',
-      ]);
-    const process = jest.fn();
-    const loggerSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
-
-    jest.doMock('../../src/utils/config', () => ({
-      loadConfig: jest.fn().mockReturnValue({
-        blogUrl: 'https://example.com',
-        workerCount: 7,
-        outputDir: './output',
-      }),
-    }));
-
-    jest.doMock('../../src/db', () => ({
-      getDb: jest.fn(),
-      getLatestRunningJobByTypeAndUrl: jest.fn().mockReturnValue({ id: 888 }),
-      createMigrationJob: jest.fn().mockReturnValue({ id: 888 }),
-      getMigrationJobItemsByJobIdAndStatus: jest.fn().mockReturnValue([
-        { id: 1, job_id: 888, tistory_url: 'https://example.com/post/1', status: 'completed' },
-        { id: 2, job_id: 888, tistory_url: 'https://example.com/post/2', status: 'completed' },
-      ]),
+      getAttemptedTistoryUrlsByBlogUrl: jest
+        .fn()
+        .mockReturnValue(['https://example.com/post/1', 'https://example.com/post/2']),
       getMigrationJobItemsByJobId: jest.fn().mockReturnValue([]),
       updateMigrationJob: jest.fn(),
       closeDb: jest.fn(),
@@ -356,20 +282,69 @@ describe('CLI --all', () => {
 
     const db = await import('../../src/db');
     const postProcessor = await import('../../src/workers/postProcessor');
-    expect(db.getLatestRunningJobByTypeAndUrl).toHaveBeenCalledWith(
-      MigrationJobType.FULL,
-      'https://example.com'
-    );
-    expect(db.createMigrationJob).not.toHaveBeenCalled();
+    expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.FULL);
     expect(discoverPostUrls).toHaveBeenCalled();
-    expect(db.getMigrationJobItemsByJobIdAndStatus).toHaveBeenCalledWith(
-      888,
-      MigrationJobItemStatus.COMPLETED
-    );
-    expect(db.getMigrationJobItemsByJobIdAndStatus).toHaveBeenCalledWith(
-      888,
-      MigrationJobItemStatus.FAILED
-    );
+    expect(db.getAttemptedTistoryUrlsByBlogUrl).toHaveBeenCalledWith('https://example.com');
+    expect(postProcessor.createPostProcessor).toHaveBeenCalledWith();
+    expect(process).toHaveBeenCalledWith([], 999);
+    expect(db.getMigrationJobItemsByJobId).toHaveBeenCalledWith(999);
+
+    logSpy.mockRestore();
+  });
+
+  it('migrates only never-attempted URLs for --all', async () => {
+    const discoverPostUrls = jest
+      .fn()
+      .mockResolvedValue([
+        'https://example.com/post/1',
+        'https://example.com/post/2',
+        'https://example.com/post/3',
+      ]);
+    const process = jest.fn();
+    const loggerSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    jest.doMock('../../src/utils/config', () => ({
+      loadConfig: jest.fn().mockReturnValue({
+        blogUrl: 'https://example.com',
+        workerCount: 7,
+        outputDir: './output',
+      }),
+    }));
+
+    jest.doMock('../../src/db', () => ({
+      getDb: jest.fn(),
+      createMigrationJob: jest.fn().mockReturnValue({ id: 888 }),
+      getAttemptedTistoryUrlsByBlogUrl: jest
+        .fn()
+        .mockReturnValue(['https://example.com/post/1', 'https://example.com/post/2']),
+      getMigrationJobItemsByJobId: jest.fn().mockReturnValue([]),
+      updateMigrationJob: jest.fn(),
+      closeDb: jest.fn(),
+    }));
+
+    jest.doMock('../../src/services/crawler', () => ({
+      createCrawler: jest.fn().mockReturnValue({ discoverPostUrls }),
+    }));
+
+    jest.doMock('../../src/services/migrator', () => ({
+      createMigrator: jest.fn().mockReturnValue({}),
+    }));
+
+    jest.doMock('../../src/workers/postProcessor', () => ({
+      createPostProcessor: jest.fn().mockReturnValue({ process }),
+    }));
+
+    const { runCli } = await import('../../src/cli');
+
+    const code = await runCli(['node', 'cli', '--all']);
+
+    expect(code).toBe(0);
+
+    const db = await import('../../src/db');
+    const postProcessor = await import('../../src/workers/postProcessor');
+    expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.FULL);
+    expect(discoverPostUrls).toHaveBeenCalled();
+    expect(db.getAttemptedTistoryUrlsByBlogUrl).toHaveBeenCalledWith('https://example.com');
     expect(postProcessor.createPostProcessor).toHaveBeenCalledWith();
     expect(process).toHaveBeenCalledWith(['https://example.com/post/3'], 888);
     expect(db.getMigrationJobItemsByJobId).toHaveBeenCalledWith(888);
@@ -377,14 +352,28 @@ describe('CLI --all', () => {
     loggerSpy.mockRestore();
   });
 
-  it('retries failed items when --retry-failed flag is set', async () => {
-    const discoverPostUrls = jest
-      .fn()
-      .mockResolvedValue([
-        'https://example.com/post/1',
-        'https://example.com/post/2',
-        'https://example.com/post/3',
-      ]);
+  it('rejects --all + --retry-failed (mutually exclusive)', async () => {
+    jest.doMock('../../src/utils/config', () => ({
+      loadConfig: jest.fn().mockReturnValue({
+        blogUrl: 'https://example.com',
+        workerCount: 7,
+        outputDir: './output',
+      }),
+    }));
+
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    const { runCli } = await import('../../src/cli');
+
+    const code = await runCli(['node', 'cli', '--all', '--retry-failed']);
+
+    expect(code).toBe(1);
+    expect(logSpy).toHaveBeenCalled();
+
+    logSpy.mockRestore();
+  });
+
+  it('retries failed items when --retry-failed is set', async () => {
     const process = jest.fn();
     const loggerSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
@@ -398,39 +387,13 @@ describe('CLI --all', () => {
 
     jest.doMock('../../src/db', () => ({
       getDb: jest.fn(),
-      getLatestRunningJobByTypeAndUrl: jest.fn().mockReturnValue({ id: 999 }),
-      createMigrationJob: jest.fn().mockReturnValue({ id: 999 }),
-      getMigrationJobItemsByJobIdAndStatus: jest.fn().mockImplementation((id, status) => {
-        if (status === MigrationJobItemStatus.COMPLETED) {
-          return [
-            { id: 1, job_id: 999, tistory_url: 'https://example.com/post/1', status: 'completed' },
-          ];
-        }
-        if (status === MigrationJobItemStatus.FAILED) {
-          return [
-            { id: 2, job_id: 999, tistory_url: 'https://example.com/post/2', status: 'failed' },
-          ];
-        }
-        return [];
-      }),
+      createMigrationJob: jest.fn().mockReturnValue({ id: 777 }),
+      getRetryUrlsByBlogUrl: jest
+        .fn()
+        .mockReturnValue(['https://example.com/post/2', 'https://example.com/post/3']),
       getMigrationJobItemsByJobId: jest.fn().mockReturnValue([]),
-      getMigrationJobById: jest.fn().mockReturnValue({
-        id: 999,
-        job_type: 'full',
-        status: 'running',
-        created_at: new Date().toISOString(),
-        completed_at: null,
-        error_message: null,
-        processed_count: 0,
-        skipped_count: 0,
-        failed_count: 0,
-      }),
       updateMigrationJob: jest.fn(),
       closeDb: jest.fn(),
-    }));
-
-    jest.doMock('../../src/services/crawler', () => ({
-      createCrawler: jest.fn().mockReturnValue({ discoverPostUrls }),
     }));
 
     jest.doMock('../../src/services/migrator', () => ({
@@ -443,30 +406,19 @@ describe('CLI --all', () => {
 
     const { runCli } = await import('../../src/cli');
 
-    const code = await runCli(['node', 'cli', '--all', '--retry-failed']);
+    const code = await runCli(['node', 'cli', '--retry-failed']);
 
     expect(code).toBe(0);
 
     const db = await import('../../src/db');
     const postProcessor = await import('../../src/workers/postProcessor');
-    expect(db.getLatestRunningJobByTypeAndUrl).toHaveBeenCalledWith(
-      MigrationJobType.FULL,
-      'https://example.com'
-    );
-    expect(db.getMigrationJobItemsByJobIdAndStatus).toHaveBeenCalledWith(
-      999,
-      MigrationJobItemStatus.COMPLETED
-    );
-    expect(db.getMigrationJobItemsByJobIdAndStatus).toHaveBeenCalledWith(
-      999,
-      MigrationJobItemStatus.FAILED
-    );
+    expect(db.createMigrationJob).toHaveBeenCalledWith(MigrationJobType.RETRY);
+    expect(db.getRetryUrlsByBlogUrl).toHaveBeenCalledWith('https://example.com');
     expect(postProcessor.createPostProcessor).toHaveBeenCalledWith();
     expect(process).toHaveBeenCalledWith(
       ['https://example.com/post/2', 'https://example.com/post/3'],
-      999
+      777
     );
-    expect(db.getMigrationJobItemsByJobId).toHaveBeenCalledWith(999);
 
     loggerSpy.mockRestore();
   });

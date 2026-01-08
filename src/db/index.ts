@@ -262,6 +262,55 @@ export function getMigrationJobItemsByJobIdAndStatus(
 }
 
 /**
+ * Get distinct tistory URLs that were ever attempted (have any migration_job_items record)
+ * for a given blog URL.
+ * @param blogUrl base URL of the Tistory blog
+ * @return string[]
+ */
+export function getAttemptedTistoryUrlsByBlogUrl(blogUrl: string): string[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT DISTINCT mji.tistory_url
+       FROM migration_job_items mji
+       JOIN migration_jobs mj ON mji.job_id = mj.id
+       WHERE mj.blog_url = ?
+       ORDER BY mji.tistory_url`
+    )
+    .all(blogUrl) as Array<{ tistory_url: string }>;
+
+  return rows.map((r) => r.tistory_url);
+}
+
+/**
+ * Get tistory URLs to retry for a given blog URL.
+ *
+ * Criteria:
+ * - FAILED at least once
+ * - COMPLETED never
+ * @param blogUrl base URL of the Tistory blog
+ * @return string[]
+ */
+export function getRetryUrlsByBlogUrl(blogUrl: string): string[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT mji.tistory_url
+       FROM migration_job_items mji
+       JOIN migration_jobs mj ON mji.job_id = mj.id
+       WHERE mj.blog_url = ?
+       GROUP BY mji.tistory_url
+       HAVING
+         SUM(CASE WHEN mji.status = 'completed' THEN 1 ELSE 0 END) = 0
+         AND SUM(CASE WHEN mji.status = 'failed' THEN 1 ELSE 0 END) > 0
+       ORDER BY mji.tistory_url`
+    )
+    .all(blogUrl) as Array<{ tistory_url: string }>;
+
+  return rows.map((r) => r.tistory_url);
+}
+
+/**
  * Get FAILED migration job items for a given blog URL,
  * excluding any items that have ever succeeded (COMPLETED) for the same tistory_url.
  */

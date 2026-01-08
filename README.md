@@ -26,11 +26,11 @@ node dist/cli.js --help
 # 단일 포스트 이관
 node dist/cli.js --post=https://yourblog.tistory.com/123
 
-# 전체 포스트 이관
+# 전체 포스트 이관 (역대 미시도 URL만)
 node dist/cli.js --all
 
-# 실패 항목 재시도
-node dist/cli.js --all --retry-failed
+# 실패 항목 재시도 (역대 성공한 적 없이 실패만 한 URL만)
+node dist/cli.js --retry-failed
 
 # 내부 링크 매핑 내보내기
 node dist/cli.js --all --export-links
@@ -65,7 +65,7 @@ node dist/cli.js --all --export-links
 | `LOG_FILE`                        | 로그를 파일로 저장할 경로 (지정하지 않으면 콘솔만 출력)                                                    | -                     | X    |
 | `MAX_RETRY_ATTEMPTS`              | HTTP 요청 실패 시 재시도할 최대 횟수                                                                       | 3                     | X    |
 | `RETRY_INITIAL_DELAY_MS`          | 재시도 시 첫 번째 대기 시간 (ms)                                                                           | 500                   | X    |
-| `RETRY_MAX_DELAY_MS`              | 재시도 시 최대 대기 시간 (ms)                                                                              | 600000                 | X    |
+| `RETRY_MAX_DELAY_MS`              | 재시도 시 최대 대기 시간 (ms)                                                                              | 600000                | X    |
 | `RETRY_BACKOFF_MULTIPLIER`        | 재시도할 때마다 대기 시간을 늘리는 배수 (지수적 백오프)                                                    | 10                    | X    |
 
 ## 주요 기능
@@ -77,7 +77,7 @@ node dist/cli.js --all --export-links
 - **이미지 이관**: 워드프레스 미디어 라이브러리로 이미지 다운로드 및 업로드
 - **컨텐츠 정제**: 불필요한 HTML 태그 및 속성 제거, 구조 보존
 - **내부 링크 추적**: 자신의 다른 티스토리 블로그 글을 참조한 블로그 글을 기록. 워드프레스 이관 후에도 수정해야할 내부 링크 목록 제공.
-- **재시도 지원**: 실패한 이관 항목 재시도
+- **재시도 지원**: 실패한 URL 재시도
 
 자세한 기능 설명과 한계점은 [docs/spec.md](docs/spec.md)를 참고하세요.
 
