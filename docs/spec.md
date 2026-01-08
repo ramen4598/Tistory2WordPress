@@ -63,11 +63,11 @@ node dist/cli.js -h
 - CSS 선택자로 북마크 요소 감지
 - 각 북마크 URL에서 OpenGraph 메타데이터 fetch:
   - 제목 (og:title → title → URL)
-  - 설명 (og:description → 빈 문자열)
-  - 대표이미지 (og:image → favicon → 빈 문자열)
+  - 설명 (og:description → 없음이면 생략)
+  - 대표이미지 (og:image → favicon → 없음이면 생략)
   - URL (og:url → 원본 URL)
 - HTTP 요청 설정:
-  - 타임아웃: 10초
+  - 타임아웃: 60초
   - 최대 리디렉션: 5회
   - User-Agent 헤더 설정
   - 재시도 메커니즘 (백오프 포함)
@@ -81,7 +81,7 @@ node dist/cli.js -h
 
 **북마크 카드 구조**:
 
-- `src/templates/bookmark-template.html`에서 확인 및 수정 가능 
+- `src/templates/bookmark-template.html`에서 확인 및 수정 가능
 
 **보안**:
 
@@ -139,6 +139,10 @@ node dist/cli.js -h
 ### 6. 워드프레스 REST API 통합
 
 워드프레스 REST API를 사용하여 포스트를 생성합니다.
+
+**특이사항**:
+
+- 네트워크가 느리거나 이미지 업로드가 오래 걸리는 경우를 고려해, 워드프레스 API 요청 timeout은 비교적 길게 설정됩니다(10분).
 
 **기능**:
 
@@ -212,10 +216,15 @@ SQLite 데이터베이스로 이관 상태를 추적합니다.
 **기능**:
 
 - p-queue 라이브러리로 작업 큐 관리
-- 동시 작업자 수 설정 가능 (WORKER_COUNT)
-- 작업자당 요청 속도 제한 (RATE_LIMIT_PER_WORKER)
-- 요청 간 지연으로 서버 과부하 방지
+- 동시 작업자 수 설정 가능 (WORKER_COUNT, 기본 1)
+- 요청 속도 제한 설정 가능 (`RATE_LIMIT_INTERVAL`, `RATE_LIMIT_CAP`)
+- 서버 과부하/차단 방지를 위한 속도 제한
 - PostProcessor가 작업자 풀 관리
+
+**요청 속도 제한 (Rate Limit)**:
+
+- `RATE_LIMIT_INTERVAL` 동안 `RATE_LIMIT_CAP`번까지만 요청하도록 제한합니다.
+- `WORKER_COUNT`는 동시 처리(병렬 처리) 작업 수입니다.
 
 ### 10. 재시도 메커니즘
 
@@ -225,13 +234,18 @@ SQLite 데이터베이스로 이관 상태를 추적합니다.
 
 - exponential backoff:
   - 초기 지연: RETRY_INITIAL_DELAY_MS (기본 500ms)
-  - 백오프 배수: RETRY_BACKOFF_MULTIPLIER (기본 2)
-  - 최대 지연: RETRY_MAX_DELAY_MS (기본 10000ms)
+  - 백오프 배수: RETRY_BACKOFF_MULTIPLIER (기본 10)
+  - 최대 지연: RETRY_MAX_DELAY_MS (기본 600000ms)
 - 최대 재시도 횟수: MAX_RETRY_ATTEMPTS (기본 3)
 - 적용 대상:
   - HTTP 요청 (크롤링, 이미지 다운로드)
   - 북마크 메타데이터 fetch
   - 워드프레스 API 요청
+
+** 예시 **:
+- 첫 번째 실패 후: 500ms 대기
+- 두 번째 실패 후: 500ms × 10 = 5000ms 대기
+- 세 번째 실패 후: 5000ms × 10 = 50000ms 대기
 
 ### 11. 롤백 메커니즘
 
@@ -317,7 +331,7 @@ SQLite 데이터베이스로 이관 상태를 추적합니다.
 **완화**:
 
 - 재시도 메커니즘으로 일시적 실패 대응
-- 타임아웃이 비교적 짧음 (10초)
+- 타임아웃이 비교적 짧음 (60초)
 
 ### 4. 이미지 업로드 제한
 

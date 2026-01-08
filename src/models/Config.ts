@@ -47,13 +47,13 @@ export interface Config {
 
   /**
    * Maximum retry delay in milliseconds
-   * @default 10000
+   * @default 600000 (10 minutes)
    */
   retryMaxDelayMs: number;
 
   /**
    * Backoff multiplier for retries
-   * @default 2
+   * @default 10
    */
   retryBackoffMultiplier: number;
 

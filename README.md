@@ -54,16 +54,17 @@ node dist/cli.js --all --export-links
 | `TISTORY_SELECTOR_FEATURED_IMAGE` | 포스트 대표이미지를 추출하는 CSS 선택자                                                                    | -                     | O    |
 | `TISTORY_BOOKMARK_SELECTOR`       | 티스토리 북마크(웹사이트 미리보기)를 감지하는 CSS 선택자                                                   | -                     | O    |
 | `CATEGORY_HIERARCHY_ORDER`        | 포스트에 카테고리가 2개일 때 어느 것을 부모로 할지 결정 (first-is-parent: 첫 번째, last-is-parent: 마지막) | `first-is-parent`     | X    |
-| `WORKER_COUNT`                    | 동시에 처리할 작업자 수 (높일수록 빠르지만 부하 증가)                                                      | 4                     | X    |
-| `RATE_LIMIT_PER_WORKER`           | 각 작업자가 요청 간에 대기할 시간 (ms) - 너무 낮으면 서버에서 차단됨                                       | 1000                  | X    |
+| `WORKER_COUNT`                    | 동시에 처리할 작업자 수 (높일수록 빠르지만 부하 증가)                                                      | 1                     | X    |
+| `RATE_LIMIT_INTERVAL`             | 일정 시간 간격(ms) 동안 요청을 허용하는 기준 간격                                                          | 60000                 | X    |
+| `RATE_LIMIT_CAP`                  | 위 간격(`RATE_LIMIT_INTERVAL`) 동안 허용할 최대 요청 수                                                    | 1                     | X    |
 | `OUTPUT_DIR`                      | 생성된 파일들을 저장할 디렉토리 경로                                                                       | `./output`            | X    |
 | `MIGRATION_DB_PATH`               | 이관 상태를 저장할 SQLite DB 파일 경로                                                                     | `./data/migration.db` | X    |
 | `LOG_LEVEL`                       | 로그 레벨 (debug: 모든 정보, info: 일반 정보, warn: 경고, error: 에러만)                                   | `info`                | X    |
 | `LOG_FILE`                        | 로그를 파일로 저장할 경로 (지정하지 않으면 콘솔만 출력)                                                    | -                     | X    |
 | `MAX_RETRY_ATTEMPTS`              | HTTP 요청 실패 시 재시도할 최대 횟수                                                                       | 3                     | X    |
 | `RETRY_INITIAL_DELAY_MS`          | 재시도 시 첫 번째 대기 시간 (ms)                                                                           | 500                   | X    |
-| `RETRY_MAX_DELAY_MS`              | 재시도 시 최대 대기 시간 (ms)                                                                              | 10000                 | X    |
-| `RETRY_BACKOFF_MULTIPLIER`        | 재시도할 때마다 대기 시간을 늘리는 배수 (지수적 백오프)                                                    | 2                     | X    |
+| `RETRY_MAX_DELAY_MS`              | 재시도 시 최대 대기 시간 (ms)                                                                              | 600000                 | X    |
+| `RETRY_BACKOFF_MULTIPLIER`        | 재시도할 때마다 대기 시간을 늘리는 배수 (지수적 백오프)                                                    | 10                    | X    |
 
 ## 주요 기능
 

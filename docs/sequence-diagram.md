@@ -32,7 +32,7 @@ sequenceDiagram
         CLI-->>User: Exit with code 0
     else Normal migration
         CLI->>Config: Load environment variables
-        Config-->>CLI: TISTORY_BLOG_URL, WP_BASE_URL, WP_APP_USER, WP_APP_PASSWORD, WORKER_COUNT, RATE_LIMIT, MIGRATION_DB_PATH
+        Config-->>CLI: TISTORY_BLOG_URL, WP_BASE_URL, WP_APP_USER, WP_APP_PASSWORD, WORKER_COUNT, RATE_LIMIT_INTERVAL, RATE_LIMIT_CAP, MIGRATION_DB_PATH
 
         CLI->>DB: Initialize connection and run migrations
 
@@ -268,11 +268,11 @@ sequenceDiagram
     participant Logger
 
     CLI->>Config: Load config
-    Config-->>CLI: WORKER_COUNT, RATE_LIMIT_PER_WORKER
+    Config-->>CLI: WORKER_COUNT, RATE_LIMIT_INTERVAL, RATE_LIMIT_CAP
 
     CLI->>WorkerPool: Initialize with concurrency=WORKER_COUNT
 
-    Note right of WorkerPool: p-queue configuration:<br/>concurrency: WORKER_COUNT<br/>intervalCap: 1<br/>interval: RATE_LIMIT_PER_WORKER
+    Note right of WorkerPool: p-queue configuration:<br/>concurrency: WORKER_COUNT<br/>intervalCap: RATE_LIMIT_CAP<br/>interval: RATE_LIMIT_INTERVAL
 
     CLI->>WorkerPool: process(urls, jobId)
 
@@ -308,10 +308,20 @@ sequenceDiagram
 
 **Rate Limiting**:
 
-- Effective throughput: WORKER_COUNT × (1 request / RATE_LIMIT_PER_WORKER ms)
-- Example: WORKER_COUNT=4, RATE_LIMIT_PER_WORKER=1000ms → 4 req/sec
-- Each worker respects the rate limit independently
-- Worker pool ensures exactly WORKER_COUNT concurrent operations
+사용자 관점:
+
+- `RATE_LIMIT_INTERVAL` 동안 `RATE_LIMIT_CAP`번까지만 요청하도록 제한합니다.
+- `WORKER_COUNT`는 동시 처리(병렬 처리) 작업 수입니다.
+- `WORKER_COUNT`를 늘리면 병렬 처리가 가능하지만, 그럼에도 전체 요청 속도는 `RATE_LIMIT_CAP`에 의해 제한됩니다.
+
+구현 관점:
+
+- p-queue 설정: `concurrency=WORKER_COUNT`, `interval=RATE_LIMIT_INTERVAL`, `intervalCap=RATE_LIMIT_CAP`
+
+예시:
+
+- `WORKER_COUNT=1`, `RATE_LIMIT_INTERVAL=60000ms`, `RATE_LIMIT_CAP=1` → 분당 최대 1회 요청, 단일 작업자
+- `WORKER_COUNT=4`, `RATE_LIMIT_INTERVAL=60000ms`, `RATE_LIMIT_CAP=1` → 분당 최대 1회 요청, 4개의 작업자가 병렬 처리
 
 ---
 
@@ -334,7 +344,7 @@ sequenceDiagram
         BookmarkProcessor->>BookmarkProcessor: Extract URL from anchor tag
         BookmarkProcessor->>External URL: Fetch metadata (GET /)
 
-        alt Success (HTTP 200, timeout=10s, maxRedirects=5)
+        alt Success (HTTP 200, timeout=60s, maxRedirects=5)
             External URL-->>BookmarkProcessor: HTML with OpenGraph meta
             BookmarkProcessor->>BookmarkProcessor: Extract og:title, og:description, og:image, og:url
             BookmarkProcessor->>BookmarkProcessor: renderBookmarkHTML() with metadata
@@ -568,7 +578,7 @@ sequenceDiagram
 **Rate Limiting**:
 
 - Applied at WorkerPool level (p-queue)
-- Per-worker rate limit: 1 request per RATE_LIMIT_PER_WORKER ms
+- 제한 모델: `RATE_LIMIT_INTERVAL` 동안 `RATE_LIMIT_CAP`번 요청 허용
 - Ensures we don't overwhelm Tistory or WordPress
 
 **State Persistence**:
