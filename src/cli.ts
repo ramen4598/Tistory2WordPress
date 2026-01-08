@@ -4,7 +4,7 @@ import {
   createMigrationJob,
   getDb,
   getMigrationJobItemsByJobId,
-  getLatestRunningJobByType,
+  getLatestRunningJobByTypeAndUrl,
   getMigrationJobItemsByJobIdAndStatus,
   updateMigrationJob,
   closeDb,
@@ -13,6 +13,7 @@ import { MigrationJobItemStatus, MigrationJobStatus, MigrationJobType } from './
 import { createMigrator } from './services/migrator';
 import { createCrawler } from './services/crawler';
 import { exportLinkMapping } from './services/linkMapper';
+import { exportFailedPostsByBlogUrl } from './services/failedPostExporter';
 import { MigrationJob } from './models/MigrationJob';
 import { createPostProcessor } from './workers/postProcessor';
 import path from 'path';
@@ -48,7 +49,7 @@ function printUsage(): void {
   console.log('Tistory2Wordpress - Migrate Tistory blog posts to WordPress');
   console.log('');
   console.log('Usage:');
-  console.log('[--post=<url> | --all] [--retry-failed] [--export-links]');
+  console.log('[--post=<url> | --all] [--retry-failed] [--export-links] [--export-failed]');
   console.log('');
   console.log('Options:');
   console.log('  -h, --help           Show this help message');
@@ -56,6 +57,7 @@ function printUsage(): void {
   console.log('  --all                Migrate all posts from the blog');
   console.log('  --retry-failed       Retry failed migration items');
   console.log('  --export-links       Export internal link mapping to JSON');
+  console.log('  --export-failed      Export failed posts to failed_posts.json');
   console.log('');
   console.log('Environment Variables (in .env):');
 }
@@ -73,9 +75,10 @@ export async function runCli(argv: string[]): Promise<number> {
     return 0;
   }
 
+  let config;
   try {
     // Load config early to validate and provide clear error messages
-    loadConfig();
+    config = loadConfig();
   } catch (error) {
     console.error('Error loading configuration:', (error as Error).message);
     return 1;
@@ -85,8 +88,9 @@ export async function runCli(argv: string[]): Promise<number> {
   const allFlag = hasFlag(argv, '--all');
   const retryFailedFlag = hasFlag(argv, '--retry-failed');
   const exportLinksFlag = hasFlag(argv, '--export-links');
+  const exportFailedFlag = hasFlag(argv, '--export-failed');
 
-  if (!postUrl && !allFlag) {
+  if (!postUrl && !allFlag && !exportFailedFlag) {
     printUsage();
     return 1;
   }
@@ -108,6 +112,14 @@ export async function runCli(argv: string[]): Promise<number> {
     // Ensure DB is initialized and schema applied.
     const migrator = createMigrator();
 
+    if (exportFailedFlag) {
+      const outputPath = path.join(config.outputDir, 'failed_posts.json');
+      exportFailedPostsByBlogUrl(outputPath, config.blogUrl);
+      console.log(`- Failed posts exported to: ${outputPath}`);
+      close();
+      return 0;
+    }
+
     if (postUrl) {
       new URL(postUrl);
       const job = createMigrationJob(MigrationJobType.SINGLE);
@@ -117,7 +129,7 @@ export async function runCli(argv: string[]): Promise<number> {
 
     if (allFlag) {
       const job =
-        getLatestRunningJobByType(MigrationJobType.FULL) ??
+        getLatestRunningJobByTypeAndUrl(MigrationJobType.FULL, config.blogUrl) ??
         createMigrationJob(MigrationJobType.FULL);
 
       const crawler = createCrawler({

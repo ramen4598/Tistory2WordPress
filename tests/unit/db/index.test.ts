@@ -16,6 +16,7 @@ import {
   getPostMapByTistoryUrl,
   insertInternalLink,
   getInternalLinksByJobItemId,
+  getFailedMigrationJobItemsByBlogUrl,
 } from '../../../src/db/index';
 import {
   MigrationJobType,
@@ -95,6 +96,7 @@ describe('db repository methods', () => {
     const job = createMigrationJob(MigrationJobType.SINGLE);
 
     expect(job.id).toBeGreaterThan(0);
+    expect(job.blog_url).toBe(baseConfig.blogUrl);
     expect(job.job_type).toBe(MigrationJobType.SINGLE);
     expect(job.status).toBe(MigrationJobStatus.RUNNING);
     expect(job.created_at).toBeTruthy();
@@ -168,6 +170,60 @@ describe('db repository methods', () => {
 
     const itemsByJob = getMigrationJobItemsByJobId(job.id);
     expect(itemsByJob.map((i) => i.id)).toContain(item.id);
+  });
+
+  it('fetches failed migration job items by blog URL', () => {
+    mockedLoadConfig.mockReturnValue({
+      ...baseConfig,
+      blogUrl: 'https://blog-a.example',
+      migrationDbPath: TEST_DB_PATH,
+    });
+
+    const jobA1 = createMigrationJob(MigrationJobType.SINGLE);
+    const jobA2 = createMigrationJob(MigrationJobType.SINGLE);
+
+    mockedLoadConfig.mockReturnValue({
+      ...baseConfig,
+      blogUrl: 'https://blog-b.example',
+      migrationDbPath: TEST_DB_PATH,
+    });
+
+    const jobB1 = createMigrationJob(MigrationJobType.SINGLE);
+
+    const itemA1 = createMigrationJobItem({
+      job_id: jobA1.id,
+      tistory_url: 'https://blog-a/post/1',
+    });
+    const itemA2 = createMigrationJobItem({
+      job_id: jobA2.id,
+      tistory_url: 'https://blog-a/post/2',
+    });
+    const itemB1 = createMigrationJobItem({
+      job_id: jobB1.id,
+      tistory_url: 'https://blog-b/post/1',
+    });
+
+    updateMigrationJobItem(itemA1.id, {
+      status: MigrationJobItemStatus.FAILED,
+      error_message: 'A1 failed',
+      updated_at: new Date().toISOString(),
+    });
+    updateMigrationJobItem(itemA2.id, {
+      status: MigrationJobItemStatus.COMPLETED,
+      error_message: null,
+      updated_at: new Date().toISOString(),
+    });
+    updateMigrationJobItem(itemB1.id, {
+      status: MigrationJobItemStatus.FAILED,
+      error_message: 'B1 failed',
+      updated_at: new Date().toISOString(),
+    });
+
+    const failedForA = getFailedMigrationJobItemsByBlogUrl('https://blog-a.example');
+    expect(failedForA.map((i) => i.tistory_url)).toEqual(['https://blog-a/post/1']);
+
+    const failedForB = getFailedMigrationJobItemsByBlogUrl('https://blog-b.example');
+    expect(failedForB.map((i) => i.tistory_url)).toEqual(['https://blog-b/post/1']);
   });
 
   it('creates and updates image assets', () => {
