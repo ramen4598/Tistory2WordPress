@@ -17,6 +17,8 @@ npm run build
 
 ## 사용법
 
+**실행하기 전에 워드프레스를 반드시 백업하세요!**
+
 ```bash
 # 도움말 표시
 node dist/cli.js --help
