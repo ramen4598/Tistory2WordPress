@@ -64,19 +64,23 @@ describe('wpClient', () => {
           headers: expect.objectContaining({
             Authorization: expect.stringMatching(/^Basic /),
           }),
-          timeout: 600000, // 10 minutes
+          httpsAgent: expect.anything(),
         })
       );
 
-      expect(axiosInstance.post).toHaveBeenCalledWith('/posts', {
-        title: 'Post Title',
-        content: '<p>content</p>',
-        status: 'draft',
-        date: '2026-01-01T12:00:00',
-        categories: [10],
-        tags: [20],
-        featured_media: 123,
-      });
+      expect(axiosInstance.post).toHaveBeenCalledWith(
+        '/posts',
+        {
+          title: 'Post Title',
+          content: '<p>content</p>',
+          status: 'draft',
+          date: '2026-01-01T12:00:00',
+          categories: [10],
+          tags: [20],
+          featured_media: 123,
+        },
+        { timeout: 600000 }
+      );
 
       expect(result).toEqual(responseData);
     });
@@ -106,7 +110,7 @@ describe('wpClient', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith(
         '/media',
         expect.anything(),
-        expect.objectContaining({ headers: expect.any(Object) })
+        expect.objectContaining({ headers: expect.any(Object), timeout: 600000 })
       );
 
       expect(result).toEqual({
@@ -124,7 +128,9 @@ describe('wpClient', () => {
 
       await client.deleteMedia(123);
 
-      expect(axiosInstance.delete).toHaveBeenCalledWith('/media/123?force=true');
+      expect(axiosInstance.delete).toHaveBeenCalledWith('/media/123?force=true', {
+        timeout: 600000,
+      });
     });
 
     it('deletes post via /posts/{id}?force=true for rollback', async () => {
@@ -134,7 +140,9 @@ describe('wpClient', () => {
 
       await client.deletePost(456);
 
-      expect(axiosInstance.delete).toHaveBeenCalledWith('/posts/456?force=true');
+      expect(axiosInstance.delete).toHaveBeenCalledWith('/posts/456?force=true', {
+        timeout: 600000,
+      });
     });
 
     it('ensures category by searching then creating and caches result', async () => {
@@ -154,12 +162,17 @@ describe('wpClient', () => {
       expect(axiosInstance.get).toHaveBeenCalledTimes(1);
       expect(axiosInstance.get).toHaveBeenCalledWith('/categories', {
         params: { per_page: 100, page: 1, search: 'Tech' },
+        timeout: 600000,
       });
       expect(axiosInstance.post).toHaveBeenCalledTimes(1);
-      expect(axiosInstance.post).toHaveBeenCalledWith('/categories', {
-        name: 'Tech',
-        parent: 0,
-      });
+      expect(axiosInstance.post).toHaveBeenCalledWith(
+        '/categories',
+        {
+          name: 'Tech',
+          parent: 0,
+        },
+        { timeout: 600000 }
+      );
     });
 
     it('returns existing category id when found and caches it', async () => {
@@ -195,11 +208,14 @@ describe('wpClient', () => {
       expect(axiosInstance.get).toHaveBeenCalledTimes(1);
       expect(axiosInstance.get).toHaveBeenCalledWith('/tags', {
         params: { per_page: 100, page: 1, search: 'javascript' },
+        timeout: 600000,
       });
       expect(axiosInstance.post).toHaveBeenCalledTimes(1);
-      expect(axiosInstance.post).toHaveBeenCalledWith('/tags', {
-        name: 'javascript',
-      });
+      expect(axiosInstance.post).toHaveBeenCalledWith(
+        '/tags',
+        { name: 'javascript' },
+        { timeout: 600000 }
+      );
     });
 
     it('returns existing tag id when found and caches it', async () => {
@@ -237,14 +253,18 @@ describe('wpClient', () => {
         featuredImageId: null,
       });
 
-      expect(axiosInstance.post).toHaveBeenCalledWith('/posts', {
-        title: 'Post Title',
-        content: '<p>content</p>',
-        status: 'draft',
-        date: '2026-01-01T12:00:00',
-        categories: [10],
-        tags: [20],
-      });
+      expect(axiosInstance.post).toHaveBeenCalledWith(
+        '/posts',
+        {
+          title: 'Post Title',
+          content: '<p>content</p>',
+          status: 'draft',
+          date: '2026-01-01T12:00:00',
+          categories: [10],
+          tags: [20],
+        },
+        { timeout: 600000 }
+      );
 
       expect(result).toEqual(responseData);
     });

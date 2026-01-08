@@ -1,8 +1,11 @@
 import axios, { type AxiosError, type AxiosInstance } from 'axios';
 import FormData from 'form-data';
+import https from 'https';
 import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
 import { retryWithBackoff } from '../utils/retry';
+
+const WP_REQUEST_TIMEOUT_MS = 600000; // 10 minutes
 
 export interface CreateDraftPostOptions {
   title: string;
@@ -109,12 +112,20 @@ export function createWpClient(): WpClient {
 
   const auth = Buffer.from(`${config.wpAppUser}:${config.wpAppPassword}`).toString('base64');
 
+  const httpsAgent = new https.Agent({
+    keepAlive: true,
+    keepAliveMsecs: 60000, // 1 minute
+    // 최대 유휴 연결 수. worker 수만큼은 항상 유지.
+    maxFreeSockets: config.workerCount,
+    rejectUnauthorized: true,
+  });
+
   const client: AxiosInstance = axios.create({
     baseURL: apiBase,
     headers: {
       Authorization: `Basic ${auth}`,
     },
-    timeout: 600000, // 10 minutes
+    httpsAgent,
   });
 
   const categoryCache = new Map<string, number>(); // key: name value: categoryId
@@ -171,7 +182,7 @@ export function createWpClient(): WpClient {
     });
 
     const exec = async () => {
-      const response = await client.post('/posts', payload);
+      const response = await client.post('/posts', payload, { timeout: WP_REQUEST_TIMEOUT_MS });
       return response.data as { id: number; status: string; link: string };
     };
 
@@ -227,6 +238,7 @@ export function createWpClient(): WpClient {
     const exec = async () => {
       const response = await client.post<WpMediaResponse>('/media', form, {
         headers: form.getHeaders(),
+        timeout: WP_REQUEST_TIMEOUT_MS,
       });
       return response.data;
     };
@@ -264,7 +276,7 @@ export function createWpClient(): WpClient {
 
   const deleteMedia = async (mediaId: number): Promise<void> => {
     try {
-      await client.delete(`/media/${mediaId}?force=true`);
+      await client.delete(`/media/${mediaId}?force=true`, { timeout: WP_REQUEST_TIMEOUT_MS });
     } catch (error) {
       const axiosError = error as AxiosError;
       const status = axiosError.response?.status;
@@ -287,7 +299,7 @@ export function createWpClient(): WpClient {
 
   const deletePost = async (postId: number): Promise<void> => {
     try {
-      await client.delete(`/posts/${postId}?force=true`);
+      await client.delete(`/posts/${postId}?force=true`, { timeout: WP_REQUEST_TIMEOUT_MS });
     } catch (error) {
       const axiosError = error as AxiosError;
       const status = axiosError.response?.status;
@@ -328,6 +340,7 @@ export function createWpClient(): WpClient {
       do {
         const response = await client.get<WpCategory[]>(`/categories`, {
           params: { per_page: 100, page, search: name },
+          timeout: WP_REQUEST_TIMEOUT_MS,
         });
 
         if (!response?.data || response?.data.length === 0) break;
@@ -356,10 +369,14 @@ export function createWpClient(): WpClient {
 
     // --- if not found, create it ---
     const createExec = async () => {
-      const response = await client.post<WpCategory>('/categories', {
-        name,
-        parent,
-      });
+      const response = await client.post<WpCategory>(
+        '/categories',
+        {
+          name,
+          parent,
+        },
+        { timeout: WP_REQUEST_TIMEOUT_MS }
+      );
       return response.data;
     };
 
@@ -390,6 +407,7 @@ export function createWpClient(): WpClient {
       do {
         const response = await client.get<WpTag[]>(`/tags`, {
           params: { per_page: 100, page, search: name },
+          timeout: WP_REQUEST_TIMEOUT_MS,
         });
 
         if (!response?.data || response?.data.length === 0) break;
@@ -418,9 +436,11 @@ export function createWpClient(): WpClient {
 
     // --- if not found, create it ---
     const createExec = async () => {
-      const response = await client.post<WpTag>('/tags', {
-        name,
-      });
+      const response = await client.post<WpTag>(
+        '/tags',
+        { name },
+        { timeout: WP_REQUEST_TIMEOUT_MS }
+      );
       return response.data;
     };
 
