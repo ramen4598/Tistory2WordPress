@@ -262,19 +262,29 @@ export function getMigrationJobItemsByJobIdAndStatus(
 }
 
 /**
- * Get all FAILED migration job items for a given blog URL.
+ * Get FAILED migration job items for a given blog URL,
+ * excluding any items that have ever succeeded (COMPLETED) for the same tistory_url.
  */
-export function getFailedMigrationJobItemsByBlogUrl(blogUrl: string): MigrationJobItem[] {
+export function getUnresolvedFailedMigrationJobItemsByBlogUrl(blogUrl: string): MigrationJobItem[] {
   const db = getDb();
   return db
     .prepare(
-      `SELECT mji.*
-       FROM migration_job_items mji
-       JOIN migration_jobs mj ON mji.job_id = mj.id
-       WHERE mj.blog_url = ? AND mji.status = ?
-       ORDER BY mji.id`
+      `SELECT mji_failed.*
+       FROM migration_job_items mji_failed
+       JOIN migration_jobs mj_failed ON mji_failed.job_id = mj_failed.id
+       WHERE mj_failed.blog_url = ?
+         AND mji_failed.status = 'failed'
+         AND NOT EXISTS (
+           SELECT 1
+           FROM migration_job_items mji_completed
+           JOIN migration_jobs mj_completed ON mji_completed.job_id = mj_completed.id
+           WHERE mj_completed.blog_url = mj_failed.blog_url
+             AND mji_completed.status = 'completed'
+             AND mji_completed.tistory_url = mji_failed.tistory_url
+         )
+       ORDER BY mji_failed.id`
     )
-    .all(blogUrl, MigrationJobItemStatus.FAILED) as MigrationJobItem[];
+    .all(blogUrl) as MigrationJobItem[];
 }
 
 // --- ImageAsset ---

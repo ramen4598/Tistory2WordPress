@@ -16,7 +16,7 @@ import {
   getPostMapByTistoryUrl,
   insertInternalLink,
   getInternalLinksByJobItemId,
-  getFailedMigrationJobItemsByBlogUrl,
+  getUnresolvedFailedMigrationJobItemsByBlogUrl,
 } from '../../../src/db/index';
 import {
   MigrationJobType,
@@ -172,7 +172,7 @@ describe('db repository methods', () => {
     expect(itemsByJob.map((i) => i.id)).toContain(item.id);
   });
 
-  it('fetches failed migration job items by blog URL', () => {
+  it('fetches unresolved failed migration job items by blog URL', () => {
     mockedLoadConfig.mockReturnValue({
       ...baseConfig,
       blogUrl: 'https://blog-a.example',
@@ -213,17 +213,26 @@ describe('db repository methods', () => {
       error_message: null,
       updated_at: new Date().toISOString(),
     });
+
+    // If a URL ever succeeds, it should be excluded from unresolved failures.
+    updateMigrationJobItem(itemA1.id, {
+      status: MigrationJobItemStatus.COMPLETED,
+      error_message: null,
+      updated_at: new Date().toISOString(),
+    });
     updateMigrationJobItem(itemB1.id, {
       status: MigrationJobItemStatus.FAILED,
       error_message: 'B1 failed',
       updated_at: new Date().toISOString(),
     });
 
-    const failedForA = getFailedMigrationJobItemsByBlogUrl('https://blog-a.example');
-    expect(failedForA.map((i) => i.tistory_url)).toEqual(['https://blog-a/post/1']);
+    const unresolvedFailedForA =
+      getUnresolvedFailedMigrationJobItemsByBlogUrl('https://blog-a.example');
+    expect(unresolvedFailedForA.map((i) => i.tistory_url)).toEqual([]);
 
-    const failedForB = getFailedMigrationJobItemsByBlogUrl('https://blog-b.example');
-    expect(failedForB.map((i) => i.tistory_url)).toEqual(['https://blog-b/post/1']);
+    const unresolvedFailedForB =
+      getUnresolvedFailedMigrationJobItemsByBlogUrl('https://blog-b.example');
+    expect(unresolvedFailedForB.map((i) => i.tistory_url)).toEqual(['https://blog-b/post/1']);
   });
 
   it('creates and updates image assets', () => {

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { getFailedMigrationJobItemsByBlogUrl } from '../db';
+import { getUnresolvedFailedMigrationJobItemsByBlogUrl } from '../db';
 import { getLogger } from '../utils/logger';
 
 export interface FailedPostsExportItem {
@@ -24,9 +24,7 @@ export function exportFailedPostsByBlogUrl(outputPath: string, blogUrl: string):
     logger.info(`FailedPostExporter.exportFailedPostsByBlogUrl - created output directory: ${dir}`);
   }
 
-  const failedItems = getFailedMigrationJobItemsByBlogUrl(blogUrl);
-
-  // TODO: 성공한 적이 있는 항목은 제외하는 로직 추가
+  const failedItems = getUnresolvedFailedMigrationJobItemsByBlogUrl(blogUrl);
 
   const errorMessagesByUrl = new Map<string, Set<string>>();
   for (const item of failedItems) {
