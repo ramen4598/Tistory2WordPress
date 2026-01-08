@@ -512,7 +512,7 @@ describe('CLI --export-failed', () => {
 
     expect(code).toBe(0);
     expect(exportFailedPostsByBlogUrl).toHaveBeenCalledWith(
-      expect.stringContaining('failed_posts.json'),
+      expect.stringMatching(/failed_posts-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z\.json/),
       'https://example.com'
     );
 

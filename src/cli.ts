@@ -18,6 +18,8 @@ import { MigrationJob } from './models/MigrationJob';
 import { createPostProcessor } from './workers/postProcessor';
 import path from 'path';
 
+const TIME_POSTFIX = new Date().toISOString().replace(/[:.]/g, '-');
+
 function getArgValue(argv: string[], flag: string): string | undefined {
   const exact = argv.find((a) => a === flag);
   if (exact) {
@@ -113,7 +115,7 @@ export async function runCli(argv: string[]): Promise<number> {
     const migrator = createMigrator();
 
     if (exportFailedFlag) {
-      const outputPath = path.join(config.outputDir, 'failed_posts.json');
+      const outputPath = path.join(config.outputDir, `failed_posts-${TIME_POSTFIX}.json`);
       exportFailedPostsByBlogUrl(outputPath, config.blogUrl);
       console.log(`- Failed posts exported to: ${outputPath}`);
       close();
@@ -224,7 +226,7 @@ async function finalizeJob(
   console.log(`- Internal links: stored in 'internal_links' table (jobId=${jobId})`);
 
   if (exportLinks) {
-    const linkMappingPath = path.join(config.outputDir, 'link_mapping.json');
+    const linkMappingPath = path.join(config.outputDir, `link_mapping-${TIME_POSTFIX}.json`);
     exportLinkMapping(linkMappingPath, jobId);
     console.log(`- Link mapping exported to: ${linkMappingPath}`);
   }
