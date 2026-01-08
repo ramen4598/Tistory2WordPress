@@ -40,7 +40,7 @@ export async function retryWithBackoff<T>(
       lastError = error instanceof Error ? error : new Error(String(error));
 
       if (attempt === maxAttempts) {
-        logger.error(`retryWithBackoff - max retry attempts (${maxAttempts}) exceeded`, {
+        logger.warn(`retryWithBackoff - max retry attempts (${maxAttempts}) exceeded`, {
           error: lastError.message,
         });
         throw lastError;

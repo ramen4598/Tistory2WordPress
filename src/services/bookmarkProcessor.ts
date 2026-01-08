@@ -129,7 +129,7 @@ export const createBookmarkProcessor = (
       const err = error instanceof Error ? error : new Error(String(error));
       const elapsedTime = Date.now() - startTime;
 
-      logger.error('BookmarkProcessor.fetchMetadata - fetch bookmark metadata failed', {
+      logger.warn('BookmarkProcessor.fetchMetadata - fetch bookmark metadata failed', {
         url,
         errorType: err.name,
         message: err.message,
