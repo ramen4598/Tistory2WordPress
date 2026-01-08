@@ -38,18 +38,18 @@ export function getDb(): BetterSqliteDatabase {
 
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
-    logger.info(`Created SQLite directory: ${dbDir}`);
+    logger.info(`Db.getDb - created SQLite directory: ${dbDir}`);
   }
 
   const db = new DatabaseConstructor(dbPath);
-  logger.info(`Opened SQLite database: ${dbPath}`);
+  logger.info(`Db.getDb - opened SQLite database: ${dbPath}`);
 
   try {
     const schemaSql = fs.readFileSync(SCHEMA_PATH, 'utf-8');
     db.exec(schemaSql);
-    logger.info('Successed to apply SQLite schema migrations');
+    logger.info('Db.getDb - applied SQLite schema migrations');
   } catch (error) {
-    logger.error('Failed to apply SQLite schema migrations', error);
+    logger.error('Db.getDb - apply SQLite schema migrations failed', error);
     db.close();
     throw error;
   }

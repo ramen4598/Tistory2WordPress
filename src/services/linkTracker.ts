@@ -73,11 +73,14 @@ export function createLinkTracker(): LinkTracker {
     const internalLinks: InternalLink[] = extractInternalLinks(sourceUrl, html);
 
     if (internalLinks.length === 0) {
-      logger.debug('No internal links found', { sourceUrl });
+      logger.debug('LinkTracker.trackInternalLinks - no internal links found', { sourceUrl });
       return;
     }
 
-    logger.info('Tracking internal links', { sourceUrl, count: internalLinks.length });
+    logger.info('LinkTracker.trackInternalLinks - tracking internal links', {
+      sourceUrl,
+      count: internalLinks.length,
+    });
 
     for (const link of internalLinks) {
       insertInternalLink({

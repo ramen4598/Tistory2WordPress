@@ -263,9 +263,12 @@ describe('wpClient', () => {
 
       await expect(client.deleteMedia(999)).resolves.toBeUndefined();
 
-      expect(loggerMock.warn).toHaveBeenCalledWith('Media already absent during rollback', {
-        wpMediaId: 999,
-      });
+      expect(loggerMock.warn).toHaveBeenCalledWith(
+        'WpClient.deleteMedia - media already absent during rollback',
+        {
+          wpMediaId: 999,
+        }
+      );
     });
 
     it('treats 404 on post deletion as non-fatal, logs warning', async () => {
@@ -280,9 +283,12 @@ describe('wpClient', () => {
 
       await expect(client.deletePost(999)).resolves.toBeUndefined();
 
-      expect(loggerMock.warn).toHaveBeenCalledWith('Post already absent during rollback', {
-        wpPostId: 999,
-      });
+      expect(loggerMock.warn).toHaveBeenCalledWith(
+        'WpClient.deletePost - post already absent during rollback',
+        {
+          wpPostId: 999,
+        }
+      );
     });
   });
 

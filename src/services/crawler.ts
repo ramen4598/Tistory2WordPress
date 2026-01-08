@@ -61,7 +61,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
   const { fetchFn } = options;
   const logger = getLogger();
 
-  logger.info('Crawler: initialized', { blogUrl: config.blogUrl });
+  logger.info('Crawler.createCrawler - initialized', { blogUrl: config.blogUrl });
 
   const postLinkSelector = config.postListLinkSelector;
 
@@ -92,12 +92,12 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
   };
 
   const fetchPage = async (url: string): Promise<{ html: string }> => {
-    logger.debug('Crawler.fetchPage: fetching list page', { url });
+    logger.debug('Crawler.fetchPage - fetching list page', { url });
 
     const response = await fetchFn(url);
     const html = await response.text();
 
-    logger.debug('Crawler.fetchPage: fetched list page HTML', { url, length: html.length });
+    logger.debug('Crawler.fetchPage - fetched list page HTML', { url, length: html.length });
 
     return { html };
   };
@@ -113,7 +113,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       }
     });
 
-    logger.debug('Crawler.extractPostUrls: extracted post URLs from page', {
+    logger.debug('Crawler.extractPostUrls - extracted post URLs from page', {
       count: urls.length,
     });
 
@@ -124,7 +124,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
     const discoveredUrls = new Set<string>();
     let page = 1;
 
-    logger.info('Crawler.discoverPostUrls: start discovery');
+    logger.info('Crawler.discoverPostUrls - start discovery');
 
     // 페이지 전략:
     // - 1페이지: BLOG_URL (page=1 취급)
@@ -134,14 +134,14 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
     while (true) {
       const pageUrl = buildPageUrl(page);
 
-      logger.debug('Crawler.discoverPostUrls: fetching page', { page, pageUrl });
+      logger.debug('Crawler.discoverPostUrls - fetching page', { page, pageUrl });
 
       let html: string;
       try {
         const result = await fetchPage(pageUrl);
         html = result.html;
       } catch {
-        logger.info('Crawler.discoverPostUrls: stopping discovery, failed to fetch page', {
+        logger.info('Crawler.discoverPostUrls - stopping discovery; fetch page failed', {
           page,
           pageUrl,
         });
@@ -152,7 +152,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       const pagePostUrls = extractPostUrls(html);
 
       if (pagePostUrls.length === 0) {
-        logger.info('Crawler.discoverPostUrls: stopping discovery, no post URLs on page', {
+        logger.info('Crawler.discoverPostUrls - stopping discovery; no post URLs on page', {
           page,
           pageUrl,
         });
@@ -166,7 +166,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
         }
       }
 
-      logger.debug('Crawler.discoverPostUrls: accumulated URLs after page', {
+      logger.debug('Crawler.discoverPostUrls - accumulated URLs after page', {
         page,
         totalCount: discoveredUrls.size,
       });
@@ -174,7 +174,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       page += 1;
     }
 
-    logger.info('Crawler.discoverPostUrls: finished discovery', {
+    logger.info('Crawler.discoverPostUrls - finished discovery', {
       totalCount: discoveredUrls.size,
     });
 
@@ -184,13 +184,13 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
   const fetchPostHtml = async (postPathOrUrl: string): Promise<string> => {
     const targetUrl = resolveUrl(postPathOrUrl);
 
-    logger.debug('Crawler.fetchPostHtml: fetching post HTML', { input: postPathOrUrl, targetUrl });
+    logger.debug('Crawler.fetchPostHtml - fetching post HTML', { input: postPathOrUrl, targetUrl });
 
     const response = await fetchFn(targetUrl);
     const html = await response.text();
     const trimmed = html.trim();
 
-    logger.debug('Crawler.fetchPostHtml: fetched post HTML', {
+    logger.debug('Crawler.fetchPostHtml - fetched post HTML', {
       targetUrl,
       length: trimmed.length,
     });
@@ -209,7 +209,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
   };
 
   const parsePostMetadata = (html: string, url: string): ParsedPostMetadata => {
-    logger.debug('Crawler.parsePostMetadata: parsing metadata', { url });
+    logger.debug('Crawler.parsePostMetadata - parsing metadata', { url });
 
     const $ = cheerio.load(html);
 
@@ -303,7 +303,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
       tags,
     };
 
-    logger.debug('Crawler.parsePostMetadata: parsed metadata summary', {
+    logger.debug('Crawler.parsePostMetadata - parsed metadata summary', {
       url,
       title: result.title,
       categoryCount: result.categories.length,
@@ -314,7 +314,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
   };
 
   const extractFImgUrl = (html: string): string | null => {
-    logger.debug('Crawler.extractFeaturedImage: extracting featured image');
+    logger.debug('Crawler.extractFImgUrl - extracting featured image');
 
     const $ = cheerio.load(html);
     const featuredImageElement = $(metadataSelectors.featuredImage).first();
@@ -328,7 +328,7 @@ export const createCrawler = (options: CrawlerOptions): Crawler => {
 
     const imageUrl = resolveUrl(match[1]);
     new URL(imageUrl);
-    logger.debug('Crawler.extractFImgUrl: extracted featured image URL', {
+    logger.debug('Crawler.extractFImgUrl - extracted featured image URL', {
       imageUrl,
     });
     return imageUrl;

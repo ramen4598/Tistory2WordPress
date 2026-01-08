@@ -62,7 +62,7 @@ function printUsage(): void {
 
 function close(): void {
   const logger: Logger = getLogger();
-  logger.info('Shutting down gracefully');
+  logger.info('CLI.close - shutting down gracefully');
   logger.close();
   closeDb();
 }
@@ -128,7 +128,7 @@ export async function runCli(argv: string[]): Promise<number> {
       });
 
       const allUrls = await crawler.discoverPostUrls();
-      logger.info('Discovered URLs for full migration', { count: allUrls.length });
+      logger.info('CLI.runCli - discovered URLs for full migration', { count: allUrls.length });
 
       const completedItems = getMigrationJobItemsByJobIdAndStatus(
         job.id,
@@ -169,7 +169,7 @@ export async function runCli(argv: string[]): Promise<number> {
     }
     return 0;
   } catch (error) {
-    logger.error('CLI failed', {
+    logger.error('CLI.runCli - failed', {
       error: (error as Error)?.message ?? String(error),
     });
     close();

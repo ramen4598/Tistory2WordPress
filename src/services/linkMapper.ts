@@ -11,7 +11,7 @@ export function exportLinkMapping(outputPath: string, jobId?: number): void {
 
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
-    logger.info(`Created output directory: ${dir}`);
+    logger.info(`LinkMapper.exportLinkMapping - created output directory: ${dir}`);
   }
 
   const links: InternalLinkRecord[] =
@@ -26,9 +26,12 @@ export function exportLinkMapping(outputPath: string, jobId?: number): void {
 
   fs.writeFileSync(outputPath, JSON.stringify(exportData, null, 2), 'utf-8');
 
-  logger.info(`Exported ${exportData.length} internal links to ${outputPath}`, {
-    outputPath,
-    count: exportData.length,
-    jobId,
-  });
+  logger.info(
+    `LinkMapper.exportLinkMapping - exported ${exportData.length} internal links to ${outputPath}`,
+    {
+      outputPath,
+      count: exportData.length,
+      jobId,
+    }
+  );
 }

@@ -78,35 +78,35 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
   const markdownToHtml = (markdown: string): string => markdownToHtmlImpl(markdown);
 
   const cleanHtml = (html: string): string => {
-    logger.debug('Cleaner.cleanHtml: start');
+    logger.debug('Cleaner.cleanHtml - start');
 
     const $ = cheerio.load(html);
     const root = $(postContentSelector).first();
-    logger.debug('Cleaner.cleanHtml: selected content root', {
+    logger.debug('Cleaner.cleanHtml - selected content root', {
       selector: postContentSelector,
       html: root.html(),
     });
 
     const rawContentHtml = root.html();
     if (!rawContentHtml) {
-      logger.warn('Cleaner.cleanHtml: no content found for selector', {
+      logger.warn('Cleaner.cleanHtml - no content found for selector', {
         selector: postContentSelector,
       });
       return '';
     }
 
-    logger.debug('Cleaner.cleanHtml: extracted content root HTML', {
+    logger.debug('Cleaner.cleanHtml - extracted content root HTML', {
       selector: postContentSelector,
       length: rawContentHtml.length,
     });
 
     const markdown = htmlToMarkdown(rawContentHtml);
-    logger.debug('Cleaner.cleanHtml: converted HTML to markdown', {
+    logger.debug('Cleaner.cleanHtml - converted HTML to markdown', {
       markdownLength: markdown.length,
     });
 
     const cleanedHtml = markdownToHtml(markdown);
-    logger.debug('Cleaner.cleanHtml: converted markdown back to HTML', {
+    logger.debug('Cleaner.cleanHtml - converted markdown back to HTML', {
       cleanedHtmlLength: cleanedHtml.length,
     });
 

@@ -100,7 +100,7 @@ export function createImageProcessor(wpc?: WpClient): ImageProcessor {
       const response = await retryWithBackoff(downloadExec, config, {
         onRetry: (error, attempt, delayMs) => {
           logger.warn(
-            'Retrying image download',
+            'ImageProcessor.uploadImage - retrying image download',
             { imageUrl: uploaderOptions.source_url, attempt, delayMs },
             String(error)
           );

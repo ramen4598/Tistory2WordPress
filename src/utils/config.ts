@@ -127,8 +127,9 @@ export function loadConfig(): Config {
   } else if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.LAST_IS_PARENT) {
     categoryHierarchyOrder = CategoryHierarchyOrder.LAST_IS_PARENT;
   } else {
+    // eslint-disable-next-line no-console
     console.warn(
-      `Invalid or missing CATEGORY_HIERARCHY_ORDER. Defaulting to "${CategoryHierarchyOrder.FIRST_IS_PARENT}".`
+      `Config.loadConfig - invalid or missing CATEGORY_HIERARCHY_ORDER; defaulting to "${CategoryHierarchyOrder.FIRST_IS_PARENT}".`
     );
     categoryHierarchyOrder =
       DEFAULT_CONFIG.CATEGORY_HIERARCHY_ORDER || CategoryHierarchyOrder.FIRST_IS_PARENT;

@@ -105,7 +105,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         updated_at: new Date().toISOString(),
       });
 
-      logger.info('Migrated post successfully', {
+      logger.info('Migrator.migratePostByUrl - migrated post successfully', {
         url,
         jobId: context.jobId,
         jobItemId: jobItem.id,
@@ -113,7 +113,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
       });
     } catch (error) {
       const message = (error as Error)?.message ?? String(error);
-      logger.error('Failed to migrate post; starting rollback', {
+      logger.error('Migrator.migratePostByUrl - migrate post failed; starting rollback', {
         url,
         jobId: context.jobId,
         jobItemId: jobItem.id,
@@ -127,7 +127,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         try {
           await wpClient.deleteMedia(post.featured_image.wp_media_id);
         } catch (rollbackError) {
-          logger.error('Rollback: failed to delete featured image', {
+          logger.error('Migrator.migratePostByUrl - rollback delete featured image failed', {
             url,
             wpMediaId: post.featured_image.wp_media_id,
             error: (rollbackError as Error)?.message ?? String(rollbackError),
@@ -140,7 +140,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         try {
           await wpClient.deleteMedia(image.wp_media_id);
         } catch (rollbackError) {
-          logger.error('Rollback: failed to delete media', {
+          logger.error('Migrator.migratePostByUrl - rollback delete media failed', {
             url,
             wpMediaId: image.wp_media_id,
             error: (rollbackError as Error)?.message ?? String(rollbackError),
@@ -152,7 +152,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         try {
           await wpClient.deletePost(wpPostId);
         } catch (rollbackError) {
-          logger.error('Rollback: failed to delete post', {
+          logger.error('Migrator.migratePostByUrl - rollback delete post failed', {
             url,
             wpPostId,
             error: (rollbackError as Error)?.message ?? String(rollbackError),
@@ -166,7 +166,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         updated_at: new Date().toISOString(),
       });
 
-      logger.info('Rollback completed', {
+      logger.info('Migrator.migratePostByUrl - rollback completed', {
         url,
         jobId: context.jobId,
         jobItemId: jobItem.id,

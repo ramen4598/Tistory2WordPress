@@ -64,7 +64,7 @@ export const createBookmarkProcessor = (
       }
     });
 
-    logger.info(`Detected ${bookmarks.length} bookmark(s)`);
+    logger.info(`BookmarkProcessor.detectBookmarks - detected ${bookmarks.length} bookmark(s)`);
 
     return bookmarks;
   };
@@ -74,7 +74,7 @@ export const createBookmarkProcessor = (
     const fetchedAt = new Date().toISOString();
 
     try {
-      logger.info('Fetching bookmark metadata', { url });
+      logger.info('BookmarkProcessor.fetchMetadata - fetching bookmark metadata', { url });
 
       const response = await retryWithBackoff(async () => {
         return await axios.get(url, {
@@ -110,7 +110,7 @@ export const createBookmarkProcessor = (
       const canonicalUrl = $('meta[property="og:url"]').attr('content') || url;
 
       const elapsedTime = Date.now() - startTime;
-      logger.info('Bookmark metadata fetched successfully', {
+      logger.info('BookmarkProcessor.fetchMetadata - bookmark metadata fetched successfully', {
         url,
         title,
         hasDescription: description ? description.length > 0 : false,
@@ -129,7 +129,7 @@ export const createBookmarkProcessor = (
       const err = error instanceof Error ? error : new Error(String(error));
       const elapsedTime = Date.now() - startTime;
 
-      logger.warn('Failed to fetch bookmark metadata', {
+      logger.error('BookmarkProcessor.fetchMetadata - fetch bookmark metadata failed', {
         url,
         errorType: err.name,
         message: err.message,
@@ -172,7 +172,7 @@ export const createBookmarkProcessor = (
         featuredImage: metadata.featuredImage,
       });
 
-      logger.info('Replacing bookmark with bookmark-card HTML', {
+      logger.info('BookmarkProcessor.replaceBookmarks - replacing bookmark with card HTML', {
         url,
         selector: config.bookmarkSelector,
         index: i,

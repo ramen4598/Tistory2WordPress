@@ -127,7 +127,7 @@ export function createWpClient(): WpClient {
     return retryWithBackoff(fn, config, {
       onRetry: (error, attempt, delayMs) => {
         logger.warn(
-          'Retrying WordPress request',
+          'WpClient.withRetry - retrying WordPress request',
           { operation: context.operation, url: context.url, attempt, delayMs },
           getAxiosErrorMessage(error)
         );
@@ -162,7 +162,7 @@ export function createWpClient(): WpClient {
       payload.featured_media = featuredImageId;
     }
 
-    logger.debug('Creating WordPress draft post', {
+    logger.debug('WpClient.createDraftPost - creating WordPress draft post', {
       title,
       date,
       categories,
@@ -181,7 +181,7 @@ export function createWpClient(): WpClient {
         url: `${apiBase}/posts`,
       });
 
-      logger.info('Created WordPress draft post', {
+      logger.info('WpClient.createDraftPost - created WordPress draft post', {
         wpPostId: data.id,
         status: data.status,
       });
@@ -193,7 +193,7 @@ export function createWpClient(): WpClient {
       };
     } catch (error) {
       const message = getAxiosErrorMessage(error);
-      logger.error('Failed to create WordPress draft post', {
+      logger.error('WpClient.createDraftPost - create draft post failed', {
         error: message,
         title,
       });
@@ -237,7 +237,7 @@ export function createWpClient(): WpClient {
         url: `${apiBase}/media`,
       });
 
-      logger.info('Uploaded WordPress media', {
+      logger.info('WpClient.uploadMedia - uploaded WordPress media', {
         wpMediaId: data.id,
         url: data.source_url,
       });
@@ -250,7 +250,7 @@ export function createWpClient(): WpClient {
       };
     } catch (error) {
       const message = getAxiosErrorMessage(error);
-      logger.error('Failed to upload WordPress media', {
+      logger.error('WpClient.uploadMedia - upload media failed', {
         error: message,
         fileName,
         mimeType,
@@ -270,12 +270,14 @@ export function createWpClient(): WpClient {
       const status = axiosError.response?.status;
 
       if (axiosError.isAxiosError && status === 404) {
-        logger.warn('Media already absent during rollback', { wpMediaId: mediaId });
+        logger.warn('WpClient.deleteMedia - media already absent during rollback', {
+          wpMediaId: mediaId,
+        });
         return;
       }
 
       const message = getAxiosErrorMessage(error);
-      logger.error('Failed to delete WordPress media during rollback', {
+      logger.error('WpClient.deleteMedia - delete media during rollback failed', {
         error: message,
         wpMediaId: mediaId,
       });
@@ -291,12 +293,14 @@ export function createWpClient(): WpClient {
       const status = axiosError.response?.status;
 
       if (axiosError.isAxiosError && status === 404) {
-        logger.warn('Post already absent during rollback', { wpPostId: postId });
+        logger.warn('WpClient.deletePost - post already absent during rollback', {
+          wpPostId: postId,
+        });
         return;
       }
 
       const message = getAxiosErrorMessage(error);
-      logger.error('Failed to delete WordPress post during rollback', {
+      logger.error('WpClient.deletePost - delete post during rollback failed', {
         error: message,
         wpPostId: postId,
       });
