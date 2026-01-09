@@ -4,6 +4,7 @@ import { createBookmarkProcessor, type BookmarkProcessor } from './bookmarkProce
 import { type ImageProcessor, createImageProcessor } from './imageProcessor';
 import { createLinkTracker, type LinkTracker } from './linkTracker';
 import { createWpClient, type WpClient } from './wpClient';
+import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
 import { createMigrationJobItem, createPostMap, updateMigrationJobItem } from '../db';
 import { MigrationJobItemStatus } from '../enums/db.enum';
@@ -33,6 +34,7 @@ export interface CreateMigratorOptions {
 
 export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
   const logger = getLogger();
+  const config = loadConfig();
 
   const crawler = options.crawler ?? createCrawler({ fetchFn: fetch });
   const cleaner = options.cleaner ?? createCleaner();
@@ -85,9 +87,10 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
 
       const tagIds = await Promise.all(post.tags.map(async (tag) => wpClient.ensureTag(tag.name)));
 
-      const wpPost = await wpClient.createDraftPost({
+      const wpPost = await wpClient.createPost({
         title: post.title,
         content: post.content,
+        status: config.wpPostStatus,
         date: post.publish_date.toISOString(),
         categories: categoryIds,
         tags: tagIds,

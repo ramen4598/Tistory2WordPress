@@ -153,7 +153,7 @@ node dist/cli.js -h
   - ensureTag(name): 존재하면 ID 반환, 없으면 생성
 - 포스트 생성:
   - REST API /wp/v2/posts 엔드포인트 사용
-  - 초안 상태 (draft)로 생성
+  - 설정된 상태(WP_POST_STATUS)로 생성 (기본값: pending)
   - 제목, 컨텐츠, 발행일 설정
   - 카테고리 ID 목록 연결
   - 태그 ID 목록 연결
@@ -205,7 +205,7 @@ SQLite 데이터베이스로 이관 상태를 추적합니다.
 
 **작업 관리**:
 
-- `--all`: 역대 미시도 URL만 시도 
+- `--all`: 역대 미시도 URL만 시도
 - `--retry-failed`: 역대 실패(미성공) URL만 선택적으로 재시도
 
 ### 9. 작업자 풀 (Worker Pool)

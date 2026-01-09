@@ -3,6 +3,7 @@ import { loadConfig } from '../../../src/utils/config';
 import { getLogger } from '../../../src/utils/logger';
 import { createWpClient, type WpClient } from '../../../src/services/wpClient';
 import { baseConfig } from '../helpers/baseConfig';
+import { WpPostStatus } from '../../../src/enums/config.enum';
 
 jest.mock('axios');
 jest.mock('../../../src/utils/config');
@@ -39,19 +40,20 @@ describe('wpClient', () => {
   const createClient = (): WpClient => createWpClient();
 
   describe('happy paths', () => {
-    it('creates a draft post via /posts', async () => {
+    it('creates a post via /posts', async () => {
       const client = createClient();
 
       const responseData = {
         id: 456,
-        status: 'draft',
+        status: 'publish',
         link: 'https://example.wordpress.com/?p=456',
       };
       axiosInstance.post.mockResolvedValue({ data: responseData } as AxiosResponse);
 
-      const result = await client.createDraftPost({
+      const result = await client.createPost({
         title: 'Post Title',
         content: '<p>content</p>',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
@@ -71,7 +73,7 @@ describe('wpClient', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('/posts', {
         title: 'Post Title',
         content: '<p>content</p>',
-        status: 'draft',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
@@ -216,19 +218,20 @@ describe('wpClient', () => {
       expect(axiosInstance.post).not.toHaveBeenCalledWith('/tags', expect.anything());
     });
 
-    it('creates draft post without featured image when featuredImageId is null', async () => {
+    it('creates post without featured image when featuredImageId is null', async () => {
       const client = createClient();
 
       const responseData = {
         id: 456,
-        status: 'draft',
+        status: 'publish',
         link: 'https://example.wordpress.com/?p=456',
       };
       axiosInstance.post.mockResolvedValue({ data: responseData } as AxiosResponse);
 
-      const result = await client.createDraftPost({
+      const result = await client.createPost({
         title: 'Post Title',
         content: '<p>content</p>',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
@@ -238,7 +241,7 @@ describe('wpClient', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('/posts', {
         title: 'Post Title',
         content: '<p>content</p>',
-        status: 'draft',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
@@ -301,9 +304,10 @@ describe('wpClient', () => {
 
       axiosInstance.post.mockRejectedValue(error).mockRejectedValue(error).mockRejectedValue(error);
 
-      const result = client.createDraftPost({
+      const result = client.createPost({
         title: 'Bad',
         content: '<p>bad</p>',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [],
         tags: [],
@@ -323,7 +327,7 @@ describe('wpClient', () => {
 
       const successResponse = {
         id: 789,
-        status: 'draft',
+        status: 'publish',
         link: 'https://example.wordpress.com/?p=789',
       };
 
@@ -331,9 +335,10 @@ describe('wpClient', () => {
         .mockRejectedValueOnce(transientError)
         .mockResolvedValueOnce({ data: successResponse } as AxiosResponse);
 
-      const result = await client.createDraftPost({
+      const result = await client.createPost({
         title: 'Retry',
         content: '<p>retry</p>',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [],
         tags: [],
@@ -343,7 +348,7 @@ describe('wpClient', () => {
       expect(axiosInstance.post).toHaveBeenCalledTimes(2);
       expect(result).toEqual({
         id: 789,
-        status: 'draft',
+        status: 'publish',
         link: 'https://example.wordpress.com/?p=789',
       });
     });

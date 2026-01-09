@@ -1,3 +1,5 @@
+import { load } from 'cheerio';
+
 function resetEnv() {
   for (const key of Object.keys(process.env)) {
     if (
@@ -149,21 +151,14 @@ describe('loadConfig', () => {
     expect(() => loadConfig()).toThrow('WP_BASE_URL must be a valid URL');
   });
 
-  it('uses CATEGORY_HIERARCHY_ORDER default when invalid', () => {
+  it('throws ConfigurationError when CATEGORY_HIERARCHY_ORDER is invalid', () => {
     setMinimumValidEnv();
     process.env.CATEGORY_HIERARCHY_ORDER = 'invalid-order';
-
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
-    const config = loadConfig();
-
-    expect(warnSpy).toHaveBeenCalled();
-    expect(config.categoryHierarchyOrder).toBe('first-is-parent');
-
-    warnSpy.mockRestore();
+    expect(() => loadConfig()).toThrow('CATEGORY_HIERARCHY_ORDER must be one of');
   });
 
   it('loads concurrency config from environment variable', () => {
@@ -229,6 +224,39 @@ describe('loadConfig', () => {
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
     expect(() => loadConfig()).toThrow('RATE_LIMIT_CAP must be a positive number. Got: 0');
+  });
+
+  it('defaults WP_POST_STATUS to pending', () => {
+    setMinimumValidEnv();
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.wpPostStatus).toBe('pending');
+  });
+
+  it('accepts pending and private for WP_POST_STATUS', () => {
+    setMinimumValidEnv();
+    process.env.WP_POST_STATUS = 'private';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.wpPostStatus).toBe('private');
+  });
+
+  it('rejects invalid WP_POST_STATUS', () => {
+    setMinimumValidEnv();
+    process.env.WP_POST_STATUS = 'future';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow('WP_POST_STATUS must be one of');
   });
 
   it('handles string values for numeric config', () => {

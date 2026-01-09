@@ -1,4 +1,4 @@
-import { CategoryHierarchyOrder, LogLevel } from '../enums/config.enum';
+import { CategoryHierarchyOrder, LogLevel, WpPostStatus } from '../enums/config.enum';
 
 /**
  * Application configuration interface
@@ -26,6 +26,12 @@ export interface Config {
    * WordPress Application Password value
    */
   wpAppPassword: string;
+
+  /**
+   * WordPress post status for created posts.
+   * @default WpPostStatus.PENDING
+   */
+  wpPostStatus: WpPostStatus;
 
   /**
    * SQLite DB file path for REST migration state

@@ -87,11 +87,19 @@ TISTORY_BLOG_URL=https://yourblog.tistory.com
 | 예시 | `abcd 1234 efgh 5678 ijkl`                                                                                                                      |
 | 설명 | 워드프레스 관리자 페이지에서 생성한 애플리케이션 비밀번호입니다. 일반 비밀번호가 아닙니다. 사용자 → 프로필 → 애플리케이션 비밀명에서 생성하세요 |
 
+| 변수 | `WP_POST_STATUS`                                                       |
+| ---- | ---------------------------------------------------------------------- |
+| 용도 | 워드프레스 업로드 시 포스트 상태를 지정합니다                          |
+| 예시 | 공개(`publish`), 비공개(`private`), 검토대기(`pending`), 임시(`draft`) |
+| 설명 | 포스트 업로드 시 기본 상태를 지정합니다. 기본값은 `pending`입니다.     |
+
 ```bash
 # 워드프레스 REST API
 WP_BASE_URL=https://your-wordpress-site.com
 WP_APP_USER=your-wordpress-username
 WP_APP_PASSWORD=abcd 1234 efgh 5678 ijkl
+# post status (default: pending)
+WP_POST_STATUS=pending
 ```
 
 ### 3. 티스토리 CSS 선택자 설정
@@ -180,6 +188,18 @@ TISTORY_SELECTOR_FEATURED_IMAGE="#main > div > div > div.article_header.type_art
 ```bash
 # 북마크 감지 CSS 선택자
 TISTORY_BOOKMARK_SELECTOR=figure[data-ke-type="opengraph"]
+```
+
+#### 북마크 템플릿 경로
+
+| 변수   | `TISTORY_BOOKMARK_TEMPLATE_PATH`                                               |
+| ------ | ------------------------------------------------------------------------------ |
+| 용도   | 북마크 카드 렌더링 템플릿 파일 경로                                            |
+| 기본값 | `./src/templates/bookmark-template.html`                                       |
+| 설명   | 북마크(웹사이트 미리보기)를 HTML로 렌더링할 때 사용하는 템플릿 파일 경로입니다 |
+
+```bash
+TISTORY_BOOKMARK_TEMPLATE_PATH=./src/templates/bookmark-template.html
 ```
 
 ### 5. 선택적 환경변수
@@ -332,7 +352,17 @@ node dist/cli.js --all
 node dist/cli.js --all --export-links
 ```
 
-출력된 맵핑 파일(`output/link_mapping.json`)을 사용하여 이관 후 내부 링크를 업데이트할 수 있습니다.
+출력된 맵핑 파일(`output/link_mapping-<timestamp>.json`)을 사용하여 이관 후 내부 링크를 업데이트할 수 있습니다.
+
+### 실패한 포스트 목록 내보내기
+
+마이그레이션 DB에 기록된 **실패한 포스트 목록**을 JSON으로 내보내려면 `--export-failed` 옵션을 사용하세요:
+
+```bash
+node dist/cli.js --export-failed
+```
+
+출력 파일은 `OUTPUT_DIR` 아래에 `failed_posts-<timestamp>.json` 형태로 생성됩니다.
 
 ### 실패 항목 재시도
 
@@ -344,13 +374,14 @@ node dist/cli.js --retry-failed
 
 ### CLI 옵션
 
-| 옵션             | 설명                               |
-| ---------------- | ---------------------------------- |
-| `-h, --help`     | 도움말 메시지 표시 후 종료         |
-| `--post=<url>`   | 단일 포스트 URL로 이관             |
-| `--all`          | 역대 미시도 URL만 이관             |
-| `--retry-failed` | 역대 실패(미성공) URL만 재시도     |
-| `--export-links` | 내부 링크 매핑을 JSON으로 내보내기 |
+| 옵션              | 설명                                   |
+| ----------------- | -------------------------------------- |
+| `-h, --help`      | 도움말 메시지 표시 후 종료             |
+| `--post=<url>`    | 단일 포스트 URL로 이관                 |
+| `--all`           | 역대 미시도 URL만 이관                 |
+| `--retry-failed`  | 역대 실패(미성공) URL만 재시도         |
+| `--export-links`  | 내부 링크 매핑을 JSON으로 내보내기     |
+| `--export-failed` | 실패한 포스트 목록을 JSON으로 내보내기 |
 
 ## 북마크 처리
 

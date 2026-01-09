@@ -119,7 +119,7 @@ describe('migrator (T221/T223)', () => {
     const wpClient = {
       ensureCategory: jest.fn(),
       ensureTag: jest.fn(),
-      createDraftPost: jest.fn().mockResolvedValue({ id: 999 }),
+      createPost: jest.fn().mockResolvedValue({ id: 999 }),
       deleteMedia: jest.fn(),
       deletePost: jest.fn(),
     };
@@ -207,7 +207,7 @@ describe('migrator (T221/T223)', () => {
     const wpClient = {
       ensureCategory: jest.fn(),
       ensureTag: jest.fn(),
-      createDraftPost: jest.fn().mockRejectedValue(new Error('post create failed')),
+      createPost: jest.fn().mockRejectedValue(new Error('post create failed')),
       deleteMedia,
       deletePost,
     };

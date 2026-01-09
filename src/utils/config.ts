@@ -1,6 +1,6 @@
 import { config as dotenvConfig } from 'dotenv';
 import { Config } from '../models/Config';
-import { CategoryHierarchyOrder, LogLevel } from '../enums/config.enum';
+import { CategoryHierarchyOrder, LogLevel, WpPostStatus } from '../enums/config.enum';
 
 /**
  * Default configuration values
@@ -19,6 +19,7 @@ const DEFAULT_CONFIG = {
   RETRY_MAX_DELAY_MS: 600000, // 10 minutes
   RETRY_BACKOFF_MULTIPLIER: 10,
   BOOKMARK_TEMPLATE_PATH: './src/templates/bookmark-template.html',
+  WP_POST_STATUS: WpPostStatus.PENDING,
 };
 
 /**
@@ -29,6 +30,36 @@ export class ConfigurationError extends Error {
     super(message);
     this.name = 'ConfigurationError';
   }
+}
+
+function parseCategoryHierarchyOrder(raw: string | undefined): CategoryHierarchyOrder | undefined {
+  if (raw === undefined) return undefined;
+  const trimmed = raw.trim();
+  if (!trimmed)
+    throw new ConfigurationError('CATEGORY_HIERARCHY_ORDER must be a non-empty string.');
+  if (trimmed === CategoryHierarchyOrder.FIRST_IS_PARENT)
+    return CategoryHierarchyOrder.FIRST_IS_PARENT;
+  if (trimmed === CategoryHierarchyOrder.LAST_IS_PARENT)
+    return CategoryHierarchyOrder.LAST_IS_PARENT;
+
+  throw new ConfigurationError(
+    `CATEGORY_HIERARCHY_ORDER must be one of: ${CategoryHierarchyOrder.FIRST_IS_PARENT}, ${CategoryHierarchyOrder.LAST_IS_PARENT}. Got: ${raw}`
+  );
+}
+
+function parseWpPostStatus(raw: string | undefined): WpPostStatus | undefined {
+  if (raw === undefined) return undefined;
+  const trimmed = raw.trim();
+  if (!trimmed) throw new ConfigurationError('WP_POST_STATUS must be a non-empty string.');
+
+  if (trimmed === WpPostStatus.DRAFT) return WpPostStatus.DRAFT;
+  if (trimmed === WpPostStatus.PUBLISH) return WpPostStatus.PUBLISH;
+  if (trimmed === WpPostStatus.PENDING) return WpPostStatus.PENDING;
+  if (trimmed === WpPostStatus.PRIVATE) return WpPostStatus.PRIVATE;
+
+  throw new ConfigurationError(
+    `WP_POST_STATUS must be one of: ${WpPostStatus.DRAFT}, ${WpPostStatus.PUBLISH}, ${WpPostStatus.PENDING}, ${WpPostStatus.PRIVATE}. Got: ${raw}`
+  );
 }
 
 // Cached configuration after first load
@@ -87,6 +118,9 @@ export function loadConfig(): Config {
   const wpAppUser: string | undefined = process.env['WP_APP_USER'];
   const wpAppPassword: string | undefined = process.env['WP_APP_PASSWORD'];
 
+  const rawWpPostStatus = process.env['WP_POST_STATUS'];
+  const wpPostStatus = parseWpPostStatus(rawWpPostStatus) ?? WpPostStatus.PENDING;
+
   const migrationDbPath: string =
     process.env['MIGRATION_DB_PATH'] || DEFAULT_CONFIG.MIGRATION_DB_PATH;
 
@@ -120,20 +154,10 @@ export function loadConfig(): Config {
   const bookmarkTemplatePath: string =
     process.env['TISTORY_BOOKMARK_TEMPLATE_PATH'] ?? DEFAULT_CONFIG.BOOKMARK_TEMPLATE_PATH;
 
-  let categoryHierarchyOrder: CategoryHierarchyOrder;
   const rawCategoryHierarchyOrder: string | undefined = process.env['CATEGORY_HIERARCHY_ORDER'];
-  if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.FIRST_IS_PARENT) {
-    categoryHierarchyOrder = CategoryHierarchyOrder.FIRST_IS_PARENT;
-  } else if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.LAST_IS_PARENT) {
-    categoryHierarchyOrder = CategoryHierarchyOrder.LAST_IS_PARENT;
-  } else {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `Config.loadConfig - invalid or missing CATEGORY_HIERARCHY_ORDER; defaulting to "${CategoryHierarchyOrder.FIRST_IS_PARENT}".`
-    );
-    categoryHierarchyOrder =
-      DEFAULT_CONFIG.CATEGORY_HIERARCHY_ORDER || CategoryHierarchyOrder.FIRST_IS_PARENT;
-  }
+  const categoryHierarchyOrder: CategoryHierarchyOrder =
+    parseCategoryHierarchyOrder(rawCategoryHierarchyOrder) ??
+    DEFAULT_CONFIG.CATEGORY_HIERARCHY_ORDER;
 
   if (!postTitleSelector) {
     throw new ConfigurationError(
@@ -272,6 +296,7 @@ export function loadConfig(): Config {
     wpBaseUrl,
     wpAppUser,
     wpAppPassword,
+    wpPostStatus,
     migrationDbPath,
 
     maxRetryAttempts,

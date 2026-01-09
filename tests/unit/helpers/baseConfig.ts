@@ -1,5 +1,5 @@
 import { Config } from '../../../src/models/Config';
-import { CategoryHierarchyOrder, LogLevel } from '../../../src/enums/config.enum';
+import { CategoryHierarchyOrder, LogLevel, WpPostStatus } from '../../../src/enums/config.enum';
 
 export const baseConfig: Config = {
   blogUrl: 'https://example.tistory.com',
@@ -26,6 +26,7 @@ export const baseConfig: Config = {
   wpBaseUrl: 'https://example.wordpress.com',
   wpAppUser: 'user',
   wpAppPassword: 'password',
+  wpPostStatus: WpPostStatus.PENDING,
   migrationDbPath: './data/migration.db',
   maxRetryAttempts: 3,
   retryInitialDelayMs: 500,

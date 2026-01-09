@@ -4,17 +4,19 @@ import https from 'https';
 import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
 import { retryWithBackoff } from '../utils/retry';
+import { WpPostStatus } from '../enums/config.enum';
 
-export interface CreateDraftPostOptions {
+export interface CreatePostOptions {
   title: string;
   content: string;
+  status: WpPostStatus;
   date: string;
   categories: number[];
   tags: number[];
   featuredImageId: number | null;
 }
 
-export interface CreateDraftPostResult {
+export interface CreatePostResult {
   id: number;
   status: string;
   link: string;
@@ -45,7 +47,7 @@ export interface WpClient {
    * @param options Options for creating the draft post.
    * @returns Result containing the ID, status, and link of the created post.
    */
-  createDraftPost(options: CreateDraftPostOptions): Promise<CreateDraftPostResult>;
+  createPost(options: CreatePostOptions): Promise<CreatePostResult>;
   /**
    * Uploads media to WordPress.
    * @param options Options for uploading the media.
@@ -144,24 +146,22 @@ export function createWpClient(): WpClient {
     });
   }
 
-  const createDraftPost = async (
-    options: CreateDraftPostOptions
-  ): Promise<CreateDraftPostResult> => {
+  const createPost = async (options: CreatePostOptions): Promise<CreatePostResult> => {
     type WpPostPayload = {
       title: string;
       content: string;
-      status: 'draft';
+      status: WpPostStatus;
       date: string;
       categories: number[];
       tags: number[];
       featured_media?: number;
     };
 
-    const { title, content, date, categories, tags, featuredImageId } = options;
+    const { title, content, status, date, categories, tags, featuredImageId } = options;
     const payload: WpPostPayload = {
       title,
       content,
-      status: 'draft',
+      status,
       date,
       categories,
       tags,
@@ -171,8 +171,9 @@ export function createWpClient(): WpClient {
       payload.featured_media = featuredImageId;
     }
 
-    logger.debug('WpClient.createDraftPost - creating WordPress draft post', {
+    logger.debug('WpClient.createPost - creating WordPress post', {
       title,
+      status,
       date,
       categories,
       tags,
@@ -186,11 +187,11 @@ export function createWpClient(): WpClient {
 
     try {
       const data = await withRetry(exec, {
-        operation: 'createDraftPost',
+        operation: 'createPost',
         url: `${apiBase}/posts`,
       });
 
-      logger.info('WpClient.createDraftPost - created WordPress draft post', {
+      logger.info('WpClient.createPost - created WordPress post', {
         wpPostId: data.id,
         status: data.status,
       });
@@ -202,7 +203,7 @@ export function createWpClient(): WpClient {
       };
     } catch (error) {
       const message = getAxiosErrorMessage(error);
-      logger.error('WpClient.createDraftPost - create draft post failed', {
+      logger.error('WpClient.createPost - create post failed', {
         error: message,
         title,
       });
@@ -440,5 +441,5 @@ export function createWpClient(): WpClient {
     return created.id;
   };
 
-  return { createDraftPost, uploadMedia, deleteMedia, deletePost, ensureCategory, ensureTag };
+  return { createPost, uploadMedia, deleteMedia, deletePost, ensureCategory, ensureTag };
 }
