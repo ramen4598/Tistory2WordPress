@@ -51,18 +51,19 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
 
     try {
       // --- Start Fetch and Process Post Content ---
-      const html = await crawler.fetchPostHtml(url);
+      let html = await crawler.fetchPostHtml(url);
       const metadata = crawler.parsePostMetadata(html, url);
       const featuredImageUrl: string | null = crawler.extractFImgUrl(html);
 
       // --- Start Clean HTML ---
-      const bookmarkProcessedHtml = await bookmarkProcessor.replaceBookmarks(html);
-      const cleanedHtml = cleaner.cleanHtml(bookmarkProcessedHtml);
+      html = await bookmarkProcessor.replaceBookmarks(html);
+      html = cleaner.cleanHtml(html);
+      html = bookmarkProcessor.insertWPComment(html);
 
       post = {
         url,
         title: metadata.title,
-        content: cleanedHtml,
+        content: html,
         publish_date: metadata.publish_date,
         modified_date: metadata.modified_date,
         categories: metadata.categories,

@@ -70,6 +70,7 @@ describe('migrator (T221/T223)', () => {
 
     const bookmarkProcessor = {
       replaceBookmarks: jest.fn().mockResolvedValue(bookmarkProcessedHtml),
+      insertWPComment: jest.fn().mockImplementation((html: string) => html),
     };
     mockedCreateBookmarkProcessor.mockReturnValue(
       bookmarkProcessor as unknown as BookmarkProcessor
@@ -88,12 +89,13 @@ describe('migrator (T221/T223)', () => {
       extractFImgUrl: jest.fn().mockReturnValue(null),
     };
 
+    const cleanedHtml = '<p>cleaned</p>';
     const cleaner = {
       cleanHtml: jest.fn().mockImplementation((incomingHtml: string) => {
         if (incomingHtml === legacyHtml) {
           throw new Error('Cleaner must run after bookmark processing');
         }
-        return '<p>cleaned</p>';
+        return cleanedHtml;
       }),
     };
 
@@ -135,6 +137,7 @@ describe('migrator (T221/T223)', () => {
     await migrator.migratePostByUrl(url, context);
 
     expect(bookmarkProcessor.replaceBookmarks).toHaveBeenCalledWith(legacyHtml);
+    expect(bookmarkProcessor.insertWPComment).toHaveBeenCalledWith(cleanedHtml);
     expect(crawler.parsePostMetadata).toHaveBeenCalledWith(legacyHtml, url);
     expect(crawler.extractFImgUrl).toHaveBeenCalledWith(legacyHtml);
     expect(cleaner.cleanHtml).toHaveBeenCalledWith(bookmarkProcessedHtml);
@@ -143,6 +146,7 @@ describe('migrator (T221/T223)', () => {
   it('rolls back uploaded media when post creation fails', async () => {
     const bookmarkProcessor = {
       replaceBookmarks: jest.fn().mockResolvedValue('<html></html>'),
+      insertWPComment: jest.fn().mockImplementation((html: string) => html),
     };
     mockedCreateBookmarkProcessor.mockReturnValue(
       bookmarkProcessor as unknown as BookmarkProcessor

@@ -182,10 +182,30 @@ export const createBookmarkProcessor = (
     return $.html();
   };
 
+  /**
+   * 워드프레스 커스텀 HTML 주석 형태로 북마크를 삽입합니다.
+   * @param html 원본 HTML 문자열
+   * @return 커스텀 HTML 주석이 삽입된 HTML 문자열
+   */
+  const insertWPComment = (html: string): string => {
+    // clean 후 삽입
+    // turndown 과정에서 주석이 유지하는 시도에 실패하여, 후처리로 주석을 삽입합니다.
+    const $ = cheerio.load(html);
+    const bookmarkEls = $('figure.bookmark-card');
+
+    for (let i = 0; i < bookmarkEls.length; i++) {
+      const bookmarkEl = bookmarkEls.eq(i);
+      bookmarkEl.before(`<!-- wp:html -->`);
+      bookmarkEl.after(`<!-- /wp:html -->`);
+    }
+    return $.html();
+  };
+
   return {
     detectBookmarks,
     fetchMetadata,
     replaceBookmarks,
+    insertWPComment,
   };
 };
 
@@ -193,4 +213,5 @@ export interface BookmarkProcessor {
   detectBookmarks(html: string): Bookmark[];
   fetchMetadata(url: string): Promise<BookmarkMetadata>;
   replaceBookmarks(html: string): Promise<string>;
+  insertWPComment(html: string): string;
 }

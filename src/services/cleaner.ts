@@ -165,7 +165,7 @@ const registerKeepBookmarkCardRule = (turndownService: TurndownService): void =>
     },
     replacement: (_content, node) => {
       const element = node;
-      return `\n\n<!-- wp:html -->${element.outerHTML}<!-- /wp:html -->\n\n`;
+      return `\n\n${element.outerHTML}\n\n`;
     },
   });
 };
