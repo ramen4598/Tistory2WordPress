@@ -94,13 +94,9 @@ export async function runCli(argv: string[]): Promise<number> {
 
   const selectedModes = Number(Boolean(postUrl)) + Number(allFlag) + Number(retryFailedFlag);
 
-  if (exportFailedFlag) {
-    // Export-only mode (does not run migration).
-  } else {
-    if (selectedModes !== 1) {
-      printUsage();
-      return 1;
-    }
+  if (!exportFailedFlag && selectedModes !== 1) {
+    printUsage();
+    return 1;
   }
 
   const logger = getLogger();
