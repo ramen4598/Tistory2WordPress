@@ -512,6 +512,32 @@ HTML을 마크다운으로 변환한 후, 다시 HTML로 변환하여 워드프�
 4. 타임아웃 설정(`10분`) 확인
 5. 로그에서 업로드 실패 원인 확인
 
+### 이미지 업로드 크기 제한 / PHP 설정
+
+**문제**: 이미지 파일이 큰 경우(워드프레스/PHP 기본 설정이 2MB인 경우가 흔함) 업로드가 실패합니다. 이 때 워드프레스 LOG가 `408`이거나 Node 쪽에서 `socket hang up` 오류가 발생할 수 있습니다.
+
+**확인 방법**:
+
+```bash
+php -i | grep -E "upload_max_filesize|post_max_size|memory_limit|memory_limit|max_execution_time|max_input_time"
+```
+
+현재 사용 중인 PHP 설정 파일 위치는 아래로 확인할 수 있습니다.
+
+```bash
+php --ini
+```
+
+**조치**: `php.ini`에서 최대 파일 업로드 사이즈를 늘리세요. 예:
+
+```ini
+upload_max_filesize = 64M
+post_max_size = 64M
+memory_limit = 256M
+```
+
+설정 변경 후에는 웹서버/PHP-FPM 재시작이 필요할 수 있습니다.
+
 ### 북마크 메타데이터 fetch 실패
 
 **문제**: 북마크 메타데이터가 fetch되지 않습니다.
