@@ -1,19 +1,22 @@
 import axios, { type AxiosError, type AxiosInstance } from 'axios';
 import FormData from 'form-data';
+import https from 'https';
 import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
 import { retryWithBackoff } from '../utils/retry';
+import { WpPostStatus } from '../enums/config.enum';
 
-export interface CreateDraftPostOptions {
+export interface CreatePostOptions {
   title: string;
   content: string;
+  status: WpPostStatus;
   date: string;
   categories: number[];
   tags: number[];
   featuredImageId: number | null;
 }
 
-export interface CreateDraftPostResult {
+export interface CreatePostResult {
   id: number;
   status: string;
   link: string;
@@ -44,7 +47,7 @@ export interface WpClient {
    * @param options Options for creating the draft post.
    * @returns Result containing the ID, status, and link of the created post.
    */
-  createDraftPost(options: CreateDraftPostOptions): Promise<CreateDraftPostResult>;
+  createPost(options: CreatePostOptions): Promise<CreatePostResult>;
   /**
    * Uploads media to WordPress.
    * @param options Options for uploading the media.
@@ -109,12 +112,20 @@ export function createWpClient(): WpClient {
 
   const auth = Buffer.from(`${config.wpAppUser}:${config.wpAppPassword}`).toString('base64');
 
+  const httpsAgent = new https.Agent({
+    keepAlive: true,
+    // 최대 유휴 연결 수. worker 수만큼은 항상 유지.
+    maxFreeSockets: config.workerCount,
+    rejectUnauthorized: true,
+  });
+
   const client: AxiosInstance = axios.create({
     baseURL: apiBase,
     headers: {
       Authorization: `Basic ${auth}`,
     },
-    timeout: 3000,
+    timeout: 600000, // 10 minutes
+    httpsAgent,
   });
 
   const categoryCache = new Map<string, number>(); // key: name value: categoryId
@@ -127,7 +138,7 @@ export function createWpClient(): WpClient {
     return retryWithBackoff(fn, config, {
       onRetry: (error, attempt, delayMs) => {
         logger.warn(
-          'Retrying WordPress request',
+          'WpClient.withRetry - retrying WordPress request',
           { operation: context.operation, url: context.url, attempt, delayMs },
           getAxiosErrorMessage(error)
         );
@@ -135,24 +146,22 @@ export function createWpClient(): WpClient {
     });
   }
 
-  const createDraftPost = async (
-    options: CreateDraftPostOptions
-  ): Promise<CreateDraftPostResult> => {
+  const createPost = async (options: CreatePostOptions): Promise<CreatePostResult> => {
     type WpPostPayload = {
       title: string;
       content: string;
-      status: 'draft';
+      status: WpPostStatus;
       date: string;
       categories: number[];
       tags: number[];
       featured_media?: number;
     };
 
-    const { title, content, date, categories, tags, featuredImageId } = options;
+    const { title, content, status, date, categories, tags, featuredImageId } = options;
     const payload: WpPostPayload = {
       title,
       content,
-      status: 'draft',
+      status,
       date,
       categories,
       tags,
@@ -162,8 +171,9 @@ export function createWpClient(): WpClient {
       payload.featured_media = featuredImageId;
     }
 
-    logger.debug('Creating WordPress draft post', {
+    logger.debug('WpClient.createPost - creating WordPress post', {
       title,
+      status,
       date,
       categories,
       tags,
@@ -177,11 +187,11 @@ export function createWpClient(): WpClient {
 
     try {
       const data = await withRetry(exec, {
-        operation: 'createDraftPost',
+        operation: 'createPost',
         url: `${apiBase}/posts`,
       });
 
-      logger.info('Created WordPress draft post', {
+      logger.info('WpClient.createPost - created WordPress post', {
         wpPostId: data.id,
         status: data.status,
       });
@@ -193,7 +203,7 @@ export function createWpClient(): WpClient {
       };
     } catch (error) {
       const message = getAxiosErrorMessage(error);
-      logger.error('Failed to create WordPress draft post', {
+      logger.error('WpClient.createPost - create post failed', {
         error: message,
         title,
       });
@@ -237,7 +247,7 @@ export function createWpClient(): WpClient {
         url: `${apiBase}/media`,
       });
 
-      logger.info('Uploaded WordPress media', {
+      logger.info('WpClient.uploadMedia - uploaded WordPress media', {
         wpMediaId: data.id,
         url: data.source_url,
       });
@@ -250,7 +260,7 @@ export function createWpClient(): WpClient {
       };
     } catch (error) {
       const message = getAxiosErrorMessage(error);
-      logger.error('Failed to upload WordPress media', {
+      logger.error('WpClient.uploadMedia - upload media failed', {
         error: message,
         fileName,
         mimeType,
@@ -270,12 +280,14 @@ export function createWpClient(): WpClient {
       const status = axiosError.response?.status;
 
       if (axiosError.isAxiosError && status === 404) {
-        logger.warn('Media already absent during rollback', { wpMediaId: mediaId });
+        logger.warn('WpClient.deleteMedia - media already absent during rollback', {
+          wpMediaId: mediaId,
+        });
         return;
       }
 
       const message = getAxiosErrorMessage(error);
-      logger.error('Failed to delete WordPress media during rollback', {
+      logger.error('WpClient.deleteMedia - delete media during rollback failed', {
         error: message,
         wpMediaId: mediaId,
       });
@@ -291,12 +303,14 @@ export function createWpClient(): WpClient {
       const status = axiosError.response?.status;
 
       if (axiosError.isAxiosError && status === 404) {
-        logger.warn('Post already absent during rollback', { wpPostId: postId });
+        logger.warn('WpClient.deletePost - post already absent during rollback', {
+          wpPostId: postId,
+        });
         return;
       }
 
       const message = getAxiosErrorMessage(error);
-      logger.error('Failed to delete WordPress post during rollback', {
+      logger.error('WpClient.deletePost - delete post during rollback failed', {
         error: message,
         wpPostId: postId,
       });
@@ -414,9 +428,7 @@ export function createWpClient(): WpClient {
 
     // --- if not found, create it ---
     const createExec = async () => {
-      const response = await client.post<WpTag>('/tags', {
-        name,
-      });
+      const response = await client.post<WpTag>('/tags', { name });
       return response.data;
     };
 
@@ -429,5 +441,5 @@ export function createWpClient(): WpClient {
     return created.id;
   };
 
-  return { createDraftPost, uploadMedia, deleteMedia, deletePost, ensureCategory, ensureTag };
+  return { createPost, uploadMedia, deleteMedia, deletePost, ensureCategory, ensureTag };
 }

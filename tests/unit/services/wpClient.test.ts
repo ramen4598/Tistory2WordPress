@@ -3,6 +3,7 @@ import { loadConfig } from '../../../src/utils/config';
 import { getLogger } from '../../../src/utils/logger';
 import { createWpClient, type WpClient } from '../../../src/services/wpClient';
 import { baseConfig } from '../helpers/baseConfig';
+import { WpPostStatus } from '../../../src/enums/config.enum';
 
 jest.mock('axios');
 jest.mock('../../../src/utils/config');
@@ -39,19 +40,20 @@ describe('wpClient', () => {
   const createClient = (): WpClient => createWpClient();
 
   describe('happy paths', () => {
-    it('creates a draft post via /posts', async () => {
+    it('creates a post via /posts', async () => {
       const client = createClient();
 
       const responseData = {
         id: 456,
-        status: 'draft',
+        status: 'publish',
         link: 'https://example.wordpress.com/?p=456',
       };
       axiosInstance.post.mockResolvedValue({ data: responseData } as AxiosResponse);
 
-      const result = await client.createDraftPost({
+      const result = await client.createPost({
         title: 'Post Title',
         content: '<p>content</p>',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
@@ -64,14 +66,14 @@ describe('wpClient', () => {
           headers: expect.objectContaining({
             Authorization: expect.stringMatching(/^Basic /),
           }),
-          timeout: 3000,
+          httpsAgent: expect.anything(),
         })
       );
 
       expect(axiosInstance.post).toHaveBeenCalledWith('/posts', {
         title: 'Post Title',
         content: '<p>content</p>',
-        status: 'draft',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
@@ -197,9 +199,7 @@ describe('wpClient', () => {
         params: { per_page: 100, page: 1, search: 'javascript' },
       });
       expect(axiosInstance.post).toHaveBeenCalledTimes(1);
-      expect(axiosInstance.post).toHaveBeenCalledWith('/tags', {
-        name: 'javascript',
-      });
+      expect(axiosInstance.post).toHaveBeenCalledWith('/tags', { name: 'javascript' });
     });
 
     it('returns existing tag id when found and caches it', async () => {
@@ -218,19 +218,20 @@ describe('wpClient', () => {
       expect(axiosInstance.post).not.toHaveBeenCalledWith('/tags', expect.anything());
     });
 
-    it('creates draft post without featured image when featuredImageId is null', async () => {
+    it('creates post without featured image when featuredImageId is null', async () => {
       const client = createClient();
 
       const responseData = {
         id: 456,
-        status: 'draft',
+        status: 'publish',
         link: 'https://example.wordpress.com/?p=456',
       };
       axiosInstance.post.mockResolvedValue({ data: responseData } as AxiosResponse);
 
-      const result = await client.createDraftPost({
+      const result = await client.createPost({
         title: 'Post Title',
         content: '<p>content</p>',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
@@ -240,7 +241,7 @@ describe('wpClient', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('/posts', {
         title: 'Post Title',
         content: '<p>content</p>',
-        status: 'draft',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [10],
         tags: [20],
@@ -263,9 +264,12 @@ describe('wpClient', () => {
 
       await expect(client.deleteMedia(999)).resolves.toBeUndefined();
 
-      expect(loggerMock.warn).toHaveBeenCalledWith('Media already absent during rollback', {
-        wpMediaId: 999,
-      });
+      expect(loggerMock.warn).toHaveBeenCalledWith(
+        'WpClient.deleteMedia - media already absent during rollback',
+        {
+          wpMediaId: 999,
+        }
+      );
     });
 
     it('treats 404 on post deletion as non-fatal, logs warning', async () => {
@@ -280,9 +284,12 @@ describe('wpClient', () => {
 
       await expect(client.deletePost(999)).resolves.toBeUndefined();
 
-      expect(loggerMock.warn).toHaveBeenCalledWith('Post already absent during rollback', {
-        wpPostId: 999,
-      });
+      expect(loggerMock.warn).toHaveBeenCalledWith(
+        'WpClient.deletePost - post already absent during rollback',
+        {
+          wpPostId: 999,
+        }
+      );
     });
   });
 
@@ -297,9 +304,10 @@ describe('wpClient', () => {
 
       axiosInstance.post.mockRejectedValue(error).mockRejectedValue(error).mockRejectedValue(error);
 
-      const result = client.createDraftPost({
+      const result = client.createPost({
         title: 'Bad',
         content: '<p>bad</p>',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [],
         tags: [],
@@ -319,7 +327,7 @@ describe('wpClient', () => {
 
       const successResponse = {
         id: 789,
-        status: 'draft',
+        status: 'publish',
         link: 'https://example.wordpress.com/?p=789',
       };
 
@@ -327,9 +335,10 @@ describe('wpClient', () => {
         .mockRejectedValueOnce(transientError)
         .mockResolvedValueOnce({ data: successResponse } as AxiosResponse);
 
-      const result = await client.createDraftPost({
+      const result = await client.createPost({
         title: 'Retry',
         content: '<p>retry</p>',
+        status: WpPostStatus.PUBLISH,
         date: '2026-01-01T12:00:00',
         categories: [],
         tags: [],
@@ -339,7 +348,7 @@ describe('wpClient', () => {
       expect(axiosInstance.post).toHaveBeenCalledTimes(2);
       expect(result).toEqual({
         id: 789,
-        status: 'draft',
+        status: 'publish',
         link: 'https://example.wordpress.com/?p=789',
       });
     });

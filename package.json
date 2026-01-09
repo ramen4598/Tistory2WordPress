@@ -1,8 +1,11 @@
 {
-  "name": "tistory-wxr-generator",
+  "name": "tistory2wp",
   "version": "1.0.0",
   "description": "CLI tool to migrate Tistory blog posts to WordPress WXR format",
   "main": "dist/cli.js",
+  "bin": {
+    "tistory2wp": "./dist/cli.js"
+  },
   "type": "commonjs",
   "engines": {
     "node": ">=18.0.0"

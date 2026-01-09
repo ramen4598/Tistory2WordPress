@@ -40,4 +40,5 @@ tmp/
 .ignore
 
 # DB
+/data/
 *.db

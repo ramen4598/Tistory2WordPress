@@ -1,4 +1,4 @@
-import { CategoryHierarchyOrder, LogLevel } from '../enums/config.enum';
+import { CategoryHierarchyOrder, LogLevel, WpPostStatus } from '../enums/config.enum';
 
 /**
  * Application configuration interface
@@ -28,6 +28,12 @@ export interface Config {
   wpAppPassword: string;
 
   /**
+   * WordPress post status for created posts.
+   * @default WpPostStatus.PENDING
+   */
+  wpPostStatus: WpPostStatus;
+
+  /**
    * SQLite DB file path for REST migration state
    * @default './data/migration.db'
    */
@@ -47,29 +53,35 @@ export interface Config {
 
   /**
    * Maximum retry delay in milliseconds
-   * @default 10000
+   * @default 600000 (10 minutes)
    */
   retryMaxDelayMs: number;
 
   /**
    * Backoff multiplier for retries
-   * @default 2
+   * @default 10
    */
   retryBackoffMultiplier: number;
 
   /**
    * Number of concurrent workers for parallel processing
-   * @default 4
+   * @default 1
    * @min 1
    * @max 16
    */
   workerCount: number;
 
   /**
-   * Rate limit per worker in milliseconds
-   * @default 1000
+   * Rate limit interval
+   * @default 60000 (1 minute)
    */
-  rateLimitPerWorker: number;
+  rateLimitInterval: number;
+
+  /**
+   * Rate limit cap (number of requests per interval)
+   * @default 1 (1 request per interval)
+   */
+  rateLimitCap: number;
 
   /**
    * Output directory path for generated files
@@ -146,4 +158,16 @@ export interface Config {
    * @default CategoryHierarchyOrder.FIRST_IS_PARENT
    */
   categoryHierarchyOrder: CategoryHierarchyOrder;
+
+  /**
+   * CSS selector to detect bookmark elements in Tistory posts
+   * e.g. figure[data-ke-type="opengraph"]
+   */
+  bookmarkSelector: string;
+
+  /**
+   * Path to bookmark HTML template file
+   * @default "./src/templates/bookmark-template.html"
+   */
+  bookmarkTemplatePath: string;
 }

@@ -46,10 +46,12 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
   const logger = getLogger();
 
   const defaultHtmlToMarkdown = (html: string): string => {
-    const turndownService = new TurndownService();
+    const turndownService = new TurndownService({
+      codeBlockStyle: 'fenced', // fenced = ``` , indented = 4 spaces
+    });
 
     // Preserve inline formatting tags that should survive
-    // the HTML -> Markdown -> HTML round trip.
+    // HTML -> Markdown -> HTML round trip.
     turndownService.keep(['sup', 'sub']);
 
     // Rule 적용 순서가 중요. 나중에 추가한 규칙이 최종적으로 우선 적용됨
@@ -58,6 +60,7 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
     turndownService.use([gfm.strikethrough, gfm.taskListItems]);
     registerGenericTableRule(turndownService);
     registerCleanIframeRule(turndownService);
+    registerKeepBookmarkCardRule(turndownService);
 
     return turndownService.turndown(html);
   };
@@ -74,35 +77,35 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
   const markdownToHtml = (markdown: string): string => markdownToHtmlImpl(markdown);
 
   const cleanHtml = (html: string): string => {
-    logger.debug('Cleaner.cleanHtml: start');
+    logger.debug('Cleaner.cleanHtml - start');
 
     const $ = cheerio.load(html);
     const root = $(postContentSelector).first();
-    logger.debug('Cleaner.cleanHtml: selected content root', {
+    logger.debug('Cleaner.cleanHtml - selected content root', {
       selector: postContentSelector,
       html: root.html(),
     });
 
     const rawContentHtml = root.html();
     if (!rawContentHtml) {
-      logger.warn('Cleaner.cleanHtml: no content found for selector', {
+      logger.warn('Cleaner.cleanHtml - no content found for selector', {
         selector: postContentSelector,
       });
       return '';
     }
 
-    logger.debug('Cleaner.cleanHtml: extracted content root HTML', {
+    logger.debug('Cleaner.cleanHtml - extracted content root HTML', {
       selector: postContentSelector,
       length: rawContentHtml.length,
     });
 
     const markdown = htmlToMarkdown(rawContentHtml);
-    logger.debug('Cleaner.cleanHtml: converted HTML to markdown', {
+    logger.debug('Cleaner.cleanHtml - converted HTML to markdown', {
       markdownLength: markdown.length,
     });
 
     const cleanedHtml = markdownToHtml(markdown);
-    logger.debug('Cleaner.cleanHtml: converted markdown back to HTML', {
+    logger.debug('Cleaner.cleanHtml - converted markdown back to HTML', {
       cleanedHtmlLength: cleanedHtml.length,
     });
 
@@ -143,6 +146,26 @@ const registerCleanIframeRule = (turndownService: TurndownService): void => {
       const attrString = attrs.join(' ');
 
       return `\n\n<iframe ${attrString}></iframe>\n\n`;
+    },
+  });
+};
+
+/**
+ * Turndown 규칙을 추가하여 bookmark-card를 유지합니다.
+ * HTML -> Markdown -> HTML 변환 과정에서 bookmark-card가 손상되지 않도록 합니다.
+ * @param turndownService TurndownService 인스턴스
+ * @return void
+ */
+const registerKeepBookmarkCardRule = (turndownService: TurndownService): void => {
+  turndownService.addRule('keepBookmarkCard', {
+    filter: (node: HTMLElement) => {
+      if (node.nodeName.toLowerCase() !== 'figure') return false;
+      const cls = (node.getAttribute('class') ?? '').trim().split(/\s+/).filter(Boolean);
+      return cls.includes('bookmark-card');
+    },
+    replacement: (_content, node) => {
+      const element = node;
+      return `\n\n${element.outerHTML}\n\n`;
     },
   });
 };

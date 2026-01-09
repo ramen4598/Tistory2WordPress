@@ -1,8 +1,10 @@
 import { createCrawler, type Crawler } from './crawler';
 import { createCleaner, type Cleaner } from './cleaner';
+import { createBookmarkProcessor, type BookmarkProcessor } from './bookmarkProcessor';
 import { type ImageProcessor, createImageProcessor } from './imageProcessor';
 import { createLinkTracker, type LinkTracker } from './linkTracker';
 import { createWpClient, type WpClient } from './wpClient';
+import { loadConfig } from '../utils/config';
 import { getLogger } from '../utils/logger';
 import { createMigrationJobItem, createPostMap, updateMigrationJobItem } from '../db';
 import { MigrationJobItemStatus } from '../enums/db.enum';
@@ -24,6 +26,7 @@ export interface Migrator {
 export interface CreateMigratorOptions {
   crawler?: Crawler;
   cleaner?: Cleaner;
+  bookmarkProcessor?: BookmarkProcessor;
   linkTracker?: LinkTracker;
   imageProcessor?: ImageProcessor;
   wpClient?: WpClient;
@@ -31,14 +34,15 @@ export interface CreateMigratorOptions {
 
 export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
   const logger = getLogger();
+  const config = loadConfig();
 
   const crawler = options.crawler ?? createCrawler({ fetchFn: fetch });
   const cleaner = options.cleaner ?? createCleaner();
+  const bookmarkProcessor = options.bookmarkProcessor ?? createBookmarkProcessor();
   const linkTracker = options.linkTracker ?? createLinkTracker();
   const wpClient = options.wpClient ?? createWpClient();
   const imageProcessor = options.imageProcessor ?? createImageProcessor(wpClient);
 
-  // TODO: 예외 처리 강화 (전반적인 예외 처리 강화가 필요)
   const migratePostByUrl = async (url: string, context: MigratorContext): Promise<void> => {
     const jobItem = createMigrationJobItem({ job_id: context.jobId, tistory_url: url });
 
@@ -46,15 +50,20 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
     let post: Post | null = null;
 
     try {
-      const html = await crawler.fetchPostHtml(url);
+      // --- Start Fetch and Process Post Content ---
+      let html = await crawler.fetchPostHtml(url);
       const metadata = crawler.parsePostMetadata(html, url);
       const featuredImageUrl: string | null = crawler.extractFImgUrl(html);
-      const cleanedHtml = cleaner.cleanHtml(html);
+
+      // --- Start Clean HTML ---
+      html = await bookmarkProcessor.replaceBookmarks(html);
+      html = cleaner.cleanHtml(html);
+      html = bookmarkProcessor.insertWPComment(html);
 
       post = {
         url,
         title: metadata.title,
-        content: cleanedHtml,
+        content: html,
         publish_date: metadata.publish_date,
         modified_date: metadata.modified_date,
         categories: metadata.categories,
@@ -66,6 +75,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
 
       linkTracker.trackInternalLinks(url, post.content, jobItem.id);
 
+      // --- Start Upload to WordPress ---
       post.featured_image = featuredImageUrl
         ? await imageProcessor.processFImg(jobItem.id, post.title, featuredImageUrl)
         : null;
@@ -82,15 +92,17 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
 
       const tagIds = await Promise.all(post.tags.map(async (tag) => wpClient.ensureTag(tag.name)));
 
-      const wpPost = await wpClient.createDraftPost({
+      const wpPost = await wpClient.createPost({
         title: post.title,
         content: post.content,
+        status: config.wpPostStatus,
         date: post.publish_date.toISOString(),
         categories: categoryIds,
         tags: tagIds,
         featuredImageId: post.featured_image?.wp_media_id ?? null,
       });
 
+      // --- After post creation ---
       wpPostId = wpPost.id;
 
       createPostMap({ tistory_url: url, wp_post_id: wpPostId });
@@ -101,7 +113,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         updated_at: new Date().toISOString(),
       });
 
-      logger.info('Migrated post successfully', {
+      logger.info('Migrator.migratePostByUrl - migrated post successfully', {
         url,
         jobId: context.jobId,
         jobItemId: jobItem.id,
@@ -109,7 +121,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
       });
     } catch (error) {
       const message = (error as Error)?.message ?? String(error);
-      logger.error('Failed to migrate post; starting rollback', {
+      logger.error('Migrator.migratePostByUrl - migrate post failed; starting rollback', {
         url,
         jobId: context.jobId,
         jobItemId: jobItem.id,
@@ -123,7 +135,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         try {
           await wpClient.deleteMedia(post.featured_image.wp_media_id);
         } catch (rollbackError) {
-          logger.error('Rollback: failed to delete featured image', {
+          logger.error('Migrator.migratePostByUrl - rollback delete featured image failed', {
             url,
             wpMediaId: post.featured_image.wp_media_id,
             error: (rollbackError as Error)?.message ?? String(rollbackError),
@@ -136,7 +148,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         try {
           await wpClient.deleteMedia(image.wp_media_id);
         } catch (rollbackError) {
-          logger.error('Rollback: failed to delete media', {
+          logger.error('Migrator.migratePostByUrl - rollback delete media failed', {
             url,
             wpMediaId: image.wp_media_id,
             error: (rollbackError as Error)?.message ?? String(rollbackError),
@@ -148,7 +160,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         try {
           await wpClient.deletePost(wpPostId);
         } catch (rollbackError) {
-          logger.error('Rollback: failed to delete post', {
+          logger.error('Migrator.migratePostByUrl - rollback delete post failed', {
             url,
             wpPostId,
             error: (rollbackError as Error)?.message ?? String(rollbackError),
@@ -162,7 +174,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         updated_at: new Date().toISOString(),
       });
 
-      logger.info('Rollback completed', {
+      logger.info('Migrator.migratePostByUrl - rollback completed', {
         url,
         jobId: context.jobId,
         jobItemId: jobItem.id,

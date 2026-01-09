@@ -15,3 +15,13 @@ export enum LogLevel {
   INFO = 'info',
   DEBUG = 'debug',
 }
+
+/**
+ * WordPress post status options
+ */
+export enum WpPostStatus {
+  DRAFT = 'draft',
+  PUBLISH = 'publish',
+  PENDING = 'pending',
+  PRIVATE = 'private',
+}

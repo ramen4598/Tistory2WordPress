@@ -30,7 +30,6 @@ describe('MigrationState', () => {
     });
   });
 
-  // TODO: Add more tests for edge cases and validation after implementing validation logic
   describe('MigrationState validation scenarios', () => {
     it('should enforce unique processed_posts URLs', () => {
       const state: MigrationState = {

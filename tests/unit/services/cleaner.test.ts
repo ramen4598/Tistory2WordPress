@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'fs';
 import * as path from 'path';
+import { Config } from '../../../src/models/Config';
 import { loadConfig } from '../../../src/utils/config';
 import { createCleaner } from '../../../src/services/cleaner';
+import { baseConfig } from '../helpers/baseConfig';
 
 jest.mock('../../../src/utils/config');
 
@@ -23,7 +24,6 @@ const dummyPost384Html = fs.readFileSync(
 );
 
 describe('Cleaner service', () => {
-  const blogUrl = 'https://ramen4598.tistory.com';
   const metaTags = `
     <meta name="title" content="Test Post Title">
     <meta property="article:published_time" content="2024-01-15T10:00:00+09:00">
@@ -45,20 +45,9 @@ describe('Cleaner service', () => {
 
   beforeEach(() => {
     mockedLoadConfig.mockReturnValue({
-      blogUrl,
-      workerCount: 4,
-      rateLimitPerWorker: 1000,
-      outputDir: './output',
-      downloadsDir: './output/downloads',
-      logLevel: 'info',
-      postTitleSelector: 'meta[name="title"]',
-      postPublishDateSelector: 'meta[property="article:published_time"]',
-      postModifiedDateSelector: 'meta[property="article:modified_time"]',
-      postCategorySelector: 'div.another_category h4 a',
-      postTagSelector: 'div.area_tag a[rel="tag"]',
-      postListLinkSelector: 'a.link_category',
-      postContentSelector: 'div.tt_article_useless_p_margin.contents_style',
-    } as any);
+      ...baseConfig,
+      blogUrl: 'https://ramen4598.tistory.com',
+    } as Config);
   });
 
   afterEach(() => {
@@ -147,6 +136,42 @@ describe('Cleaner service', () => {
 
     expect(cleanedHtml).toContain('<sup>superscript</sup>');
     expect(cleanedHtml).toContain('<sub>subscript</sub>');
+  });
+
+  it('should preserve bookmark-card figure structure during cleaning', () => {
+    const cleaner = createCleaner();
+    const content = `
+      <figure class="bookmark-card">
+        <div class="bookmark-card-inner">
+          <a class="bookmark-card-link" href="https://example.com" target="_blank" rel="noopener noreferrer">
+            <div class="bookmark-card-content">
+              <div class="bookmark-card-text">
+                <div class="bookmark-card-title">Example Title</div>
+                <div class="bookmark-card-description">Example description</div>
+                <div class="bookmark-card-url">https://example.com</div>
+              </div>
+              <div class="bookmark-card-thumbnail">
+                <img src="https://example.com/image.jpg" alt="Example Title" />
+              </div>
+            </div>
+          </a>
+        </div>
+      </figure>
+    `;
+
+    const html =
+      metaTags + categoryTags + tagTags + contentWrapperStart + content + contentWrapperEnd;
+
+    const cleanedHtml = cleaner.cleanHtml(html);
+
+    expect(cleanedHtml).toContain('<figure class="bookmark-card">');
+    expect(cleanedHtml).toContain('<a class="bookmark-card-link" href="https://example.com"');
+    expect(cleanedHtml).toContain('<div class="bookmark-card-title">Example Title</div>');
+    expect(cleanedHtml).toContain(
+      '<div class="bookmark-card-description">Example description</div>'
+    );
+    expect(cleanedHtml).toContain('<div class="bookmark-card-url">https://example.com</div>');
+    expect(cleanedHtml).toContain('<img src="https://example.com/image.jpg" alt="Example Title">');
   });
 
   it('should preserve blockquotes during cleaning', () => {

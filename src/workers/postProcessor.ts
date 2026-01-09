@@ -24,24 +24,21 @@ export const createPostProcessor = (): PostProcessor => {
   const logger = getLogger();
   const config = loadConfig();
 
-  // Calculate rate limiting parameters
-  // If rateLimitPerWorker is 1000ms, allow 1 request per 1000ms
-  const intervalMs = config.rateLimitPerWorker;
-  const intervalCap = 1; // 1 request per interval
-
   const queue = new PQueue({
-    concurrency: config.workerCount,
-    intervalCap: intervalCap,
-    interval: intervalMs,
+    // maximum throughput per minute: rateLimitCap / (rateLimitInterval / 60000)
+    concurrency: config.workerCount, // Number of concurrent workers
+    intervalCap: config.rateLimitCap, // Max requests per interval
+    interval: config.rateLimitInterval, // Interval duration in ms
   });
 
   const migrator = createMigrator();
 
   const process = async (urls: string[], jobId: number): Promise<void> => {
-    logger.info('PostProcessor: starting processing', {
+    logger.info('PostProcessor.process - starting processing', {
       count: urls.length,
       concurrency: config.workerCount,
-      rateLimitPerWorker: config.rateLimitPerWorker,
+      rateLimitInterval: config.rateLimitInterval,
+      rateLimitCap: config.rateLimitCap,
     });
 
     const tasks = urls.map((url) => {
@@ -49,7 +46,7 @@ export const createPostProcessor = (): PostProcessor => {
         try {
           await migrator.migratePostByUrl(url, { jobId: jobId });
         } catch (error) {
-          logger.error('PostProcessor: failed to process post', {
+          logger.error('PostProcessor.process - process url failed', {
             url,
             error: (error as Error)?.message ?? String(error),
           });
@@ -61,7 +58,7 @@ export const createPostProcessor = (): PostProcessor => {
     await queue.addAll(tasks);
     await queue.onIdle();
 
-    logger.info('PostProcessor: finished processing');
+    logger.info('PostProcessor.process - finished processing');
   };
 
   return {

@@ -1,20 +1,24 @@
-import { getLogger } from './utils/logger';
+import { getLogger, Logger } from './utils/logger';
 import { loadConfig } from './utils/config';
 import {
   createMigrationJob,
+  getAttemptedTistoryUrlsByBlogUrl,
   getDb,
   getMigrationJobItemsByJobId,
-  getLatestRunningJobByType,
-  getMigrationJobItemsByJobIdAndStatus,
+  getRetryUrlsByBlogUrl,
   updateMigrationJob,
+  closeDb,
 } from './db';
 import { MigrationJobItemStatus, MigrationJobStatus, MigrationJobType } from './enums/db.enum';
 import { createMigrator } from './services/migrator';
 import { createCrawler } from './services/crawler';
 import { exportLinkMapping } from './services/linkMapper';
+import { exportFailedPostsByBlogUrl } from './services/failedPostExporter';
 import { MigrationJob } from './models/MigrationJob';
 import { createPostProcessor } from './workers/postProcessor';
 import path from 'path';
+
+const TIME_POSTFIX = new Date().toISOString().replace(/[:.]/g, '-');
 
 function getArgValue(argv: string[], flag: string): string | undefined {
   const exact = argv.find((a) => a === flag);
@@ -39,23 +43,46 @@ function hasFlag(argv: string[], flag: string): boolean {
   return argv.includes(flag);
 }
 
+function hasHelpFlag(argv: string[]): boolean {
+  return argv.includes('--help') || argv.includes('-h');
+}
+
 function printUsage(): void {
-  // Keep it simple; tests shouldn't depend on output.
-  console.log(
-    'Usage: ts-node src/cli.ts [--post <tistory_post_url> | --all] [--retry-failed] [--export-links]'
-  );
+  console.log('Tistory2Wordpress - Migrate Tistory blog posts to WordPress');
+  console.log('');
+  console.log('Usage:');
+  console.log('[--post=<url> | --all | --retry-failed] [--export-links] [--export-failed]');
+  console.log('');
+  console.log('Options:');
+  console.log('  -h, --help           Show this help message');
+  console.log('  --post=<url>         Migrate a single post by URL');
+  console.log('  --all                Migrate never-attempted posts from the blog');
+  console.log('  --retry-failed       Retry failed (never succeeded) posts');
+  console.log('  --export-links       Export internal link mapping to JSON');
+  console.log('  --export-failed      Export failed posts to failed_posts.json');
+  console.log('');
+  console.log('Environment Variables (in .env):');
+}
+
+function close(): void {
+  const logger: Logger = getLogger();
+  logger.info('CLI.close - shutting down gracefully');
+  logger.close();
+  closeDb();
 }
 
 export async function runCli(argv: string[]): Promise<number> {
-  const logger = getLogger();
+  if (hasHelpFlag(argv)) {
+    printUsage();
+    return 0;
+  }
 
+  let config;
   try {
     // Load config early to validate and provide clear error messages
-    loadConfig();
+    config = loadConfig();
   } catch (error) {
-    logger.error('Configuration error', {
-      error: (error as Error)?.message ?? String(error),
-    });
+    console.error('Error loading configuration:', (error as Error).message);
     return 1;
   }
 
@@ -63,16 +90,39 @@ export async function runCli(argv: string[]): Promise<number> {
   const allFlag = hasFlag(argv, '--all');
   const retryFailedFlag = hasFlag(argv, '--retry-failed');
   const exportLinksFlag = hasFlag(argv, '--export-links');
+  const exportFailedFlag = hasFlag(argv, '--export-failed');
 
-  if (!postUrl && !allFlag) {
+  const selectedModes = Number(Boolean(postUrl)) + Number(allFlag) + Number(retryFailedFlag);
+
+  if (!exportFailedFlag && selectedModes !== 1) {
     printUsage();
     return 1;
   }
 
+  const logger = getLogger();
+  getDb(); // Initialize DB connection
+
+  process.on('SIGINT', async () => {
+    close();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    close();
+    process.exit(0);
+  });
+
   try {
     // Ensure DB is initialized and schema applied.
-    getDb();
     const migrator = createMigrator();
+
+    if (exportFailedFlag) {
+      const outputPath = path.join(config.outputDir, `failed_posts-${TIME_POSTFIX}.json`);
+      exportFailedPostsByBlogUrl(outputPath, config.blogUrl);
+      console.log(`- Failed posts exported to: ${outputPath}`);
+      close();
+      return 0;
+    }
 
     if (postUrl) {
       new URL(postUrl);
@@ -82,9 +132,7 @@ export async function runCli(argv: string[]): Promise<number> {
     }
 
     if (allFlag) {
-      const job =
-        getLatestRunningJobByType(MigrationJobType.FULL) ??
-        createMigrationJob(MigrationJobType.FULL);
+      const job = createMigrationJob(MigrationJobType.FULL);
 
       const crawler = createCrawler({
         fetchFn: async (url: string) => {
@@ -94,35 +142,19 @@ export async function runCli(argv: string[]): Promise<number> {
       });
 
       const allUrls = await crawler.discoverPostUrls();
-      logger.info('Discovered URLs for full migration', { count: allUrls.length });
+      logger.info('CLI.runCli - discovered URLs for full migration', { count: allUrls.length });
 
-      const completedItems = getMigrationJobItemsByJobIdAndStatus(
-        job.id,
-        MigrationJobItemStatus.COMPLETED
-      );
-      const completedUrls = new Set(completedItems.map((item) => item.tistory_url));
-      const failedItems = getMigrationJobItemsByJobIdAndStatus(
-        job.id,
-        MigrationJobItemStatus.FAILED
-      );
-      const failedUrls = new Set(failedItems.map((item) => item.tistory_url));
+      const attemptedUrls = getAttemptedTistoryUrlsByBlogUrl(config.blogUrl);
+      const attemptedSet = new Set(attemptedUrls);
 
-      const pendingUrls = retryFailedFlag
-        ? allUrls.filter((url) => !completedUrls.has(url))
-        : allUrls.filter((url) => !completedUrls.has(url) && !failedUrls.has(url));
-
+      const pendingUrls = allUrls.filter((url) => !attemptedSet.has(url));
       const skippedCount = allUrls.length - pendingUrls.length;
 
       if (skippedCount > 0) {
-        logger.info(
-          `Resuming job ${job.id}: skipping ${skippedCount} ${retryFailedFlag ? 'completed' : 'completed/failed'} items`,
-          {
-            completedCount: completedUrls.size,
-            failedCount: failedUrls.size,
-            pendingCount: pendingUrls.length,
-            retryFailed: retryFailedFlag,
-          }
-        );
+        logger.info(`Skipping ${skippedCount} already-attempted items`, {
+          attemptedCount: attemptedSet.size,
+          pendingCount: pendingUrls.length,
+        });
       }
 
       const processor = createPostProcessor();
@@ -134,11 +166,27 @@ export async function runCli(argv: string[]): Promise<number> {
       });
     }
 
+    if (retryFailedFlag) {
+      const job = createMigrationJob(MigrationJobType.RETRY);
+      const retryUrls = getRetryUrlsByBlogUrl(config.blogUrl);
+
+      logger.info('CLI.runCli - retrying failed URLs', { count: retryUrls.length });
+
+      const processor = createPostProcessor();
+      await processor.process(retryUrls, job.id);
+
+      return await finalizeJob(job.id, {
+        skippedCount: 0,
+        exportLinks: exportLinksFlag,
+      });
+    }
+
     return 0;
   } catch (error) {
-    logger.error('CLI failed', {
+    logger.error('CLI.runCli - failed', {
       error: (error as Error)?.message ?? String(error),
     });
+    close();
     return 1;
   }
 }
@@ -178,13 +226,14 @@ async function finalizeJob(
   console.log(`- Internal links: stored in 'internal_links' table (jobId=${jobId})`);
 
   if (exportLinks) {
-    const linkMappingPath = path.join(config.outputDir, 'link_mapping.json');
+    const linkMappingPath = path.join(config.outputDir, `link_mapping-${TIME_POSTFIX}.json`);
     exportLinkMapping(linkMappingPath, jobId);
     console.log(`- Link mapping exported to: ${linkMappingPath}`);
   }
 
   console.log('----------------------------------------');
 
+  close();
   return failed > 0 ? 1 : 0;
 }
 

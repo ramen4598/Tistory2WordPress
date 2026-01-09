@@ -38,18 +38,18 @@ export function getDb(): BetterSqliteDatabase {
 
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
-    logger.info(`Created SQLite directory: ${dbDir}`);
+    logger.info(`Db.getDb - created SQLite directory: ${dbDir}`);
   }
 
   const db = new DatabaseConstructor(dbPath);
-  logger.info(`Opened SQLite database: ${dbPath}`);
+  logger.info(`Db.getDb - opened SQLite database: ${dbPath}`);
 
   try {
     const schemaSql = fs.readFileSync(SCHEMA_PATH, 'utf-8');
     db.exec(schemaSql);
-    logger.info('Successed to apply SQLite schema migrations');
+    logger.info('Db.getDb - applied SQLite schema migrations');
   } catch (error) {
-    logger.error('Failed to apply SQLite schema migrations', error);
+    logger.error('Db.getDb - apply SQLite schema migrations failed', error);
     db.close();
     throw error;
   }
@@ -77,8 +77,11 @@ export function closeDb(): void {
  */
 export function createMigrationJob(jobType: MigrationJobType): MigrationJob {
   const db = getDb();
-  const stmt = db.prepare('INSERT INTO migration_jobs (job_type, status) VALUES (?, ?)');
-  const info = stmt.run(jobType, MigrationJobStatus.RUNNING);
+  const config = loadConfig();
+  const stmt = db.prepare(
+    'INSERT INTO migration_jobs (blog_url, job_type, status) VALUES (?, ?, ?)'
+  );
+  const info = stmt.run(config.blogUrl, jobType, MigrationJobStatus.RUNNING);
   const id = Number(info.lastInsertRowid);
 
   const row = db.prepare('SELECT * FROM migration_jobs WHERE id = ?').get(id) as
@@ -131,17 +134,32 @@ export function updateMigrationJob(
 }
 
 /**
+ * Get a migration job by ID.
+ * @param jobId number
+ * @return MigrationJob | undefined
+ */
+export function getMigrationJobById(jobId: number): MigrationJob | undefined {
+  const db = getDb();
+  return db.prepare('SELECT * FROM migration_jobs WHERE id = ?').get(jobId) as
+    | MigrationJob
+    | undefined;
+}
+
+/**
  * Get the most recent running migration job of a given type.
  * @param jobType MigrationJobType
  * @return MigrationJob | undefined
  */
-export function getLatestRunningJobByType(jobType: MigrationJobType): MigrationJob | undefined {
+export function getLatestRunningJobByTypeAndUrl(
+  jobType: MigrationJobType,
+  blogUrl: string
+): MigrationJob | undefined {
   const db = getDb();
   return db
     .prepare(
-      'SELECT * FROM migration_jobs WHERE job_type = ? AND status = ? ORDER BY id DESC LIMIT 1'
+      'SELECT * FROM migration_jobs WHERE job_type = ? AND status = ? AND blog_url = ? ORDER BY id DESC LIMIT 1'
     )
-    .get(jobType, MigrationJobStatus.RUNNING) as MigrationJob | undefined;
+    .get(jobType, MigrationJobStatus.RUNNING, blogUrl) as MigrationJob | undefined;
 }
 
 // --- MigrationJobItem ---
@@ -253,6 +271,81 @@ export function getMigrationJobItemsByJobIdAndStatus(
   return db
     .prepare('SELECT * FROM migration_job_items WHERE job_id = ? AND status = ? ORDER BY id')
     .all(jobId, status) as MigrationJobItem[];
+}
+
+/**
+ * Get distinct tistory URLs that were ever attempted (have any migration_job_items record)
+ * for a given blog URL.
+ * @param blogUrl base URL of the Tistory blog
+ * @return string[]
+ */
+export function getAttemptedTistoryUrlsByBlogUrl(blogUrl: string): string[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT DISTINCT mji.tistory_url
+       FROM migration_job_items mji
+       JOIN migration_jobs mj ON mji.job_id = mj.id
+       WHERE mj.blog_url = ?
+       ORDER BY mji.tistory_url`
+    )
+    .all(blogUrl) as Array<{ tistory_url: string }>;
+
+  return rows.map((r) => r.tistory_url);
+}
+
+/**
+ * Get tistory URLs to retry for a given blog URL.
+ *
+ * Criteria:
+ * - FAILED at least once
+ * - COMPLETED never
+ * @param blogUrl base URL of the Tistory blog
+ * @return string[]
+ */
+export function getRetryUrlsByBlogUrl(blogUrl: string): string[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT mji.tistory_url
+       FROM migration_job_items mji
+       JOIN migration_jobs mj ON mji.job_id = mj.id
+       WHERE mj.blog_url = ?
+       GROUP BY mji.tistory_url
+       HAVING
+         SUM(CASE WHEN mji.status = 'completed' THEN 1 ELSE 0 END) = 0
+         AND SUM(CASE WHEN mji.status = 'failed' THEN 1 ELSE 0 END) > 0
+       ORDER BY mji.tistory_url`
+    )
+    .all(blogUrl) as Array<{ tistory_url: string }>;
+
+  return rows.map((r) => r.tistory_url);
+}
+
+/**
+ * Get FAILED migration job items for a given blog URL,
+ * excluding any items that have ever succeeded (COMPLETED) for the same tistory_url.
+ */
+export function getUnresolvedFailedMigrationJobItemsByBlogUrl(blogUrl: string): MigrationJobItem[] {
+  const db = getDb();
+  return db
+    .prepare(
+      `SELECT mji_failed.*
+       FROM migration_job_items mji_failed
+       JOIN migration_jobs mj_failed ON mji_failed.job_id = mj_failed.id
+       WHERE mj_failed.blog_url = ?
+         AND mji_failed.status = 'failed'
+         AND NOT EXISTS (
+           SELECT 1
+           FROM migration_job_items mji_completed
+           JOIN migration_jobs mj_completed ON mji_completed.job_id = mj_completed.id
+           WHERE mj_completed.blog_url = mj_failed.blog_url
+             AND mji_completed.status = 'completed'
+             AND mji_completed.tistory_url = mji_failed.tistory_url
+         )
+       ORDER BY mji_failed.id`
+    )
+    .all(blogUrl) as MigrationJobItem[];
 }
 
 // --- ImageAsset ---

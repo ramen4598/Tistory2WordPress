@@ -8,13 +8,16 @@ BEGIN TRANSACTION;
 -- 1) migration_jobs: top-level migration runs
 CREATE TABLE IF NOT EXISTS migration_jobs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  job_type TEXT NOT NULL CHECK(job_type IN ('full', 'single')),
+  blog_url TEXT NOT NULL,
+  job_type TEXT NOT NULL CHECK(job_type IN ('full', 'single', 'retry')),
   status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed')),
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   completed_at TEXT,
   error_message TEXT
 );
 
+CREATE INDEX IF NOT EXISTS idx_migration_jobs_blog_url ON migration_jobs(blog_url);
+CREATE INDEX IF NOT EXISTS idx_migration_jobs_lookup ON migration_jobs(job_type, status, blog_url);
 CREATE INDEX IF NOT EXISTS idx_migration_jobs_status ON migration_jobs(status);
 CREATE INDEX IF NOT EXISTS idx_migration_jobs_created_at ON migration_jobs(created_at);
 

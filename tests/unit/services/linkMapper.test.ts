@@ -83,7 +83,7 @@ describe('link mapping export (integration)', () => {
         context: 'Go back to previous',
       });
 
-      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'));
+      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'), job.id);
 
       const filePath = path.join(TEST_OUTPUT_DIR, 'link_mapping.json');
       expect(fs.existsSync(filePath)).toBe(true);
@@ -91,10 +91,13 @@ describe('link mapping export (integration)', () => {
       const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
 
-      expect(Array.isArray(data)).toBe(true);
-      expect(data).toHaveLength(3);
+      expect(data.blog_url).toBe(job.blog_url);
+      expect(typeof data.exported_at).toBe('string');
+      expect(data.count).toBe(3);
+      expect(Array.isArray(data.items)).toBe(true);
+      expect(data.items).toHaveLength(3);
 
-      const link1 = data.find(
+      const link1 = data.items.find(
         (l: { source_url: string; target_url: string }) =>
           l.target_url === 'https://example.tistory.com/post2'
       );
@@ -104,7 +107,7 @@ describe('link mapping export (integration)', () => {
       expect(link1.link_text).toBe('Next post');
       expect(link1.context).toBe('See the next post');
 
-      const link2 = data.find(
+      const link2 = data.items.find(
         (l: { source_url: string; target_url: string }) =>
           l.target_url === 'https://example.tistory.com/post3'
       );
@@ -122,7 +125,7 @@ describe('link mapping export (integration)', () => {
         tistory_url: 'https://example.tistory.com/post1',
       });
 
-      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'));
+      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'), job.id);
 
       const filePath = path.join(TEST_OUTPUT_DIR, 'link_mapping.json');
       expect(fs.existsSync(filePath)).toBe(true);
@@ -130,8 +133,11 @@ describe('link mapping export (integration)', () => {
       const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
 
-      expect(Array.isArray(data)).toBe(true);
-      expect(data).toHaveLength(0);
+      expect(data.blog_url).toBe(job.blog_url);
+      expect(typeof data.exported_at).toBe('string');
+      expect(data.count).toBe(0);
+      expect(Array.isArray(data.items)).toBe(true);
+      expect(data.items).toHaveLength(0);
     });
 
     it('filters internal links by job ID when exporting', async () => {
@@ -172,9 +178,11 @@ describe('link mapping export (integration)', () => {
       const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
 
-      expect(data).toHaveLength(1);
-      expect(data[0].source_url).toBe('https://example.tistory.com/job1/post');
-      expect(data[0].link_text).toBe('link from job1');
+      expect(data.blog_url).toBe(job1.blog_url);
+      expect(data.count).toBe(1);
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].source_url).toBe('https://example.tistory.com/job1/post');
+      expect(data.items[0].link_text).toBe('link from job1');
     });
 
     it('creates output directory if it does not exist', async () => {
@@ -195,7 +203,7 @@ describe('link mapping export (integration)', () => {
       });
 
       const nonExistentDir = path.join(TEST_OUTPUT_DIR, 'nested', 'dir');
-      await exportLinkMapping(path.join(nonExistentDir, 'link_mapping.json'));
+      await exportLinkMapping(path.join(nonExistentDir, 'link_mapping.json'), job.id);
 
       expect(fs.existsSync(nonExistentDir)).toBe(true);
       expect(fs.existsSync(path.join(nonExistentDir, 'link_mapping.json'))).toBe(true);
@@ -221,15 +229,17 @@ describe('link mapping export (integration)', () => {
         context: specialContext,
       });
 
-      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'));
+      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'), job.id);
 
       const filePath = path.join(TEST_OUTPUT_DIR, 'link_mapping.json');
       const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
 
-      expect(data).toHaveLength(1);
-      expect(data[0].link_text).toBe(specialText);
-      expect(data[0].context).toBe(specialContext);
+      expect(data.blog_url).toBe(job.blog_url);
+      expect(data.count).toBe(1);
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].link_text).toBe(specialText);
+      expect(data.items[0].context).toBe(specialContext);
     });
 
     it('exports links in consistent order (by creation time)', async () => {
@@ -265,16 +275,17 @@ describe('link mapping export (integration)', () => {
         context: 'third',
       });
 
-      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'));
+      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'), job.id);
 
       const filePath = path.join(TEST_OUTPUT_DIR, 'link_mapping.json');
       const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
 
-      expect(data).toHaveLength(3);
-      expect(data[0].target_url).toBe('https://example.tistory.com/target1');
-      expect(data[1].target_url).toBe('https://example.tistory.com/target2');
-      expect(data[2].target_url).toBe('https://example.tistory.com/target3');
+      expect(data.count).toBe(3);
+      expect(data.items).toHaveLength(3);
+      expect(data.items[0].target_url).toBe('https://example.tistory.com/target1');
+      expect(data.items[1].target_url).toBe('https://example.tistory.com/target2');
+      expect(data.items[2].target_url).toBe('https://example.tistory.com/target3');
     });
 
     it('validates JSON structure includes all required fields', async () => {
@@ -294,14 +305,24 @@ describe('link mapping export (integration)', () => {
         context: 'link context',
       });
 
-      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'));
+      await exportLinkMapping(path.join(TEST_OUTPUT_DIR, 'link_mapping.json'), job.id);
 
       const filePath = path.join(TEST_OUTPUT_DIR, 'link_mapping.json');
       const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
 
-      expect(data).toHaveLength(1);
-      const link = data[0];
+      expect(data).toHaveProperty('blog_url');
+      expect(data).toHaveProperty('exported_at');
+      expect(data).toHaveProperty('count');
+      expect(data).toHaveProperty('items');
+
+      expect(typeof data.blog_url).toBe('string');
+      expect(typeof data.exported_at).toBe('string');
+      expect(typeof data.count).toBe('number');
+      expect(Array.isArray(data.items)).toBe(true);
+
+      expect(data.items).toHaveLength(1);
+      const link = data.items[0];
 
       expect(link).toHaveProperty('source_url');
       expect(link).toHaveProperty('target_url');

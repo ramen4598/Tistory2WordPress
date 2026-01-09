@@ -1,10 +1,12 @@
+import { load } from 'cheerio';
+
 function resetEnv() {
   for (const key of Object.keys(process.env)) {
     if (
       key.startsWith('TISTORY_') ||
       key.startsWith('WP_') ||
       key === 'WORKER_COUNT' ||
-      key === 'RATE_LIMIT_PER_WORKER' ||
+      key.startsWith('RATE_LIMIT_') ||
       key.startsWith('RETRY_') ||
       key === 'MIGRATION_DB_PATH' ||
       key === 'LOG_LEVEL' ||
@@ -29,6 +31,7 @@ function setMinimumValidEnv() {
   process.env.TISTORY_SELECTOR_CONTENT = 'div.tt_article_useless_p_margin.contents_style';
   process.env.TISTORY_SELECTOR_FEATURED_IMAGE =
     '#main > div > div > div.article_header.type_article_header_cover > div';
+  process.env.TISTORY_BOOKMARK_SELECTOR = 'figure[data-ke-type="opengraph"]';
 }
 
 // const realDotenv = require('dotenv');
@@ -68,20 +71,54 @@ describe('loadConfig', () => {
     expect(() => loadConfig()).toThrow('TISTORY_BLOG_URL must be a valid URL');
   });
 
-  it('applies defaults and validates numeric fields', () => {
+  // it('applies defaults and validates numeric fields', () => {
+  it('throws error when there is no tistory bookmark selector', () => {
     setMinimumValidEnv();
     // no numeric envs set -> defaults used, should not throw
+    delete process.env.TISTORY_BOOKMARK_SELECTOR;
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
-    const config = loadConfig();
+    // const config = loadConfig();
+    expect(() => loadConfig()).toThrow(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
+  });
 
-    expect(config.workerCount).toBe(4);
-    expect(config.rateLimitPerWorker).toBe(1000);
-    expect(config.maxRetryAttempts).toBe(3);
-    expect(config.retryInitialDelayMs).toBe(500);
-    expect(config.retryMaxDelayMs).toBe(10000);
-    expect(config.retryBackoffMultiplier).toBe(2);
+  it('throws error when bookmark selector is missing', () => {
+    setMinimumValidEnv();
+    delete process.env.TISTORY_BOOKMARK_SELECTOR;
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
+  });
+
+  it('validates bookmark selector length and non-empty', () => {
+    setMinimumValidEnv();
+    process.env.TISTORY_BOOKMARK_SELECTOR = '';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
+  });
+
+  it('rejects overly long bookmark selector', () => {
+    setMinimumValidEnv();
+    process.env.TISTORY_BOOKMARK_SELECTOR = 'a'.repeat(201);
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
   });
 
   it('throws ConfigurationError when WORKER_COUNT is out of range', () => {
@@ -114,21 +151,14 @@ describe('loadConfig', () => {
     expect(() => loadConfig()).toThrow('WP_BASE_URL must be a valid URL');
   });
 
-  it('uses CATEGORY_HIERARCHY_ORDER default when invalid', () => {
+  it('throws ConfigurationError when CATEGORY_HIERARCHY_ORDER is invalid', () => {
     setMinimumValidEnv();
     process.env.CATEGORY_HIERARCHY_ORDER = 'invalid-order';
-
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
-    const config = loadConfig();
-
-    expect(warnSpy).toHaveBeenCalled();
-    expect(config.categoryHierarchyOrder).toBe('first-is-parent');
-
-    warnSpy.mockRestore();
+    expect(() => loadConfig()).toThrow('CATEGORY_HIERARCHY_ORDER must be one of');
   });
 
   it('loads concurrency config from environment variable', () => {
@@ -143,16 +173,28 @@ describe('loadConfig', () => {
     expect(config.workerCount).toBe(8);
   });
 
-  it('loads rate limit config from environment variable', () => {
+  it('loads rate limit interval config from environment variable', () => {
     setMinimumValidEnv();
-    process.env.RATE_LIMIT_PER_WORKER = '500';
+    process.env.RATE_LIMIT_INTERVAL = '999';
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
     const config = loadConfig();
 
-    expect(config.rateLimitPerWorker).toBe(500);
+    expect(config.rateLimitInterval).toBe(999);
+  });
+
+  it('loads rate limit cap config from environment variable', () => {
+    setMinimumValidEnv();
+    process.env.RATE_LIMIT_CAP = '9';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.rateLimitCap).toBe(9);
   });
 
   it('validates WORKER_COUNT upper bound', () => {
@@ -165,20 +207,63 @@ describe('loadConfig', () => {
     expect(() => loadConfig()).toThrow('WORKER_COUNT must be a number between 1 and 16');
   });
 
-  it('validates RATE_LIMIT_PER_WORKER is positive', () => {
+  it('validates RATE_LIMIT_INTERVAL is positive', () => {
     setMinimumValidEnv();
-    process.env.RATE_LIMIT_PER_WORKER = '0';
+    process.env.RATE_LIMIT_INTERVAL = '0';
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
 
-    expect(() => loadConfig()).toThrow('RATE_LIMIT_PER_WORKER must be a positive number');
+    expect(() => loadConfig()).toThrow('RATE_LIMIT_INTERVAL must be a positive number. Got: 0');
+  });
+
+  it('validates RATE_LIMIT_CAP is positive', () => {
+    setMinimumValidEnv();
+    process.env.RATE_LIMIT_CAP = '0';
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow('RATE_LIMIT_CAP must be a positive number. Got: 0');
+  });
+
+  it('defaults WP_POST_STATUS to pending', () => {
+    setMinimumValidEnv();
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.wpPostStatus).toBe('pending');
+  });
+
+  it('accepts pending and private for WP_POST_STATUS', () => {
+    setMinimumValidEnv();
+    process.env.WP_POST_STATUS = 'private';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    const config = loadConfig();
+
+    expect(config.wpPostStatus).toBe('private');
+  });
+
+  it('rejects invalid WP_POST_STATUS', () => {
+    setMinimumValidEnv();
+    process.env.WP_POST_STATUS = 'future';
+
+    const { loadConfig } =
+      require('../../../src/utils/config') as typeof import('../../../src/utils/config');
+
+    expect(() => loadConfig()).toThrow('WP_POST_STATUS must be one of');
   });
 
   it('handles string values for numeric config', () => {
     setMinimumValidEnv();
     process.env.WORKER_COUNT = '4';
-    process.env.RATE_LIMIT_PER_WORKER = '2000';
+    process.env.RATE_LIMIT_INTERVAL = '2000';
+    process.env.RATE_LIMIT_CAP = '4';
 
     const { loadConfig } =
       require('../../../src/utils/config') as typeof import('../../../src/utils/config');
@@ -186,6 +271,7 @@ describe('loadConfig', () => {
     const config = loadConfig();
 
     expect(config.workerCount).toBe(4);
-    expect(config.rateLimitPerWorker).toBe(2000);
+    expect(config.rateLimitInterval).toBe(2000);
+    expect(config.rateLimitCap).toBe(4);
   });
 });

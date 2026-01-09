@@ -2,7 +2,6 @@ import { Post } from '../../../src/models/Post';
 import { Category } from '../../../src/models/Category';
 import { Tag } from '../../../src/models/Tag';
 import { Image } from '../../../src/models/Image';
-import { Attachment } from '../../../src/models/Attachment';
 
 describe('Post', () => {
   describe('Post creation', () => {
@@ -16,7 +15,7 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.url).toBe('https://blog.tistory.com/123');
@@ -27,7 +26,7 @@ describe('Post', () => {
       expect(post.categories).toEqual([]);
       expect(post.tags).toEqual([]);
       expect(post.images).toEqual([]);
-      expect(post.attachments).toEqual([]);
+      expect(post.featured_image).toBeNull();
     });
 
     it('should create a post with modified date', () => {
@@ -40,7 +39,7 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.modified_date).toEqual(new Date('2025-01-02'));
@@ -63,7 +62,7 @@ describe('Post', () => {
         categories: [category],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.categories).toHaveLength(1);
@@ -85,7 +84,7 @@ describe('Post', () => {
         categories: [],
         tags: [tag],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.tags).toHaveLength(1);
@@ -107,36 +106,11 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [image],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.images).toHaveLength(1);
       expect(post.images[0]?.url).toBe('https://cdn.tistory.com/image.jpg');
-    });
-
-    it('should create a post with attachments', () => {
-      const attachment: Attachment = {
-        url: 'https://blog.tistory.com/file.pdf',
-        filename: 'file.pdf',
-        local_path: null,
-        size: null,
-        mime_type: null,
-      };
-
-      const post: Post = {
-        url: 'https://blog.tistory.com/123',
-        title: 'Test Post',
-        content: '<p>Test content</p>',
-        publish_date: new Date('2025-01-01'),
-        modified_date: null,
-        categories: [],
-        tags: [],
-        images: [],
-        attachments: [attachment],
-      };
-
-      expect(post.attachments).toHaveLength(1);
-      expect(post.attachments[0]?.filename).toBe('file.pdf');
     });
 
     it('should create a post with empty content', () => {
@@ -149,13 +123,12 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.content).toBe('');
     });
 
-    // TODO: 나중에 카테고리가 처리되는 방식을 파악한 후 테스트 수정 필요
     it('should create a post with multiple categories and tags', () => {
       const categories: Category[] = [
         { name: 'Technology', slug: 'technology', parent: null, description: null },
@@ -176,7 +149,7 @@ describe('Post', () => {
         categories,
         tags,
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.categories).toHaveLength(2);
@@ -196,7 +169,7 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(validPost.url).toMatch(/^https?:\/\//);
@@ -213,7 +186,7 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.title).toBeTruthy();
@@ -230,7 +203,7 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(post.publish_date).toBeInstanceOf(Date);
@@ -246,7 +219,7 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       const postWithModified: Post = {
@@ -258,7 +231,7 @@ describe('Post', () => {
         categories: [],
         tags: [],
         images: [],
-        attachments: [],
+        featured_image: null,
       };
 
       expect(postWithoutModified.modified_date).toBeNull();

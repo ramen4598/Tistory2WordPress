@@ -271,6 +271,66 @@ describe('imageProcessor', () => {
     expect(result.content).toContain('https://example.wordpress.com/wp-content/uploads/third.gif');
   });
 
+  it('skips images inside bookmark-card figures', async () => {
+    const post = createPost();
+    post.content = `
+      <figure class="bookmark-card">
+        <img src="https://img.tistory.com/bookmark.jpg" alt="bookmark" />
+      </figure>
+      <p>Normal:</p>
+      <img src="https://img.tistory.com/normal.jpg" alt="normal" />
+    `;
+
+    const uploadMediaMock = jest.fn().mockResolvedValue({
+      id: 101,
+      url: 'https://example.wordpress.com/wp-content/uploads/normal.jpg',
+      mediaType: 'image',
+      mimeType: 'image/jpeg',
+    });
+
+    const wpClientMock: Partial<WpClient> = {
+      uploadMedia: uploadMediaMock,
+    };
+
+    mockedCreateWpClient.mockReturnValue(wpClientMock as WpClient);
+
+    const mockAsset = {
+      id: 1,
+      job_item_id: 1,
+      tistory_image_url: 'https://img.tistory.com/normal.jpg',
+      wp_media_id: null,
+      wp_media_url: null,
+      status: ImageAssetStatus.PENDING,
+      error_message: null,
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+    };
+    mockedCreateImageAsset.mockReturnValue(mockAsset);
+
+    const axiosResponse = {
+      status: 200,
+      data: Buffer.from('normal-image'),
+      headers: { 'content-type': 'image/jpeg' },
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse as unknown as AxiosResponse);
+
+    const { processImgs } = createImageProcessor();
+
+    const result = await processImgs(post, 1);
+
+    expect(mockedCreateImageAsset).toHaveBeenCalledTimes(1);
+    expect(mockedCreateImageAsset).toHaveBeenCalledWith({
+      job_item_id: 1,
+      tistory_image_url: 'https://img.tistory.com/normal.jpg',
+    });
+    expect(uploadMediaMock).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledTimes(1);
+
+    expect(result.content).toContain('https://img.tistory.com/bookmark.jpg');
+    expect(result.content).toContain('https://example.wordpress.com/wp-content/uploads/normal.jpg');
+    expect(result.images.map((image) => image.url)).toEqual(['https://img.tistory.com/normal.jpg']);
+  });
+
   it('returns early and updates no assets when post content has no images', async () => {
     const post = createPost();
     post.content = '<p>No images here</p>';
@@ -301,9 +361,13 @@ describe('imageProcessor', () => {
   it('updates ImageAsset to FAILED when download/upload fails', async () => {
     const post = createPost();
 
-    const axiosError: any = new Error('Download failed');
+    const axiosError = new Error('Download failed') as unknown as {
+      isAxiosError: boolean;
+      response: { status: number; statusText: string };
+    };
     axiosError.isAxiosError = true;
     axiosError.response = { status: 404, statusText: 'Not Found' };
+
     mockedAxios.get.mockRejectedValue(axiosError);
 
     const uploadMediaMock = jest.fn().mockResolvedValue({

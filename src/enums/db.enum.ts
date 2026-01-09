@@ -1,6 +1,7 @@
 export enum MigrationJobType {
   FULL = 'full',
   SINGLE = 'single',
+  RETRY = 'retry',
 }
 
 export enum MigrationJobStatus {

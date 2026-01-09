@@ -1,10 +1,11 @@
 import { Config } from '../../../src/models/Config';
-import { CategoryHierarchyOrder, LogLevel } from '../../../src/enums/config.enum';
+import { CategoryHierarchyOrder, LogLevel, WpPostStatus } from '../../../src/enums/config.enum';
 
 export const baseConfig: Config = {
   blogUrl: 'https://example.tistory.com',
-  workerCount: 4,
-  rateLimitPerWorker: 1000,
+  workerCount: 1,
+  rateLimitInterval: 60000,
+  rateLimitCap: 1,
   outputDir: './output',
   logLevel: LogLevel.INFO,
 
@@ -17,12 +18,15 @@ export const baseConfig: Config = {
   postListLinkSelector: 'a.link_category',
   postFeaturedImageSelector:
     '#main > div > div > div.article_header.type_article_header_cover > div',
+  bookmarkSelector: 'figure[data-ke-type="opengraph"]',
+  bookmarkTemplatePath: './src/templates/bookmark-template.html',
 
   categoryHierarchyOrder: CategoryHierarchyOrder.FIRST_IS_PARENT,
 
   wpBaseUrl: 'https://example.wordpress.com',
   wpAppUser: 'user',
   wpAppPassword: 'password',
+  wpPostStatus: WpPostStatus.PENDING,
   migrationDbPath: './data/migration.db',
   maxRetryAttempts: 3,
   retryInitialDelayMs: 500,

@@ -1,22 +1,25 @@
 import { config as dotenvConfig } from 'dotenv';
 import { Config } from '../models/Config';
-import { CategoryHierarchyOrder, LogLevel } from '../enums/config.enum';
+import { CategoryHierarchyOrder, LogLevel, WpPostStatus } from '../enums/config.enum';
 
 /**
  * Default configuration values
  * Change Config interface JSDoc defaults when modifying these
  */
 const DEFAULT_CONFIG = {
-  WORKER_COUNT: 4,
-  RATE_LIMIT_PER_WORKER: 1000,
+  WORKER_COUNT: 1,
+  RATE_LIMIT_INTERVAL: 60000, // 1 minute
+  RATE_LIMIT_CAP: 1, // 1 request per interval
   OUTPUT_DIR: './output',
   LOG_LEVEL: LogLevel.INFO,
   CATEGORY_HIERARCHY_ORDER: CategoryHierarchyOrder.FIRST_IS_PARENT,
   MIGRATION_DB_PATH: './data/migration.db',
   MAX_RETRY_ATTEMPTS: 3,
-  RETRY_INITIAL_DELAY_MS: 500,
-  RETRY_MAX_DELAY_MS: 10000,
-  RETRY_BACKOFF_MULTIPLIER: 2,
+  RETRY_INITIAL_DELAY_MS: 500, // 0.5 seconds
+  RETRY_MAX_DELAY_MS: 600000, // 10 minutes
+  RETRY_BACKOFF_MULTIPLIER: 10,
+  BOOKMARK_TEMPLATE_PATH: './src/templates/bookmark-template.html',
+  WP_POST_STATUS: WpPostStatus.PENDING,
 };
 
 /**
@@ -27,6 +30,36 @@ export class ConfigurationError extends Error {
     super(message);
     this.name = 'ConfigurationError';
   }
+}
+
+function parseCategoryHierarchyOrder(raw: string | undefined): CategoryHierarchyOrder | undefined {
+  if (raw === undefined) return undefined;
+  const trimmed = raw.trim();
+  if (!trimmed)
+    throw new ConfigurationError('CATEGORY_HIERARCHY_ORDER must be a non-empty string.');
+  if (trimmed === CategoryHierarchyOrder.FIRST_IS_PARENT)
+    return CategoryHierarchyOrder.FIRST_IS_PARENT;
+  if (trimmed === CategoryHierarchyOrder.LAST_IS_PARENT)
+    return CategoryHierarchyOrder.LAST_IS_PARENT;
+
+  throw new ConfigurationError(
+    `CATEGORY_HIERARCHY_ORDER must be one of: ${CategoryHierarchyOrder.FIRST_IS_PARENT}, ${CategoryHierarchyOrder.LAST_IS_PARENT}. Got: ${raw}`
+  );
+}
+
+function parseWpPostStatus(raw: string | undefined): WpPostStatus | undefined {
+  if (raw === undefined) return undefined;
+  const trimmed = raw.trim();
+  if (!trimmed) throw new ConfigurationError('WP_POST_STATUS must be a non-empty string.');
+
+  if (trimmed === WpPostStatus.DRAFT) return WpPostStatus.DRAFT;
+  if (trimmed === WpPostStatus.PUBLISH) return WpPostStatus.PUBLISH;
+  if (trimmed === WpPostStatus.PENDING) return WpPostStatus.PENDING;
+  if (trimmed === WpPostStatus.PRIVATE) return WpPostStatus.PRIVATE;
+
+  throw new ConfigurationError(
+    `WP_POST_STATUS must be one of: ${WpPostStatus.DRAFT}, ${WpPostStatus.PUBLISH}, ${WpPostStatus.PENDING}, ${WpPostStatus.PRIVATE}. Got: ${raw}`
+  );
 }
 
 // Cached configuration after first load
@@ -66,9 +99,14 @@ export function loadConfig(): Config {
     ? parseInt(process.env['WORKER_COUNT'], 10)
     : DEFAULT_CONFIG.WORKER_COUNT;
 
-  const rateLimitPerWorker: number = process.env['RATE_LIMIT_PER_WORKER']
-    ? parseInt(process.env['RATE_LIMIT_PER_WORKER'], 10)
-    : DEFAULT_CONFIG.RATE_LIMIT_PER_WORKER;
+  const rateLimitInterval: number = process.env['RATE_LIMIT_INTERVAL']
+    ? parseInt(process.env['RATE_LIMIT_INTERVAL'], 10)
+    : DEFAULT_CONFIG.RATE_LIMIT_INTERVAL;
+
+  const rateLimitCap: number = process.env['RATE_LIMIT_CAP']
+    ? parseInt(process.env['RATE_LIMIT_CAP'], 10)
+    : DEFAULT_CONFIG.RATE_LIMIT_CAP;
+
   const outputDir: string = process.env['OUTPUT_DIR'] || DEFAULT_CONFIG.OUTPUT_DIR;
 
   const logLevel: LogLevel = (process.env['LOG_LEVEL'] as LogLevel) || DEFAULT_CONFIG.LOG_LEVEL;
@@ -79,6 +117,9 @@ export function loadConfig(): Config {
   const wpBaseUrl: string | undefined = process.env['WP_BASE_URL'];
   const wpAppUser: string | undefined = process.env['WP_APP_USER'];
   const wpAppPassword: string | undefined = process.env['WP_APP_PASSWORD'];
+
+  const rawWpPostStatus = process.env['WP_POST_STATUS'];
+  const wpPostStatus = parseWpPostStatus(rawWpPostStatus) ?? WpPostStatus.PENDING;
 
   const migrationDbPath: string =
     process.env['MIGRATION_DB_PATH'] || DEFAULT_CONFIG.MIGRATION_DB_PATH;
@@ -109,19 +150,14 @@ export function loadConfig(): Config {
   const postFeaturedImageSelector: string | undefined =
     process.env['TISTORY_SELECTOR_FEATURED_IMAGE'];
 
-  let categoryHierarchyOrder: CategoryHierarchyOrder;
+  const bookmarkSelector: string | undefined = process.env['TISTORY_BOOKMARK_SELECTOR'];
+  const bookmarkTemplatePath: string =
+    process.env['TISTORY_BOOKMARK_TEMPLATE_PATH'] ?? DEFAULT_CONFIG.BOOKMARK_TEMPLATE_PATH;
+
   const rawCategoryHierarchyOrder: string | undefined = process.env['CATEGORY_HIERARCHY_ORDER'];
-  if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.FIRST_IS_PARENT) {
-    categoryHierarchyOrder = CategoryHierarchyOrder.FIRST_IS_PARENT;
-  } else if (rawCategoryHierarchyOrder === CategoryHierarchyOrder.LAST_IS_PARENT) {
-    categoryHierarchyOrder = CategoryHierarchyOrder.LAST_IS_PARENT;
-  } else {
-    console.warn(
-      `Invalid or missing CATEGORY_HIERARCHY_ORDER. Defaulting to "${CategoryHierarchyOrder.FIRST_IS_PARENT}".`
-    );
-    categoryHierarchyOrder =
-      DEFAULT_CONFIG.CATEGORY_HIERARCHY_ORDER || CategoryHierarchyOrder.FIRST_IS_PARENT;
-  }
+  const categoryHierarchyOrder: CategoryHierarchyOrder =
+    parseCategoryHierarchyOrder(rawCategoryHierarchyOrder) ??
+    DEFAULT_CONFIG.CATEGORY_HIERARCHY_ORDER;
 
   if (!postTitleSelector) {
     throw new ConfigurationError(
@@ -171,6 +207,12 @@ export function loadConfig(): Config {
     );
   }
 
+  if (!bookmarkSelector || bookmarkSelector.length === 0 || bookmarkSelector.length > 200) {
+    throw new ConfigurationError(
+      'TISTORY_BOOKMARK_SELECTOR must be a non-empty string with length <= 200.'
+    );
+  }
+
   // Validate numeric fields
 
   if (isNaN(workerCount) || workerCount < 1 || workerCount > 16) {
@@ -179,9 +221,15 @@ export function loadConfig(): Config {
     );
   }
 
-  if (isNaN(rateLimitPerWorker) || rateLimitPerWorker <= 0) {
+  if (isNaN(rateLimitInterval) || rateLimitInterval <= 0) {
     throw new ConfigurationError(
-      `RATE_LIMIT_PER_WORKER must be a positive number. Got: ${process.env['RATE_LIMIT_PER_WORKER']}`
+      `RATE_LIMIT_INTERVAL must be a positive number. Got: ${process.env['RATE_LIMIT_INTERVAL']}`
+    );
+  }
+
+  if (isNaN(rateLimitCap) || rateLimitCap <= 0) {
+    throw new ConfigurationError(
+      `RATE_LIMIT_CAP must be a positive number. Got: ${process.env['RATE_LIMIT_CAP']}`
     );
   }
 
@@ -239,7 +287,8 @@ export function loadConfig(): Config {
   const config: Config = {
     blogUrl,
     workerCount,
-    rateLimitPerWorker,
+    rateLimitInterval,
+    rateLimitCap,
     outputDir,
     logLevel,
     logFile,
@@ -247,6 +296,7 @@ export function loadConfig(): Config {
     wpBaseUrl,
     wpAppUser,
     wpAppPassword,
+    wpPostStatus,
     migrationDbPath,
 
     maxRetryAttempts,
@@ -263,6 +313,8 @@ export function loadConfig(): Config {
     postContentSelector,
     categoryHierarchyOrder,
     postFeaturedImageSelector,
+    bookmarkSelector,
+    bookmarkTemplatePath,
   };
 
   cachedConfig = config;

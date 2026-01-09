@@ -9,9 +9,49 @@ import {
 } from '../../../src/utils/logger';
 import { LogLevel } from '../../../src/enums/config.enum';
 
+function resetEnv() {
+  for (const key of Object.keys(process.env)) {
+    if (
+      key.startsWith('TISTORY_') ||
+      key.startsWith('WP_') ||
+      key === 'WORKER_COUNT' ||
+      key === 'RATE_LIMIT_PER_WORKER' ||
+      key.startsWith('RETRY_') ||
+      key === 'MIGRATION_DB_PATH' ||
+      key === 'LOG_LEVEL' ||
+      key === 'CATEGORY_HIERARCHY_ORDER'
+    ) {
+      delete process.env[key];
+    }
+  }
+}
+
+function setMinimumValidEnv() {
+  process.env.TISTORY_BLOG_URL = 'https://example.tistory.com';
+  process.env.WP_BASE_URL = 'https://example.com';
+  process.env.WP_APP_USER = 'user';
+  process.env.WP_APP_PASSWORD = 'password';
+  process.env.TISTORY_SELECTOR_TITLE = 'meta[name="title"]';
+  process.env.TISTORY_SELECTOR_PUBLISH_DATE = 'meta[property="article:published_time"]';
+  process.env.TISTORY_SELECTOR_MODIFIED_DATE = 'meta[property="article:modified_time"]';
+  process.env.TISTORY_SELECTOR_CATEGORY = 'div.another_category h4 a';
+  process.env.TISTORY_SELECTOR_TAG = 'div.area_tag a[rel="tag"]';
+  process.env.TISTORY_SELECTOR_POST_LINK = 'a.link_category';
+  process.env.TISTORY_SELECTOR_CONTENT = 'div.tt_article_useless_p_margin.contents_style';
+  process.env.TISTORY_SELECTOR_FEATURED_IMAGE =
+    '#main > div > div > div.article_header.type_article_header_cover > div';
+  process.env.TISTORY_BOOKMARK_SELECTOR = 'figure[data-ke-type="opengraph"]';
+}
+
 describe('Logger', () => {
   const testLogDir = path.join(__dirname, '../../tmp/logs');
   const testLogFile = path.join(testLogDir, 'test.log');
+
+  beforeEach(() => {
+    resetEnv();
+    // clear cachedConfig via re-require
+    jest.resetModules();
+  });
 
   beforeEach(() => {
     // Clean up test log directory
@@ -26,6 +66,11 @@ describe('Logger', () => {
     if (fs.existsSync(testLogDir)) {
       fs.rmSync(testLogDir, { recursive: true, force: true });
     }
+  });
+
+  afterAll(() => {
+    // restore real dotenv
+    jest.unmock('dotenv');
   });
 
   describe('Logger class', () => {
@@ -136,6 +181,7 @@ describe('Logger', () => {
 
   describe('Global logger functions (singleton)', () => {
     it('should lazily create a default global logger via getLogger', () => {
+      setMinimumValidEnv();
       const logger = getLogger();
       expect(logger).toBeInstanceOf(Logger);
     });
