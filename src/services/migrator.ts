@@ -50,9 +50,12 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
     let post: Post | null = null;
 
     try {
+      // --- Start Fetch and Process Post Content ---
       const html = await crawler.fetchPostHtml(url);
       const metadata = crawler.parsePostMetadata(html, url);
       const featuredImageUrl: string | null = crawler.extractFImgUrl(html);
+
+      // --- Start Clean HTML ---
       const bookmarkProcessedHtml = await bookmarkProcessor.replaceBookmarks(html);
       const cleanedHtml = cleaner.cleanHtml(bookmarkProcessedHtml);
 
@@ -71,6 +74,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
 
       linkTracker.trackInternalLinks(url, post.content, jobItem.id);
 
+      // --- Start Upload to WordPress ---
       post.featured_image = featuredImageUrl
         ? await imageProcessor.processFImg(jobItem.id, post.title, featuredImageUrl)
         : null;
@@ -97,6 +101,7 @@ export function createMigrator(options: CreateMigratorOptions = {}): Migrator {
         featuredImageId: post.featured_image?.wp_media_id ?? null,
       });
 
+      // --- After post creation ---
       wpPostId = wpPost.id;
 
       createPostMap({ tistory_url: url, wp_post_id: wpPostId });

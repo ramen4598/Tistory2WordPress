@@ -58,7 +58,6 @@ export const createCleaner = (options: CleanerOptions = {}): Cleaner => {
     // 따라서 아래로 갈수록 더 세부 규칙을 처리하도록 배치해야 함
     // Plugin for GitHub Flavored Markdown (GFM) support.
     turndownService.use([gfm.strikethrough, gfm.taskListItems]);
-    registerTistoryCodeBlockRule(turndownService);
     registerGenericTableRule(turndownService);
     registerCleanIframeRule(turndownService);
     registerKeepBookmarkCardRule(turndownService);
@@ -166,26 +165,7 @@ const registerKeepBookmarkCardRule = (turndownService: TurndownService): void =>
     },
     replacement: (_content, node) => {
       const element = node;
-      return `\n\n${element.outerHTML}\n\n`;
-    },
-  });
-};
-
-/**
- * Tistory code block 전용 Turndown 규칙
- * <pre><code>...</code></pre> 형식을 fenced code block으로 변환
- * 목록과 코드 블록 간의 clear boundary를 보장
- */
-const registerTistoryCodeBlockRule = (turndownService: TurndownService): void => {
-  turndownService.addRule('tistoryCodeBlock', {
-    filter: (node: HTMLElement) => {
-      if (node.nodeName.toLowerCase() !== 'pre') return false;
-      const firstChild = node.firstChild;
-      return firstChild?.nodeName.toLowerCase() === 'code';
-    },
-    replacement: (_content, node) => {
-      const element = node;
-      return `\n\n${element.outerHTML}\n\n`;
+      return `\n\n<!-- wp:html -->${element.outerHTML}<!-- /wp:html -->\n\n`;
     },
   });
 };
