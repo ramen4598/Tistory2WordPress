@@ -213,7 +213,7 @@ sequenceDiagram
     end
 
     Migrator->>WPClient: createPost(title, content, status, date, categoryIds, tagIds, featuredImageId)
-    WPClient->>WordPress: POST /wp-json/wp/v2/posts (status=WP_POST_STATUS; default=pending)
+    WPClient->>WordPress: POST /wp-json/wp/v2/posts (status=WP_POST_STATUS, default=pending)
     WordPress-->>WPClient: Post ID
     WPClient-->>Migrator: Post ID
 
